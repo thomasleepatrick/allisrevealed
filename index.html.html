@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Links — Registro Arcano</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Raleway:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#08080f;overflow:hidden}
+:root{
+  --red:#c8102e;--bg:#08080f;--panel:#06060c;--card:#0e0e1a;--border:#1c1c2e;--muted:#c8a030;
+  --fd:'Cinzel',Georgia,serif;--fb:'Raleway',sans-serif;
+  --stabile:#00b894;--difficolta:#fdcb6e;--rovesciato:#d63031;--bloccato:#636e72;
+}
+body{font-family:var(--fd);color:#fff;display:flex;flex-direction:column;height:100vh}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--red);border-radius:2px}
+
+/* HEADER */
+#hdr{flex-shrink:0;background:linear-gradient(90deg,#08080f,#1a0008);border-bottom:2px solid var(--red);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+#hdr h1{font-size:21px;font-weight:900;letter-spacing:4px;white-space:nowrap}
+.hdr-sub{font-size:11px;letter-spacing:5px;color:var(--red);font-family:var(--fb);margin-bottom:2px}
+.nav-tabs{display:flex}
+.nav-tab{padding:7px 16px;font-size:12px;letter-spacing:2px;font-family:var(--fd);cursor:pointer;border:1px solid var(--border);color:#f0c040;transition:all .2s;background:transparent}
+.nav-tab:first-child{border-radius:2px 0 0 2px}.nav-tab:last-child{border-radius:0 2px 2px 0}
+.nav-tab.active{background:var(--red);color:#fff;border-color:var(--red)}
+.nav-tab:not(.active):hover{border-color:#f0c040;color:#f0c040}
+.hdr-stat{text-align:right;flex-shrink:0}
+.hdr-n{font-size:30px;font-weight:900;color:var(--red);line-height:1}
+.hdr-nl{font-size:11px;color:#f0c040;letter-spacing:2px;font-family:var(--fb)}
+
+/* LAYOUT */
+#layout{display:flex;flex:1;overflow:hidden;min-height:0}
+#left{width:188px;min-width:188px;background:var(--panel);border-right:1px solid #111120;overflow-y:auto;flex-shrink:0}
+#right{flex:1;overflow-y:auto;min-width:0}
+
+/* LEFT */
+.arc-row{cursor:pointer;padding:10px 13px;border-left:3px solid transparent;display:flex;align-items:center;gap:8px;transition:background .15s}
+.arc-row:hover{background:rgba(200,16,46,.1)}.arc-row.sel{background:rgba(200,16,46,.18);border-left-color:var(--red)}
+.arc-ico{width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.arc-info{flex:1;min-width:0}
+.arc-nm{font-size:13px;font-weight:700;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.arc-person-lbl{font-size:12px;color:#f0c040;font-family:var(--fb);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lvl-chip{font-size:11px;font-family:var(--fb);font-weight:700;padding:1px 4px;flex-shrink:0;border-radius:2px}
+.stato-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+
+/* ARC TOP */
+#arc-top{display:flex;gap:20px;padding:18px 24px;border-bottom:1px solid #111120;align-items:flex-start}
+.tarot-card{flex-shrink:0;width:108px;height:180px;border-radius:8px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:11px 8px 10px;transition:transform .35s}
+.tarot-card:hover{transform:translateY(-5px) rotate(1.5deg)}
+.tarot-card::before{content:'';position:absolute;inset:6px;border-radius:4px;border:1px solid rgba(255,255,255,.07);pointer-events:none}
+.t-roman{font-size:13px;letter-spacing:3px;font-weight:700}.t-sym{font-size:53px;line-height:1}.t-name{font-size:10px;letter-spacing:1.5px;text-align:center;font-weight:700}
+.arc-exp{flex:1;min-width:0;align-self:flex-start}
+.exp-lbl{font-size:11px;letter-spacing:4px;font-family:var(--fb);margin-bottom:5px}
+.exp-title{font-size:24px;font-weight:900;letter-spacing:3px;margin-bottom:3px}
+.exp-theme{font-size:14px;font-family:var(--fb);color:#f0c040;letter-spacing:1.5px;margin-bottom:11px}
+.exp-text{font-size:15px;font-family:var(--fb);color:#f0c040;line-height:1.8;max-width:540px}
+
+/* DETAIL */
+#arc-detail{padding:0 24px 20px;border-bottom:1px solid #111120}
+.det-toggle{display:flex;align-items:center;gap:10px;padding:13px 0 0;cursor:pointer;user-select:none}
+.det-toggle-lbl{font-size:11px;letter-spacing:4px;font-family:var(--fb);color:#f0c040;transition:color .2s}
+.det-toggle:hover .det-toggle-lbl{color:#f0c040}
+.det-arrow{font-size:13px;color:#f0c040;transition:transform .3s,color .2s;display:inline-block}
+.det-arrow.open{transform:rotate(90deg)}.det-toggle:hover .det-arrow{color:#f0c040}
+.det-line{flex:1;height:1px;background:#111120}
+#detail-body{display:none;padding-top:16px}
+.chips-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px}
+.chip{font-size:12px;letter-spacing:2px;font-family:var(--fb);padding:3px 9px;border-radius:2px;border:1px solid}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.det-block{background:#080812;padding:13px 15px}
+.det-block-title{font-size:11px;letter-spacing:3px;font-family:var(--fb);margin-bottom:7px}
+.det-block-text{font-size:15px;font-family:var(--fb);color:#f0c040;line-height:1.8}
+.det-stage{padding:13px 15px}
+.det-stage-lbl{font-size:11px;letter-spacing:3px;font-family:var(--fb);margin-bottom:5px}
+.det-stage-title{font-size:17px;font-weight:700;letter-spacing:2px;margin-bottom:5px}
+.det-stage-text{font-size:15px;font-family:var(--fb);color:#f0c040;line-height:1.8}
+
+/* LEGAME */
+#legame{padding:16px 24px 32px}
+.leg-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.leg-lbl{font-size:12px;letter-spacing:4px;color:#f0c040;font-family:var(--fb)}
+.empty-leg{border:1px dashed #131320;padding:36px;text-align:center;color:#f0c040;font-family:var(--fb);font-size:14px;letter-spacing:3px}
+#person-box{background:var(--card);border:1px solid var(--border)}
+
+/* person head */
+.p-head{display:flex;align-items:center;gap:16px;padding:15px 17px;border-bottom:1px solid var(--border)}
+.p-photo{width:66px;height:66px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;cursor:pointer;overflow:hidden;position:relative}
+.p-photo:hover::after{content:'📷';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(0,0,0,.65);border-radius:50%}
+.p-photo img{width:100%;height:100%;object-fit:cover}
+.p-meta{flex:1}
+.p-name-inp{font-size:22px;font-weight:900;letter-spacing:2px;background:none;border:none;color:#fff;font-family:var(--fd);width:100%;outline:none;border-bottom:1px solid transparent;transition:border-color .2s}
+.p-name-inp:focus{border-bottom-color:var(--red)}
+.p-name-inp::placeholder{color:#f0c040444}
+.p-lvl-row{display:flex;align-items:flex-end;gap:9px;margin-top:8px}
+.lvl-big{font-size:39px;font-weight:900;line-height:1}
+.lvl-of{font-size:14px;color:#f0c040;font-family:var(--fb);margin-bottom:3px}
+.lvl-bars{display:flex;gap:3px;margin-bottom:3px}
+.lbar{width:12px;height:5px;border-radius:1px;background:#181828;transition:background .3s}
+
+/* stato */
+.stato-row{display:flex;gap:0;padding:9px 17px;border-bottom:1px solid var(--border);background:#09090f;align-items:center}
+.stato-lbl{font-size:11px;letter-spacing:3px;font-family:var(--fb);color:#f0c040;margin-right:12px;white-space:nowrap}
+.stato-btn{flex:1;padding:5px 4px;text-align:center;font-size:12px;font-family:var(--fd);letter-spacing:.5px;cursor:pointer;border:1px solid var(--border);color:#f0c040;transition:all .2s;background:transparent}
+.stato-btn:first-of-type{border-radius:2px 0 0 2px}.stato-btn:last-of-type{border-radius:0 2px 2px 0}
+.stato-btn.s-stabile.active{background:var(--stabile);color:#fff;border-color:var(--stabile)}
+.stato-btn.s-difficolta.active{background:var(--difficolta);color:#000;border-color:var(--difficolta)}
+.stato-btn.s-rovesciato.active{background:var(--rovesciato);color:#fff;border-color:var(--rovesciato)}
+.stato-btn.s-bloccato.active{background:var(--bloccato);color:#fff;border-color:var(--bloccato)}
+
+/* SUGGERIMENTI */
+.sugg-section{border-bottom:1px solid var(--border)}
+.sugg-item{display:flex;align-items:flex-start;gap:10px;padding:9px 17px;border-left:2px solid transparent;background:#09090f;transition:background .2s}
+.sugg-item+.sugg-item{border-top:1px solid #0e0e1a}
+.sugg-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.sugg-text{font-size:15px;font-family:var(--fb);color:#f0c040;line-height:1.6}
+
+/* actions */
+.p-actions{display:flex;gap:7px;flex-wrap:wrap;padding:10px 17px;border-bottom:1px solid var(--border);background:#09090f}
+
+/* log */
+.log-sec{padding:13px 17px;border-bottom:1px solid var(--border)}
+.sec-title{font-size:11px;letter-spacing:4px;color:#f0c040;font-family:var(--fb);margin-bottom:11px;display:flex;align-items:center;justify-content:space-between}
+.log-empty{font-size:14px;color:#f0c040;font-family:var(--fb);letter-spacing:2px}
+.log-entry{display:flex;gap:10px;margin-bottom:18px;animation:fu .25s ease}
+.log-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.log-body{flex:1}
+.log-top{display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap}
+.log-date{font-size:12px;color:#f0c040;font-family:var(--fb);letter-spacing:1px}
+.log-badge{font-size:11px;padding:2px 7px;border-radius:2px;font-family:var(--fb);letter-spacing:1px;font-weight:700}
+.log-text{font-size:15px;color:#f0c040;font-family:var(--fb);line-height:1.65}
+.log-del{background:none;border:none;color:#f0c040;cursor:pointer;font-size:14px;padding:0 3px;transition:color .2s}
+.log-del:hover{color:var(--red)}
+
+/* ANNIVERSARI */
+.ann-sec{padding:13px 17px;border-bottom:1px solid var(--border)}
+.ann-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #0e0e14}
+.ann-item:last-child{border-bottom:none}
+.ann-icon{font-size:21px;flex-shrink:0}
+.ann-body{flex:1;min-width:0}
+.ann-label{font-size:15px;font-family:var(--fb);color:#ccc;font-weight:600}
+.ann-date{font-size:13px;font-family:var(--fb);color:#f0c040;margin-top:1px}
+.ann-upcoming{font-size:12px;font-family:var(--fb);font-weight:700;padding:2px 7px;border-radius:2px;letter-spacing:1px}
+.ann-del{background:none;border:none;color:#f0c040;cursor:pointer;font-size:14px;padding:0 4px;transition:color .2s;flex-shrink:0}
+.ann-del:hover{color:var(--red)}
+
+/* notes */
+.notes-sec{padding:13px 17px}
+.notes-ta{width:100%;background:#080810;border:1px solid var(--border);color:#f0c040;padding:10px 12px;font-family:var(--fb);font-size:16px;line-height:1.72;outline:none;resize:vertical;min-height:100px;transition:border .2s}
+.notes-ta:focus{border-color:var(--red);color:#ccc}
+.notes-ta::placeholder{color:#f0c040}
+
+/* BUTTONS */
+.btn{border:none;cursor:pointer;font-family:var(--fd);letter-spacing:1.5px;font-size:13px;text-transform:uppercase;padding:11px 20px;transition:all .2s;color:#fff}
+.btn-r{background:var(--red);color:#fff}.btn-r:hover{background:#e01030;transform:translateY(-1px)}.btn-r:disabled{opacity:.4;cursor:default;transform:none}
+.btn-g{background:transparent;border:1px solid var(--border);color:#f0c040}.btn-g:hover{border-color:var(--red);color:#fff}
+.btn-sm{padding:8px 15px;font-size:12px;color:#fff}
+.btn-xs{padding:6px 12px;font-size:11px;letter-spacing:1px;color:#fff}
+.btn-row{display:flex;gap:7px;flex-wrap:wrap}
+
+/* toggle */
+.toggle-row{display:flex}
+.tog-opt{flex:1;padding:7px 4px;text-align:center;font-size:12px;font-family:var(--fd);letter-spacing:.5px;cursor:pointer;border:1px solid var(--border);color:#f0c040;transition:all .2s}
+.tog-opt.active{background:var(--red);color:#fff;border-color:var(--red)}
+.tog-opt:first-child{border-radius:2px 0 0 2px}.tog-opt:last-child{border-radius:0 2px 2px 0}
+
+/* MODALS */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(6px)}
+.overlay.open{display:flex}
+.modal{background:#0c0c1a;width:480px;max-width:95vw;padding:26px;border:1px solid var(--border);max-height:90vh;overflow-y:auto;animation:fu .25s ease}
+.modal-sub{font-size:12px;letter-spacing:4px;font-family:var(--fb);margin-bottom:3px}
+.modal-title{font-size:21px;font-weight:700;margin-bottom:18px}
+.modal-footer{display:flex;gap:8px;margin-top:20px;justify-content:flex-end}
+.lbl{font-size:12px;letter-spacing:3px;color:var(--muted);font-family:var(--fb);display:block;margin-bottom:5px;text-transform:uppercase}
+.inp{background:#08080f;border:1px solid var(--border);color:#fff;padding:9px 12px;width:100%;font-family:var(--fb);font-size:17px;outline:none;transition:border .2s}
+.inp:focus{border-color:var(--red)}
+textarea.inp{resize:vertical;min-height:70px}
+select.inp{cursor:pointer}
+.field-g{display:flex;flex-direction:column;gap:12px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* oracle fab */
+#oracle-fab{position:fixed;bottom:20px;right:20px;background:#6c5ce7;border:none;color:#fff;font-family:var(--fd);letter-spacing:2px;font-size:13px;padding:11px 18px;cursor:pointer;transition:all .2s;z-index:50;box-shadow:0 4px 20px rgba(108,92,231,.4)}
+#oracle-fab:hover{background:#7d6df0;transform:translateY(-2px)}
+.ai-box{margin-top:14px;padding:14px 16px;background:#0a0a15;animation:fu .25s ease}
+.ai-sub{font-size:12px;letter-spacing:3px;font-family:var(--fb);margin-bottom:4px}
+.ai-arc{font-size:22px;font-weight:900;margin-bottom:6px}
+.ai-reason{font-size:15px;color:#f0c040;font-family:var(--fb);line-height:1.75;margin-bottom:13px}
+
+/* PANORAMICA */
+#view-panoramica{padding:22px 24px}
+.pan-title{font-size:12px;letter-spacing:5px;color:var(--red);font-family:var(--fb);margin-bottom:14px}
+.pan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:11px}
+.pan-card{padding:13px 11px;border-radius:4px;cursor:pointer;transition:transform .2s,box-shadow .2s;display:flex;flex-direction:column;gap:6px;border:1px solid transparent;position:relative}
+.pan-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.pan-card.empty{opacity:.35}.pan-card.empty:hover{opacity:.55}
+.pan-roman{font-size:12px;letter-spacing:2px;font-weight:700}
+.pan-sym{font-size:32px;line-height:1}
+.pan-arcname{font-size:12px;font-weight:700;letter-spacing:.5px;line-height:1.3}
+.pan-person{font-size:13px;font-family:var(--fb);color:#ccc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pan-lvl-row{display:flex;gap:2px}
+.pan-lbar{width:9px;height:3px;border-radius:1px;background:#1a1a2a}
+.ann-ping{width:7px;height:7px;border-radius:50%;background:#fd79a8;position:absolute;top:8px;right:8px;animation:ping 2s infinite}
+@keyframes ping{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+
+/* STATISTICHE */
+#view-statistiche{padding:22px 24px 40px}
+.stat-section{margin-bottom:26px}
+.stat-section-title{font-size:12px;letter-spacing:5px;color:var(--red);font-family:var(--fb);margin-bottom:13px;padding-bottom:7px;border-bottom:1px solid #111120}
+.stat-row{display:flex;align-items:center;gap:12px;margin-bottom:9px}
+.stat-row-name{font-size:15px;font-family:var(--fb);color:#ccc;width:140px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat-bar-wrap{flex:1;background:#0a0a14;height:5px;border-radius:3px;overflow:hidden}
+.stat-bar{height:100%;border-radius:3px;transition:width .6s ease}
+.stat-val{font-size:13px;font-family:var(--fb);color:#f0c040;width:70px;text-align:right;flex-shrink:0}
+.stat-empty{font-size:15px;color:#f0c040;font-family:var(--fb);letter-spacing:2px}
+.stat-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:9px;margin-bottom:4px}
+.stat-card{background:#0a0a14;padding:13px 15px;border:1px solid var(--border)}
+.stat-card-val{font-size:32px;font-weight:900;color:var(--red);line-height:1;margin-bottom:3px}
+.stat-card-lbl{font-size:12px;letter-spacing:2px;color:#f0c040;font-family:var(--fb)}
+.stat-warn{display:flex;align-items:flex-start;gap:10px;padding:10px 13px;background:#0a0a14;border-left:2px solid;margin-bottom:7px;animation:fu .25s ease}
+.stat-warn-icon{font-size:18px;flex-shrink:0}
+.stat-warn-body{flex:1}
+.stat-warn-name{font-size:15px;font-family:var(--fb);color:#ccc;font-weight:600;margin-bottom:2px}
+.stat-warn-reason{font-size:14px;font-family:var(--fb);color:#f0c040}
+
+/* CALENDARIO EVENTI */
+.cal-events-list{display:flex;flex-direction:column;gap:8px}
+.cal-event{display:flex;align-items:center;gap:12px;padding:10px 14px;background:#0a0a14;border-left:3px solid}
+.cal-event-days{font-size:28px;font-weight:900;line-height:1;flex-shrink:0;min-width:36px;text-align:center}
+.cal-event-body{flex:1}
+.cal-event-label{font-size:15px;font-family:var(--fb);color:#ccc;font-weight:600}
+.cal-event-who{font-size:13px;font-family:var(--fb);color:#f0c040;margin-top:2px}
+.cal-event-date{font-size:13px;font-family:var(--fb);color:#f0c040;margin-top:1px}
+.cal-event-go{flex-shrink:0}
+
+/* HEATMAP */
+.heatmap-wrap{overflow-x:auto}
+.heatmap{display:inline-grid;grid-template-rows:auto repeat(4,1fr);grid-template-columns:60px repeat(7,1fr);gap:4px;min-width:400px}
+.hm-empty{background:transparent}
+.hm-day-lbl{font-size:12px;font-family:var(--fb);color:#f0c040;letter-spacing:1px;text-align:center;padding-bottom:2px}
+.hm-tod-lbl{font-size:12px;font-family:var(--fb);color:#f0c040;letter-spacing:1px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px}
+.hm-cell{height:22px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:13px;font-family:var(--fb)}
+
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* keyword chips in detail */
+.kw-chip{display:inline-block;font-size:12px;font-family:var(--fb);padding:2px 8px;border-radius:2px;border:1px solid;letter-spacing:1px;margin:2px}
+
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <div><div class="hdr-sub">SISTEMA ARCANO</div><h1>SOCIAL LINKS</h1></div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="setView('arcani')">Arcani</div>
+    <div class="nav-tab" onclick="setView('panoramica')">Panoramica</div>
+    <div class="nav-tab" onclick="setView('statistiche')">Statistiche</div>
+    <div class="nav-tab" onclick="setView('impostazioni')">⚙</div>
+  </div>
+  <div class="hdr-stat"><div class="hdr-nl">LEGAMI</div><div class="hdr-n" id="total-n">0</div></div>
+</div>
+
+<div id="layout">
+  <div id="left"></div>
+  <div id="right">
+    <div id="view-arcani">
+      <div id="arc-top"></div>
+      <div id="arc-detail"></div>
+      <div id="legame"></div>
+    </div>
+    <div id="view-panoramica" style="display:none"></div>
+    <div id="view-statistiche" style="display:none"></div>
+    <div id="view-impostazioni" style="display:none"></div>
+  </div>
+</div>
+
+<button id="oracle-fab" onclick="openModal('m-oracle');setTimeout(updateOracleKeyStatus,30)">✦ Oracolo AI</button>
+
+<!-- MODAL LOG -->
+<div class="overlay" id="m-log" onclick="closeBg(event,'m-log')">
+  <div class="modal" style="border-top:3px solid var(--red)">
+    <div class="modal-sub" id="mlog-arc" style="color:var(--red)"></div>
+    <div class="modal-title" id="mlog-ttl"></div>
+    <div class="field-g">
+      <div><label class="lbl">Tipo voce</label>
+        <div class="toggle-row">
+          <div class="tog-opt" id="tog-i" onclick="setLogType('incontro')">🤝 Incontro</div>
+          <div class="tog-opt" id="tog-n" onclick="setLogType('nota')">📝 Nota</div>
+          <div class="tog-opt" id="tog-l" onclick="setLogType('lvl')">📈 Livello</div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div><label class="lbl">Data</label><input class="inp" type="date" id="log-date"></div>
+        <div id="log-todfield"><label class="lbl">Momento</label>
+          <select class="inp" id="log-tod">
+            <option value="">—</option>
+            <option value="Mattina">☀ Mattina</option>
+            <option value="Pomeriggio">🌤 Pomeriggio</option>
+            <option value="Sera">🌆 Sera</option>
+            <option value="Notte">🌙 Notte</option>
+          </select>
+        </div>
+      </div>
+      <div id="log-luogof"><label class="lbl">Luogo (opzionale)</label>
+        <input class="inp" type="text" id="log-luogo" placeholder="Es. a casa sua, al bar, online…">
+      </div>
+      <div><label class="lbl" id="log-tlbl">Descrizione</label>
+        <textarea class="inp" id="log-txt" placeholder="Cosa è successo?"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-g" onclick="closeModal('m-log')">Annulla</button>
+      <button class="btn btn-r" onclick="saveLog()">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ANNIVERSARIO -->
+<div class="overlay" id="m-ann" onclick="closeBg(event,'m-ann')">
+  <div class="modal" style="border-top:3px solid #fd79a8">
+    <div class="modal-sub" id="mann-arc" style="color:#fd79a8"></div>
+    <div class="modal-title" id="mann-ttl">Aggiungi data importante</div>
+    <div class="field-g">
+      <div><label class="lbl">Tipo</label>
+        <select class="inp" id="ann-tipo" onchange="updateAnnLabel()">
+          <option value="compleanno">🎂 Compleanno</option>
+          <option value="primo_incontro">🤝 Prima volta che ci siamo visti</option>
+          <option value="anniversario">💫 Anniversario</option>
+          <option value="altro">📌 Altra data speciale</option>
+        </select>
+      </div>
+      <div id="ann-label-field" style="display:none">
+        <label class="lbl">Nome della ricorrenza</label>
+        <input class="inp" type="text" id="ann-label-inp" placeholder="Es. Primo viaggio insieme…">
+      </div>
+      <div class="field-row">
+        <div><label class="lbl">Giorno</label>
+          <select class="inp" id="ann-day">${Array.from({length:31},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')}</select>
+        </div>
+        <div><label class="lbl">Mese</label>
+          <select class="inp" id="ann-month">
+            ${['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'].map((m,i)=>`<option value="${i+1}">${m}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div><label class="lbl">Anno (opzionale)</label>
+        <input class="inp" type="number" id="ann-anno" placeholder="Es. 2019" min="1900" max="2100">
+      </div>
+      <div><label class="lbl">Note (opzionale)</label>
+        <input class="inp" type="text" id="ann-note" placeholder="Breve nota su questa data…">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-g" onclick="closeModal('m-ann')">Annulla</button>
+      <button class="btn btn-r" onclick="saveAnn()">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ORACLE -->
+<div class="overlay" id="m-oracle" onclick="closeBg(event,'m-oracle')">
+  <div class="modal" style="border-top:3px solid #6c5ce7">
+    <div class="modal-sub" style="color:#6c5ce7">ORACOLO ARCANO · IA</div>
+    <div class="modal-title">Suggerisci un Arcano</div>
+    <p style="font-size:13px;color:#f0c040;font-family:var(--fb);line-height:1.7;margin-bottom:18px">Descrivi liberamente un rapporto e l'AI suggerirà l'Arcano più adatto.</p>
+    <div class="field-g">
+      <div><label class="lbl" style="display:flex;align-items:center;justify-content:space-between">API KEY <a href="#" onclick="setView('impostazioni');closeModal('m-oracle');return false" style="color:var(--red);font-size:10px;letter-spacing:1px;text-decoration:none">Gestisci ⚙</a></label>
+        <div id="ora-key-status" style="font-size:12px;font-family:var(--fb);padding:9px 12px;border:1px solid var(--border);background:#0a0a14"></div>
+      </div>
+      <div><label class="lbl">Descrivi il rapporto</label><textarea class="inp" id="ora-desc" style="min-height:90px" placeholder="Es: «Il mio migliore amico d'infanzia, ottimista, creativo…»"></textarea></div>
+    </div>
+    <button class="btn btn-r" id="ora-btn" onclick="askOracle()" style="width:100%;margin-top:14px">✦ Rivela l'Arcano</button>
+    <div id="ora-res" style="display:none"></div>
+  </div>
+</div>
+
+<!-- MODAL DEL -->
+<div class="overlay" id="m-del" onclick="closeBg(event,'m-del')">
+  <div class="modal" style="max-width:340px;border-top:3px solid var(--red)">
+    <div class="modal-sub" style="color:var(--red)">ATTENZIONE</div>
+    <div class="modal-title">Eliminare questa voce?</div>
+    <p style="font-size:13px;color:#f0c040;font-family:var(--fb)">L'azione non può essere annullata.</p>
+    <div class="modal-footer">
+      <button class="btn btn-g" onclick="closeModal('m-del')">Annulla</button>
+      <button class="btn btn-r" onclick="doDelLog()">Elimina</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// ARCANA
+// ─────────────────────────────────────────────────────────────────────────────
+const ARCANA=[
+  {
+    id:0, roman:"0", name:"Il Matto", theme:"Libertà · Nuovi inizi · Il Salto",
+    color:"#f0c040", sym:"✦",
+    // ── Corrispondenze ──────────────────────────────────────────
+    elemento:"Aria",
+    numero:"0 — Il numero che non esiste nella sequenza: prima del 1 e dopo il 21. Il cerchio aperto, il potenziale puro che non ha ancora scelto una forma. In alcune tradizioni è anche il 22, il numero della follia sacra.",
+    astrologia:"Urano (associazione moderna) / Aleph — l'elemento Aria nella tradizione della Golden Dawn. Urano regna sull'imprevedibile, sulla rottura delle convenzioni e sull'originalità assoluta.",
+    lettera_ebraica:"Aleph (א) — Il bue, il respiro primordiale, la prima lettera madre. Aleph è il soffio vitale prima che diventi parola. Rappresenta il vuoto potenziale da cui emerge tutta la creazione. Non si pronuncia — è il silenzio pieno.",
+    parole_chiave:["inizio assoluto","libertà","follia sacra","innocenza","salto nel vuoto","potenziale illimitato","viaggio","incoscienza feconda"],
+    simbolismo:"Nel Rider-Waite, un giovane vestito di bianco e oro cammina verso il bordo di un precipizio con lo sguardo rivolto al cielo. Porta sulle spalle uno zaino leggero appeso a un bastone — tutto ciò che possiede. Un cagnolino gli morde i talloni, avvertendolo del pericolo che ignora. In mano tiene una rosa bianca. Il sole splende radioso alle sue spalle. Il precipizio rappresenta il salto nell'ignoto; il cagnolino è l'istinto animale che tenta di trattenerlo; lo zaino leggero è la libertà di chi non si fa appesantire dal passato; la rosa bianca simboleggia la purezza dell'intenzione. Lo sguardo verso l'alto, e non verso il vuoto sotto, è il gesto definitivo: il Matto non vede il pericolo perché guarda al cielo.",
+    exp:"Chi porta caos creativo e libertà pura nella tua vita — imprevedibile, avventuroso, impossibile da classificare. Il legame è spontaneo, non strutturato, libero da aspettative e da copioni. Questa persona è comparsa senza preavviso e ha cambiato qualcosa nell'ordine delle cose. Non ci sono regole tra voi: ogni incontro è come il primo. Ideale per amici con cui condividi avventure improvvisate, per chi ti ha convinto a fare qualcosa di folle che si è rivelato giusto, o per chi rappresenta una rottura radicale con il tuo mondo precedente.",
+    dritta:"Il Matto è il principio di inizio assoluto — il momento in cui si sceglie di esistere pienamente piuttosto che di sopravvivere in sicurezza. Porta libertà autentica, apertura mentale senza confini, spirito d'avventura e una disponibilità al rischio che non è incoscienza ma fiducia profonda nella vita. È la carta dello zero che contiene tutti i numeri, del vuoto che è pienezza. Simboleggia anche la sincronicità — gli incontri che sembrano casuali ma che cambiano la traiettoria dell'esistenza.",
+    rovesciata:"L'energia del Matto si blocca o si distorce: imprudenza che diventa autodistruzione, rischi assunti senza nessuna intenzione evolutiva. Oppure il contrario: paralisi da eccesso di paura, l'incapacità di fare il salto anche quando è necessario. Può indicare immaturità prolungata, rifiuto di crescere, o un vagabondaggio esistenziale senza direzione. A volte: dispersione totale delle energie, impossibilità di impegnarsi in qualcosa.",
+    tappa_nome:"La Soglia", tappa:"Il Matto rappresenta quel preciso istante prima di ogni grande trasformazione — la notte prima del primo giorno di scuola, l'attimo in cui si lascia la casa d'infanzia, il momento in cui si dice sì a qualcosa di sconosciuto. È la tappa che precede tutte le altre e che torna ad ogni grande ciclo della vita. Chi la vive con pienezza porta con sé qualcosa di prezioso: la capacità di meravigliarsi ancora."
+  },
+  {
+    id:1, roman:"I", name:"Il Mago", theme:"Volontà · Abilità · Manifestazione",
+    color:"#ff6b6b", sym:"∞",
+    elemento:"Fuoco (volontà attiva) / Aria (Mercurio — comunicazione e intelletto)",
+    numero:"1 — L'unità, il principio individuante. Il primo atto creativo. Il numero della volontà concentrata che trasforma il caos del potenziale (0) in forma.",
+    astrologia:"Mercurio — il pianeta dell'intelletto, della comunicazione, dell'astuzia, del commercio e della mediazione tra mondi. Mercurio (Hermes nella tradizione greca) è il messaggero degli dei, il conduttore delle anime, il maestro della parola che trasforma la realtà.",
+    lettera_ebraica:"Beth (ב) — La casa, il secondo carattere dell'alfabeto ebraico (la prima lettera del Genesi: 'Bereshit'). Beth è il contenitore della creazione, la prima casa in cui abita la realtà. Il Mago è colui che abita consapevolmente la propria esistenza e la usa come strumento.",
+    parole_chiave:["volontà","manifestazione","abilità","concentrazione","comunicazione","astuzia","alchimia","come in alto così in basso"],
+    simbolismo:"Il Mago è in piedi davanti a un tavolo su cui giacciono i quattro strumenti dei semi dei Tarocchi: la coppa (acqua/emozioni), la spada (aria/mente), il pentacolo (terra/materia), la bacchetta (fuoco/volontà). Un braccio è alzato verso il cielo con la bacchetta, l'altro punta verso la terra — il principio ermetico fondamentale: 'come in alto così in basso, come in basso così in alto'. Sopra la testa brilla il lemniscato (∞), simbolo dell'energia infinita che scorre attraverso di lui. Una cintura a forma di serpente che si morde la coda (ouroboros) cinge i suoi fianchi — il ciclo eterno, la saggezza del tempo. Il giardino di rose e gigli bianchi ai suoi piedi simboleggia la purezza dell'intenzione che fiorisce quando la volontà è allineata.",
+    exp:"Una persona dotata di molte abilità, capace di trasformare le idee in realtà concreta con determinazione, precisione e un talento quasi magico per la comunicazione. Un mentore pratico che non si limita a spiegare ma ti insegna a fare. Un collega o amico che usa le parole come strumenti di trasformazione, che sa come costruire, convincere, creare. Il legame stimola la tua crescita concreta — chi ti ha mostrato che sei capace di più di quanto credevi.",
+    dritta:"La volontà incarnata nel mondo fisico. Non il sogno ma la realizzazione del sogno attraverso competenza e concentrazione totale. Il Mago possiede tutti gli strumenti necessari e sa come usarli in modo coordinato — non uno alla volta, ma in sinfonia. È anche la carta della comunicazione trasformativa: le parole che cambiano le cose, il linguaggio che costruisce la realtà. Porta potere personale, fiducia nelle proprie capacità, la capacità di adattare i mezzi allo scopo.",
+    rovesciata:"Le stesse straordinarie abilità del Mago usate per ingannare, manipolare o controllare. La comunicazione che diventa propaganda, la competenza che diventa arroganza, il talento che viene sprecato o soffocato. Può indicare dispersione di energie, incapacità di portare a termine ciò che si inizia, o un blocco creativo profondo. A volte: impostori, truffatori, chi usa il fascino per ottenere ciò che vuole senza dare nulla in cambio.",
+    tappa_nome:"L'Ingresso nel Mondo", tappa:"La tappa in cui ci si scopre capaci di agire sulla realtà con i propri strumenti. Non più spettatori della vita altrui ma protagonisti della propria. Corrisponde al primo lavoro vero, alla prima creazione riuscita, al momento in cui le capacità teoriche diventano pratiche. È il passaggio dall'adolescenza psicologica all'età adulta operativa."
+  },
+  {
+    id:2, roman:"II", name:"La Papessa", theme:"Mistero · Intuizione · Conoscenza velata",
+    color:"#a29bfe", sym:"☽",
+    elemento:"Acqua — il dominio dell'intuizione, del flusso, dell'inconscio e della memoria profonda",
+    numero:"2 — La dualità che contiene in sé la potenzialità di tutto. Il 2 non sceglie: tiene insieme gli opposti, li osserva, li comprende. È il numero della riflessione, della dualità che non è contraddizione ma completamento.",
+    astrologia:"Luna — il grande luminare notturno, signore dei cicli, delle maree, del subconscio, della memoria ancestrale e del mondo dei sogni. La Luna non ha luce propria: riflette, riceve, custodisce.",
+    lettera_ebraica:"Gimel (ג) — Il cammello, l'animale che attraversa il deserto senza bisogno d'acqua perché ne porta con sé la riserva. La Papessa attraversa il deserto dell'ignoto portando in sé la conoscenza che non ha bisogno di essere esibita.",
+    parole_chiave:["intuizione","mistero","conoscenza interiore","silenzio","sogno","inconscio","dualità","il velo tra i mondi"],
+    simbolismo:"La Papessa siede sul trono tra due grandi colonne — Boaz (nera, della Luna e del principio femminile) e Jachin (bianca, del Sole e del principio maschile) — le colonne del Tempio di Salomone. Sulle ginocchia regge un rotolo parzialmente srotolato con la scritta TORA (o TARA), ma lo nasconde parzialmente con il suo manto: il sapere esoterico non si rivela a tutti. Indossa una corona lunare a tre fasi (luna crescente, piena, calante) — i tre aspetti del femminile. Dietro di lei, un velo decorato con melograni e palme separa lo spazio sacro dall'ordinario: chi non è pronto non può varcare quel confine.",
+    exp:"Una figura di rara profondità silenziosa. Con lei le parole sono poche, ma ogni conversazione è densa di significati stratificati. Non spiega mai interamente quello che pensa — lo suggerisce, lo accenna, lascia spazio all'intuizione dell'altro. Un'amica fidata con cui basta uno sguardo, qualcuno che 'sa già' prima ancora che tu abbia finito di parlare. Il legame è fatto di comprensione silenziosa, fiducia assoluta e una qualità di presenza che raramente si trova. Spesso questa persona ha un rapporto privilegiato con i sogni, l'arte o il mondo invisibile.",
+    dritta:"Il sapere che non ha bisogno di essere esibito per essere reale. La Papessa rappresenta l'accesso alla conoscenza interiore attraverso la via dell'ascolto — non del fare, non del parlare, ma dello stare fermi e ricevere. È la carta dell'intuizione pura, della rivelazione che arriva nel silenzio, del sogno che parla più chiaramente del pensiero razionale. Porta anche la capacità di guardare oltre le apparenze e di leggere la realtà attraverso simboli e sincronicità.",
+    rovesciata:"Segreti che diventano arma, non custodia. Intuizioni sistematicamente ignorate a favore della ragione fredda. Può indicare superficialità emotiva, rifiuto dell'introspezione, isolamento che si spaccia per profondità. O al contrario: un eccesso di introversione che si chiude in un silenzio sterile, incapacità di comunicare ciò che si comprende interiormente. Informazioni trattenute in modo egoistico.",
+    tappa_nome:"Il Ritiro Interiore", tappa:"Il periodo della vita in cui si sente il bisogno profondo di fermarsi e ascoltare. Può coincidere con anni di studio silenzioso, con un periodo di lutto o di malattia, con una ritiro spirituale, o semplicemente con una fase di quiete necessaria dopo troppo rumore esterno. È la tappa in cui si costruisce la propria bussola interiore — quella che poi guiderà tutte le scelte future."
+  },
+  {
+    id:3, roman:"III", name:"L'Imperatrice", theme:"Abbondanza · Creazione · Nutrimento",
+    color:"#55efc4", sym:"♀",
+    elemento:"Terra — il dominio della fertilità, della materia che fiorisce, della natura come manifestazione del divino",
+    numero:"3 — La trinità creativa: tesi, antitesi, sintesi. Padre, Madre, Figlio. Dopo la dualità (2) nasce il terzo elemento: la creazione. Il 3 è il numero della vita che si produce da sé, del movimento creativo inarrestabile.",
+    astrologia:"Venere — la dea dell'amore, della bellezza, dell'abbondanza e del piacere sano. Venere non è solo romanticismo: è la forza attrattiva che tiene insieme il cosmo, il principio del piacere come guida spirituale, la capacità di riconoscere il bello come manifestazione del divino.",
+    lettera_ebraica:"Daleth (ד) — La porta. Il Daleth è il passaggio tra l'interno e l'esterno, tra il seme e il fiore, tra il grembo e il mondo. L'Imperatrice è la porta attraverso cui la vita entra nell'esistenza.",
+    parole_chiave:["fertilità","abbondanza","creatività","nutrimento","natura","piacere","maternità","generosità"],
+    simbolismo:"L'Imperatrice è seduta su un trono morbido decorato con cuscini rossi, in mezzo a una foresta lussureggiante con un campo di grano dorato in primo piano — simbolo di abbondanza materiale. Indossa una corona di stelle (dodici, come i segni dello zodiaco) e una veste decorata con melograni — simbolo di fertilità, underworld e rinascita. Ai suoi piedi, uno scudo decorato con il simbolo di Venere (♀). Accanto a lei, la cascata d'acqua che scorre: il flusso della vita che non si arresta. Il suo grembo appare abbondante, gravido di vita.",
+    exp:"Una figura di calore immediato e generosità autentica — può essere una madre, una sorella maggiore, una migliore amica, un mentore creativo. Qualcuno che ti fa sentire accolto senza condizioni, al sicuro senza dover guadagnarsi quello spazio. Il legame è caldo, prodigo, senza contabilità. Questa persona trova genuine gioia nel vedere gli altri fiorire — e la sua gioia è contagiosa. Spesso legata all'arte, alla natura, alla cucina, al corpo, alla cura degli altri.",
+    dritta:"La fertilità in ogni sua forma: dei campi, dell'arte, delle relazioni, del corpo, della mente. L'Imperatrice porta abbondanza materiale e spirituale simultaneamente, perché per lei non c'è distinzione tra le due. È la carta del piacere sano come guida spirituale, della creatività che fluisce senza sforzo quando ci si fida della propria natura, della connessione con il ritmo delle stagioni e del corpo. Porta anche la capacità di nutrire gli altri senza impoverire sé stessi.",
+    rovesciata:"L'aspetto materno si distorce in soffocamento o dipendenza. La cura diventa controllo, la generosità diventa aspettativa mascherata. Può indicare blocchi creativi profondi, disconnessione dal proprio corpo e dai propri bisogni, trascuratezza della propria salute o del proprio ambiente. A volte: una relazione materna difficile che lascia ferite durature. Oppure: eccessi — nel cibo, nel lusso, nel piacere compulsivo come sostituto del nutrimento autentico.",
+    tappa_nome:"La Fioritura", tappa:"Il periodo della vita in cui ci si apre pienamente alla creazione e all'espressione — artistica, lavorativa, familiare, spirituale. È la tappa in cui si smette di prepararsi e si inizia a costruire qualcosa di concreto e vivo: una famiglia, un progetto, un'opera, un giardino. Corrisponde spesso alla piena maturità adulta nel suo aspetto più generativo e gioioso."
+  },
+  {
+    id:4, roman:"IV", name:"L'Imperatore", theme:"Autorità · Struttura · Ordine",
+    color:"#e17055", sym:"♂",
+    elemento:"Fuoco — la volontà che costruisce, l'energia maschile attiva che impone ordine sulla materia",
+    numero:"4 — La stabilità assoluta: quattro angoli, quattro direzioni, quattro elementi. Il 4 è il numero della realtà manifestata e consolidata — il quadrato, la casa, il trono. Dopo la creatività del 3 arriva la struttura che la contiene.",
+    astrologia:"Ariete / Marte — Ariete è il primo segno dello zodiaco, il guerriero dell'inizio. Marte è il pianeta dell'azione, dell'energia maschile attiva, della capacità di combattere per ciò che si ritiene giusto. Insieme incarnano l'autorità guadagnata attraverso l'azione.",
+    lettera_ebraica:"Heh (ה) — La finestra. Attraverso la finestra dell'Imperatore si vede il regno — la realtà che ha costruito e che protegge. Heh è anche la lettera del respiro divino inserita nel nome di Abramo (Abraham da Abram) — il respiro che trasforma.",
+    parole_chiave:["autorità","struttura","protezione","disciplina","ordine","paternità","responsabilità","potere responsabile"],
+    simbolismo:"L'Imperatore siede su un trono di pietra grigia decorato con teste di ariete ai quattro angoli — simbolo della sua corrispondenza con Ariete. Indossa un'armatura sotto le vesti regali: il re è sempre anche un guerriero pronto a difendere ciò che ha costruito. In una mano tiene lo scettro ankh (simbolo egizio di vita e autorità), nell'altra un globo — il mondo che governa. Sullo sfondo, montagne rocciose e aride: il suo dominio è solido ma duro. Non c'è vegetazione — l'Imperatore è ordine, non creatività spontanea.",
+    exp:"Una figura di autorità che si è guadagnata il rispetto attraverso l'esperienza e la costruzione di qualcosa di solido. Un padre, un mentore autorevole, un capo che si rispetta profondamente non per il titolo ma per ciò che ha fatto. Il legame è fondato su regole chiare, rispetto reciproco e una forma di protezione genuina. Questa persona ti ha dato struttura quando ne avevi bisogno, ti ha insegnato che la disciplina è una forma di amore.",
+    dritta:"Il principio maschile nel suo aspetto costruttivo e responsabile. L'Imperatore rappresenta l'autorità guadagnata — non ereditata o imposta, ma costruita mattone per mattone attraverso la disciplina, il sacrificio e la dedizione. Porta stabilità, senso di sicurezza, capacità di creare ordine dove c'era caos. È anche la carta della paternità in senso lato: la capacità di proteggere, guidare e creare le condizioni perché gli altri possano crescere.",
+    rovesciata:"L'autorità diventa autoritarismo, la struttura si irrigidisce in gabbia. Il padre protettivo diventa il padre oppressivo; il leader diventa il tiranno; le regole diventano prigione. Può indicare mancanza totale di autodisciplina (il polo opposto dello stesso asse), incapacità di assumersi responsabilità, infantilismo mascherato da ribellione. A volte: il blocco creativo causato da strutture troppo rigide imposte dall'esterno o da sé stessi.",
+    tappa_nome:"La Costruzione", tappa:"La tappa in cui si smette di aspettare che qualcuno guidi e si diventa guida per sé stessi. Si assume piena responsabilità della propria vita e si inizia a costruire strutture durature: una carriera, una famiglia, una casa, un sistema di valori solido. È il passaggio dall'essere figli all'essere genitori — nel senso più ampio del termine."
+  },
+  {
+    id:5, roman:"V", name:"Il Papa", theme:"Tradizione · Guida · Trasmissione sacra",
+    color:"#fdcb6e", sym:"✝",
+    // CORREZIONE: Toro è retto da Venere, non da Giove. Giove è esaltato in Cancro.
+    // Il Papa corrisponde a Toro nella tradizione GD. La confusione nasce perché
+    // l'aspetto "saggezza" evoca Giove, ma la corrispondenza planetaria tradizionale è Venere.
+    elemento:"Terra — la tradizione che si radica nella storia, la saggezza che si incarna nel rito e nell'istituzione",
+    numero:"5 — Il numero del cambiamento all'interno dell'ordine. Il 5 è il pentagramma, il microcosmo dell'uomo (testa + 4 arti). Nel 5 avviene la mediazione tra il cielo (il divino) e la terra (l'umano): il sacerdote è il cinque vivente.",
+    astrologia:"Toro / Venere — Toro è il segno della tradizione, della stabilità dei valori, della fedeltà alla forma. Venere come signore di Toro porta la bellezza del rito, il valore delle cose antiche, la fedeltà come virtù spirituale. NOTA: Giove è talvolta associato per la sua dimensione di saggezza espansiva, ma non è il signore tradizionale.",
+    lettera_ebraica:"Vav (ו) — Il chiodo o il gancio. Vav è il connettore: la lettera che in ebraico funge da 'e', che lega due realtà. Il Papa è il chiodo che congiunge il cielo e la terra, il divino e l'umano, l'antico e il presente.",
+    parole_chiave:["tradizione","guida spirituale","insegnamento","istituzione","benedizione","comunità","valori","trasmissione"],
+    simbolismo:"Il Papa siede su un trono tra due colonne (diverse da quelle della Papessa: qui sono colonne di una chiesa, non del tempio di Salomone). Indossa la triplice corona papale (triregno) — le tre corone dei tre mondi: cielo, purgatorio, terra. Davanti a lui, due figure inginocchiate (monaci o novizi) che ricevono la sua benedizione. La mano destra è alzata nel gesto della benedizione cristiana: due dita alzate (dottrina), due abbassate (mistero). Nella sinistra, lo scettro a tre croci papali. Ai suoi piedi, due chiavi incrociate — le chiavi del regno dei cieli di Pietro.",
+    exp:"Un mentore spirituale, morale o intellettuale — non necessariamente in senso religioso. Qualcuno che trasmette valori, tradizioni e saggezza accumulata da una vita di pratica e riflessione. L'insegnante che ti ha formato, il saggio anziano che ti ha dato una chiave di lettura del mondo, la persona di fede che ti ha mostrato cosa significa credere in qualcosa. Il legame è basato sull'insegnamento e sull'apprendimento, su una relazione asimmetrica che nel tempo tende all'equilibrio.",
+    dritta:"La mediazione tra il divino e l'umano attraverso la tradizione e il rito. Il Papa rappresenta l'istituzione nel suo aspetto migliore: non come gabbia ma come contenitore che dà senso. Porta appartenenza, struttura morale, la saggezza che viene tramandata anziché inventata ogni volta da zero. È anche la carta dell'insegnamento formale, della comunità spirituale, della benedizione — il riconoscimento che qualcosa ha valore e che merita di essere preservato.",
+    rovesciata:"La tradizione che si chiude in dogmatismo cieco. L'istituzione che antepone la propria sopravvivenza alla verità che doveva custodire. Può indicare conformismo oppressivo, figure di autorità spirituale che manipolano, guru che usano la fede altrui per controllare. O al contrario: una ribellione sterile contro ogni forma di guida o struttura morale, senza proporre nulla di alternativo. La crisi di fede, l'abbandono della tradizione senza un approdo.",
+    tappa_nome:"L'Apprendistato Spirituale", tappa:"Il periodo in cui si cerca attivamente una guida, un sistema di valori, una tradizione a cui appartenere e da cui imparare. Può essere la scoperta della fede, di una filosofia di vita, di una scuola di pensiero, di una comunità significativa. Successivamente, questa stessa tappa può ripresentarsi in senso inverso: quando si diventa guida per altri."
+  },
+  {
+    id:6, roman:"VI", name:"Gli Amanti", theme:"Amore · Scelta · Allineamento",
+    color:"#fd79a8", sym:"♡",
+    elemento:"Aria — la mente che sceglie, il soffio vitale che unisce due respiri",
+    numero:"6 — L'armonia e la responsabilità. Il 6 è il numero della perfezione nella tradizione ebraica (la creazione in sei giorni), ma anche della responsabilità che viene dalla scelta. Il triangolo che punta su più il triangolo che punta giù: cielo e terra uniti.",
+    astrologia:"Gemelli / Mercurio — Gemelli è il segno della dualità, della comunicazione, della scelta tra due vie. Mercurio porta la velocità del pensiero, la parola come strumento di connessione e separazione. NOTA: Venere è talvolta associata per il tema dell'amore, ma la corrispondenza zodiacale è inequivocabilmente Gemelli.",
+    lettera_ebraica:"Zayin (ז) — La spada. La spada separa, distingue, taglia il nodo gordiano della scelta impossibile. Gli Amanti non sono solo un'immagine d'amore: sono l'atto del discernimento — la capacità di scegliere tra due vie che non possono coesistere.",
+    parole_chiave:["scelta","amore","allineamento","dualità","attrazione","connessione profonda","valori","decisione che definisce"],
+    simbolismo:"Nel Rider-Waite, la carta mostra Adamo ed Eva nel giardino dell'Eden con l'arcangelo Raffaele — protettore delle unioni e guaritore — che li benedice dall'alto. Alle spalle di Eva l'Albero della Conoscenza del Bene e del Male con il serpente; alle spalle di Adamo l'Albero della Vita con le dodici fiamme (i dodici segni zodiacali o le dodici apostolate). Il monte sullo sfondo è un vulcano — la passione che brucia. L'immagine non è solo romantica: è il momento del bivio tra la via della coscienza e quella dell'istinto, tra il paradiso dell'inconsapevolezza e la vita adulta nella conoscenza.",
+    exp:"Il legame romantico profondo o l'affinità più intensa della propria vita — qualcuno con cui è avvenuta una scelta deliberata, consapevole e coraggiosa. Non si tratta solo di attrazione: si tratta di un momento in cui si è dovuto decidere, di un bivio in cui due strade erano incompatibili e se ne è scelta una. Con questa persona c'è un allineamento che va oltre la superficie: valori condivisi, visione comune del mondo, una risonanza che difficilmente si spiega razionalmente.",
+    dritta:"La carta della scelta più importante — quella che rivela chi si è davvero. Non è necessariamente romantica: può essere la scelta tra due carriere, tra due vite possibili, tra due versioni di sé stessi. Porta unione profonda, allineamento dei valori, l'esperienza dell'attrazione magnetica tra elementi complementari. È anche la carta dell'autenticità: scegliere in modo davvero allineato con i propri valori più profondi, anche quando è difficile.",
+    rovesciata:"La scelta viene evitata, rimessa, delegata agli eventi. Il conflitto interiore tra ciò che si vuole e ciò che si 'dovrebbe' volere diventa paralizzante. Relazioni basate sulla paura o sulla convenienza piuttosto che sull'amore autentico. Disallineamento profondo tra la vita esterna e il mondo interiore. A volte: una scelta già compiuta in modo errato, e la difficoltà di riconoscerlo e correggerla.",
+    tappa_nome:"Il Bivio del Cuore", tappa:"Il momento cruciale in cui si sceglie il proprio compagno di vita, la propria professione, la propria identità adulta — e quella scelta non è reversibile. Non è necessariamente una scelta romantica: può essere qualsiasi decisione che definisce la traiettoria dell'esistenza. Il grande allineamento tra desiderio autentico e responsabilità verso se stessi."
+  },
+  {
+    id:7, roman:"VII", name:"Il Carro", theme:"Vittoria · Volontà · Padronanza di sé",
+    color:"#74b9ff", sym:"⊕",
+    elemento:"Acqua — Cancro è un segno d'acqua, ma il Carro trasforma l'acqua emotiva in forza direzionata. La sensibilità che diventa determinazione.",
+    numero:"7 — Il numero sacro per eccellenza: i sette giorni della creazione, i sette pianeti classici, le sette note musicali. Il 7 è la vittoria dopo la prova, il completamento del primo ciclo reale dell'esperienza.",
+    astrologia:"Cancro / Luna — Cancro è il segno dell'emozione profonda, della protezione, del guscio protettivo. La Luna (signore di Cancro) governa i ritmi, le maree emotive, la necessità di proteggere ciò che è prezioso. Il Carro usa questa sensibilità come motore della volontà — non la reprime ma la incanalata.",
+    lettera_ebraica:"Cheth (ח) — Il recinto o la recinzione. Il Carro è letteralmente un recinto mobile: l'eroe è protetto dalla sua armatura e dal carro stesso mentre si muove attraverso il mondo. Cheth rappresenta il confine che protegge ciò che è sacro.",
+    parole_chiave:["vittoria","determinazione","autodisciplina","movimento","controllo","ambizione","successo","volontà trionfante"],
+    simbolismo:"Un guerriero in armatura siede su un carro trainato da due sfingi — una nera, una bianca — simbolo degli opposti che vengono domati e diretti dalla volontà. Il guerriero non tiene le redini: guida il carro attraverso la forza della concentrazione mentale. Sopra di lui un baldacchino stellato — è protetto dal cosmo mentre avanza. Sulle spalle, le lune crescenti — la connessione con Cancro. Lo scettro che impugna è simbolo di autorità spirituale. Sullo scudo, un simbolo alato — l'anima che vola anche nella materia.",
+    exp:"Un amico o compagno di strada ambizioso, determinato e orientato ai traguardi in modo contagioso. Qualcuno con cui hai gareggiato, combattuto fianco a fianco verso un obiettivo comune, o qualcuno che ti ha spinto a dare il meglio di te in un momento in cui ti saresti accontentato di meno. Il legame è energico, spesso competitivo in modo costruttivo, sempre stimolante. Non ci si annoia mai — c'è sempre qualcosa verso cui correre insieme.",
+    dritta:"La volontà in movimento vittorioso. Il Carro non rappresenta la forza bruta ma il controllo perfetto di energie contraddittorie — come un pilota che usa tutta la potenza del motore senza perdere il controllo del volante. Porta determinazione, disciplina, la capacità di avanzare anche quando le circostanze sono avverse. È anche la carta del trionfo meritato: la vittoria che arriva dopo una vera lotta.",
+    rovesciata:"Il controllo si incrina e le energie divergono catastroficamente. Le sfingi corrono in direzioni opposte e il carro si rovescia. Può indicare aggressività incontrollata, ambizione che diventa cinica e distruttiva, vittoria cercata a qualunque costo morale. O il polo opposto: stagnazione totale, incapacità di prendere una direzione, energie che si annullano a vicenda. Il guerriero che non sa più perché combatte.",
+    tappa_nome:"La Conquista", tappa:"Il periodo della lotta attiva e consapevole verso un traguardo ben definito — lo studio intenso, la carriera che si costruisce, la gara che si affronta. Non conta solo vincere: conta imparare a governare se stessi mentre si combatte. Chi attraversa questa tappa in modo pieno esce con una padronanza di sé che non aveva prima."
+  },
+  {
+    id:8, roman:"VIII", name:"La Forza", theme:"Coraggio interiore · Grazia · Padronanza delle passioni",
+    color:"#ff9f43", sym:"∿",
+    // NOTA STORICA: Nel Tarocco di Marsiglia e in alcune tradizioni anteriori al Rider-Waite,
+    // La Forza è l'XI e La Giustizia è l'VIII. Waite e Crowley invertirono le posizioni.
+    // In questa app usiamo la sequenza Rider-Waite (Forza = VIII).
+    elemento:"Fuoco — il fuoco del leone domato, la passione trasformata in forza gentile",
+    numero:"8 — Il lemniscato in verticale: l'infinito che scorre. Il 8 è il numero della rigenerazione ciclica, del potere che si rinnova, dell'equilibrio dinamico tra forza e grazia. In numerologia è il numero del potere materiale e spirituale.",
+    astrologia:"Leone / Sole — Leone è il segno del cuore, del coraggio, della dignità regale. Il Sole (signore di Leone) è la fonte di tutta la vita, il centro consapevole dell'identità. La Forza non è la potenza solare in senso esplosivo ma quella quieta, costante, che irradia senza bruciare.",
+    lettera_ebraica:"Teth (ט) — Il serpente. Il serpente è l'energia primordiale, la kundalini, la forza che scorre lungo la spina dorsale. La Forza è la capacità di guidare questa energia — non reprimerla né esserne sopraffatti, ma danzarci insieme.",
+    parole_chiave:["coraggio","grazia","pazienza","dominio di sé","compassione","forza interiore","dolcezza","resilienza"],
+    simbolismo:"Una giovane donna vestita di bianco e incoronata di fiori apre — o chiude, a seconda dell'interpretazione — delicatamente le fauci di un leone. Il leone è enorme e potente, ma è completamente in pace con le mani di lei. Sopra la testa della donna brilla il lemniscato (∞) — lo stesso del Mago, ma qui rappresenta l'energia infinita che circola tra l'umano e l'animale, tra la mente e l'istinto. La corona di fiori è lo stesso tipo di quella dell'Imperatrice: la forza vera nasce dalla connessione con la natura, non dalla sua repressione.",
+    exp:"Una persona di forza silenziosa e profonda, che affronta le difficoltà con una grazia che spesso stupisce. Non è il tipo che urla, che combatte apertamente — è quello che resta quando tutti gli altri si sono ritirati. Ti ha aiutato nei momenti più bui non con grandi gesti ma con una presenza costante, con parole semplici e giuste, con la capacità di stare dentro al dolore senza fuggire. Il legame è caratterizzato da resilienza condivisa — avete attraversato qualcosa insieme.",
+    dritta:"Il dominio delle passioni attraverso la gentilezza, non attraverso la repressione. La Forza insegna che il vero coraggio non è l'assenza di paura ma la capacità di agire con grazia nonostante la paura. È anche la carta della pazienza infinita — non la rassegnazione passiva, ma la fermezza tranquilla di chi sa che la vera trasformazione richiede tempo. Porta anche la capacità di vedere la propria 'bestia interiore' (le passioni, le paure, gli istinti) con compassione anziché con vergogna.",
+    rovesciata:"La forza interiore si esaurisce dopo uno sforzo prolungato — il burnout, il cedimento improvviso dopo anni di resistenza. O al contrario: la codardia mascherata da prudenza, la violenza mascherata da forza. Può indicare la mancanza di autocontrollo, il cedimento agli impulsi più bassi, o la crudeltà che emerge quando si perde il contatto con la propria parte gentile.",
+    tappa_nome:"La Prova", tappa:"Il momento in cui si affronta qualcosa che sembra insuperabile — una malattia grave, una perdita devastante, un crollo professionale, una crisi di identità profonda — e si scoprono risorse interiori che non si sapeva di avere. Non è la tappa del trionfo esteriore: è quella in cui si impara a rispettarsi per la dignità mantenuta nel momento più difficile."
+  },
+  {
+    id:9, roman:"IX", name:"L'Eremita", theme:"Saggezza · Solitudine · La luce che guida",
+    color:"#b2bec3", sym:"⬡",
+    // CORREZIONE: La Vergine è retta da Mercurio, non da Saturno.
+    // In alcune tradizioni esoteriche (Crowley-Thoth) l'Eremita è associato alla Vergine
+    // e la lettera Yod. Il pianeta è Mercurio come signore della Vergine.
+    // Saturno evoca l'aspetto contemplativo ma non è la corrispondenza tradizionale.
+    elemento:"Terra — la solidità della montagna dove l'Eremita si è ritirato, la pazienza geologica della saggezza che non corre",
+    numero:"9 — Il numero del completamento del primo ciclo (1+2+3+4+5+6+7+8+9 = 45, 4+5 = 9). Il 9 è la saggezza maturata, l'esperienza distillata, il punto in cui tutto ciò che si è vissuto si trasforma in comprensione. È anche il numero dell'universalità: il 9 moltiplicato per qualsiasi numero riporta sempre al 9.",
+    astrologia:"Vergine / Mercurio — Vergine è il segno del discernimento, dell'analisi, dell'attenzione al dettaglio, della purificazione. Mercurio (signore della Vergine) porta la precisione del pensiero, la capacità di distinguere l'essenziale dall'accessorio. CORREZIONE RISPETTO ALLA VERSIONE PRECEDENTE: non Saturno — che evoca la contemplazione ma non è il signore tradizionale della Vergine.",
+    lettera_ebraica:"Yod (י) — La mano, il dito di Dio, la particella più piccola dell'alfabeto ebraico da cui si formano tutte le altre lettere. Yod è l'atomo della creazione, il punto di luce concentrata. L'Eremita porta nella sua lanterna proprio questa scintilla — il Yod luminoso che illumina il cammino degli altri.",
+    parole_chiave:["saggezza","solitudine fertile","discernimento","ritiro","guida","introspezione","purificazione","luce nel buio"],
+    simbolismo:"Un vecchio avvolto in un mantello grigio-blu cammina lentamente su una montagna innevata. Nella mano destra regge una lanterna che contiene una stella a sei punte (la Stella di Davide, o il sigillo di Salomone) — la luce della saggezza universale. Nella sinistra, un lungo bastone da cammino. Il mantello grigio è il colore della neutralità, della capacità di vedere senza pregiudizi. La montagna innevata è la vetta della conoscenza spirituale, raggiunta solo da chi ha percorso l'intero sentiero. L'Eremita non si è ritirato per fuggire dal mondo: si è ritirato per trovare la luce che poi porterà agli altri.",
+    exp:"Una persona di saggezza rara e silenziosa — forse un anziano, un maestro incontrato in circostanze insolite, qualcuno che vive ai margini del clamore sociale. Gli incontri con questa persona sono rari ma sempre illuminanti: ogni conversazione lascia qualcosa che continua a lavorare dentro di te anche dopo. Il legame è fatto di qualità pura, non di quantità. Non ci si vede spesso, ma ogni volta è come se il tempo si comprimesse. Chi ti ha cambiato con poche parole dette al momento esatto giusto.",
+    dritta:"La saggezza guadagnata attraverso l'esperienza vissuta e riflettuta — non la conoscenza accademica ma la comprensione che nasce dall'aver attraversato il buio e trovato la propria luce. L'Eremita non insegna con le parole: illumina il cammino e lascia che gli altri camminino da soli. Porta discernimento, autenticità, la capacità di distinguere ciò che è essenziale da ciò che è rumore. È anche la carta della guida spirituale autentica — non quella che dipende dai discepoli ma quella che li vuole liberi.",
+    rovesciata:"La solitudine scelta diventa isolamento imposto dall'interno — la paura del mondo mascherata da saggezza. La saggezza si tramuta in cinismo, il discernimento in giudizio freddo, il ritiro in rifiuto della vita. Può indicare chi usa l'apparenza di profondità per evitare la realtà, chi si isola per paura anziché per scelta consapevole. A volte: la necessità di uscire dal ritiro e tornare nel mondo — il rischio di rimanere intrappolati nella contemplazione senza mai tornare a illuminare nessuno.",
+    tappa_nome:"Il Grande Ritiro", tappa:"La tappa della vita in cui si sente il bisogno — o la necessità — di separarsi dal rumore per trovare risposte che il rumore rende impossibili. Può durare settimane o anni. È sempre transitoria: la lanterna è fatta per essere portata nel buio, non per illuminare solo sé stessi. Chi attraversa questa tappa pienamente emerge con una chiarezza interiore che cambia il modo in cui si vive ogni cosa successiva."
+  },
+  {
+    id:10, roman:"X", name:"La Ruota della Fortuna", theme:"Destino · Cicli · La legge del cambiamento",
+    color:"#6c5ce7", sym:"✺",
+    elemento:"Fuoco (Giove) — ma la Ruota abbraccia tutti e quattro gli elementi: nei quattro angoli della carta compaiono i quattro viventi (toro=terra, leone=fuoco, aquila=acqua, angelo=aria)",
+    numero:"10 — Il ritorno all'unità dopo il ciclo completo: 1+0 = 1. Il 10 è il numero della completezza che si rinnova, della fine che diventa nuovo inizio. Nella Kabbalah, il 10 corrisponde a Malkuth — il regno, la manifestazione finale prima che il ciclo ricomincia.",
+    astrologia:"Giove — il grande benefico, il pianeta dell'espansione, della fortuna, della filosofia e della crescita. Giove governa i grandi cambiamenti di prospettiva, le opportunità inattese, i momenti in cui la vita si apre in modo imprevisto.",
+    lettera_ebraica:"Kaph (כ) — Il palmo della mano aperta, il gesto di dare e ricevere. La ruota gira nel palmo di Dio. Kaph rappresenta anche la capacità di afferrare — e di lasciare andare quando è il momento.",
+    parole_chiave:["destino","cicli","cambiamento","fortuna","karma","opportunità","fato","inevitabilità"],
+    simbolismo:"Una grande ruota al centro della carta porta le lettere TARO (che si legge anche come ROTA — 'ruota' in latino — e contiene TORA, la legge). Intorno alla ruota, simboli alchemici degli elementi e dei quattro arcangeli. Sulla ruota: Anubis (il dio della morte egiziano) che sale, Tifone (il serpente del caos) che scende, la Sfinge in cima che sorregge una spada — il giudizio neutro della saggezza al di sopra dei cicli. Nei quattro angoli: il toro alato di Luca, il leone di Marco, l'aquila di Giovanni, l'angelo di Matteo — i quattro evangelisti, i quattro elementi, i quattro punti cardinali.",
+    exp:"Una persona o un rapporto legato agli incontri del destino — quei momenti in cui si ha la netta sensazione che qualcosa stia avvenendo al di là della propria volontà. Un conoscente casuale che diventa fondamentale, un'amicizia che attraversa cicli completi di vicinanza e lontananza e ogni volta si rinnova, qualcuno che ricompare nella vita nei momenti di svolta. Il legame ha qualcosa di inevitabile — come se fosse scritto da qualche parte in un alfabeto che non si conosce ma si sente.",
+    dritta:"Il movimento inarrestabile della ruota cosmica. Nulla è permanente — né la fortuna né la sfortuna — e questo non è una minaccia ma una liberazione. La Ruota porta la consapevolezza che il momento giusto esiste davvero, che le opportunità si presentano quando si è pronti a coglierle, che anche i periodi di crisi sono parte di un ciclo che si chiuderà. È anche la carta del karma — la legge di causa ed effetto che opera su scale temporali che spesso non comprendiamo.",
+    rovesciata:"Resistenza disperata al movimento della ruota — il tentativo di bloccare ciò che deve cambiare, di congelare un momento di fortuna o di negare l'arrivo di una crisi inevitabile. Può indicare cicli negativi che si ripetono perché non se ne comprende il meccanismo, karma non risolto che continua a ripresentarsi, o una sensazione di essere in balia del destino senza nessuna agentività. A volte: la stagnazione che si spaccia per stabilità.",
+    tappa_nome:"La Svolta", tappa:"Il punto di non ritorno — il momento in cui il destino gira e la traiettoria della vita cambia in modo irreversibile. Non si sceglie questa tappa: accade. Può essere un incontro, una diagnosi, un crollo, un successo inatteso. Ciò che conta non è il contenuto dell'evento ma la risposta: chi riesce a salire sulla ruota anziché essere travolto da essa attraversa la svolta con grazia."
+  },
+  {
+    id:11, roman:"XI", name:"La Giustizia", theme:"Equilibrio · Verità · Causa ed effetto",
+    color:"#00cec9", sym:"⚖",
+    // CORREZIONE: La Bilancia è retta da Venere, non da Saturno.
+    // Saturno è esaltato in Bilancia (esaltazione ≠ domicilio/signoria).
+    // Questa confusione è comune ma importante da correggere.
+    // NOTA STORICA: In alcune tradizioni (Marsiglia, Thoth) la Giustizia è l'VIII, non l'XI.
+    elemento:"Aria — il dominio della mente che giudica, della parola che stabilisce la verità, del pensiero che discrimina",
+    numero:"11 — Il numero master della tradizione numerologica: intuizione superiore, potere spirituale elevato, la conoscenza che va oltre la ragione ordinaria. L'11 è il doppio 1 — due unità che si affiancano senza fondersi: la testimonianza e il testimoniato.",
+    astrologia:"Bilancia / Venere — La Bilancia è il segno dell'equilibrio, della giustizia, delle relazioni e dell'armonia. Venere (signore della Bilancia) porta la capacità di vedere la bellezza in ogni situazione, di trovare l'accordo tra parti in conflitto. CORREZIONE: Saturno è esaltato in Bilancia, il che crea una connessione forte con il karma e la legge, ma non è il signore planetario — quello è Venere.",
+    lettera_ebraica:"Lamed (ל) — Il pungolo del bue, lo strumento di guida e correzione. Lamed è anche l'unica lettera dell'alfabeto ebraico che si proietta sopra tutte le altre — la lettera che 'insegna' (lamed in ebraico significa anche 'imparare/insegnare'). La Giustizia guida con la precisione del pungolo, non con la brutalità della frusta.",
+    parole_chiave:["verità","equilibrio","karma","causa ed effetto","onestà","responsabilità","chiarezza","integrità"],
+    simbolismo:"Una figura seduta su un trono tra due colonne (di nuovo le colonne — come la Papessa — ma qui il velo è aperto: la Giustizia non nasconde nulla). Nella mano destra, una spada a doppio taglio puntata verso l'alto — il pensiero che taglia la confusione e separa il vero dal falso. Nella sinistra, la bilancia — il peso dei fatti, delle cause e degli effetti. Indossa una corona con un piccolo quadrato — la solidità della legge. La veste rossa nascosta da un mantello verde — passione contenuta nella speranza di equilibrio.",
+    exp:"Una persona di onestà assoluta — diretto fino a essere scomodo, equo in modo così costante da sembrare quasi meccanico. Qualcuno con cui puoi essere completamente sincero e ricevere la stessa sincerità senza filtri. Non ti dice quello che vuoi sentire: ti dice quello che vede. Il legame è fondato sulla verità come valore irrinunciabile, anche quando quella verità fa male. Chi ti ha aiutato a vedere le cose per quello che sono davvero, smontando le storie che ti raccontavi.",
+    dritta:"La valutazione imparziale dei fatti e delle loro conseguenze. La Giustizia non è vendetta né pietà — è la capacità di guardare la realtà senza distorcerla in nessuna direzione. Porta onestà intellettuale, la capacità di assumersi la responsabilità delle proprie azioni, la comprensione che ogni causa produce effetti e che non ci sono scorciatoie nella legge del karma. È anche la carta dell'integrità morale mantenuta sotto pressione.",
+    rovesciata:"L'ingiustizia che si maschera da giustizia. Parzialità, verdetti corrotti, doppi standard. Può indicare la tendenza a evitare le conseguenze delle proprie azioni, a trovare sempre una giustificazione per non assumersi responsabilità. O il polo opposto: un giudizio eccessivamente severo verso sé stessi o verso gli altri, la giustizia che diventa punizione senza misericordia. Il perfezionismo morale che paralizza.",
+    tappa_nome:"Il Bilancio", tappa:"La tappa in cui si guarda onestamente il proprio cammino — spesso in un momento di crisi, di transizione importante, o semplicemente quando ci si ferma abbastanza a lungo da non poter più ignorare ciò che si è e ciò che si è fatto. Non è la resa dei conti finale: è l'audit di metà percorso, necessario per correggere la rotta prima di proseguire."
+  },
+  {
+    id:12, roman:"XII", name:"L'Appeso", theme:"Sacrificio volontario · Prospettiva rovesciata · Resa",
+    color:"#81ecec", sym:"∇",
+    // CORREZIONE: L'associazione con Giove è debole nella tradizione. Il primario è Acqua/Nettuno.
+    // La Golden Dawn associa l'Appeso a Mem (Acqua) — la grande lettera madre dell'elemento acqua.
+    elemento:"Acqua — il sacrificio nell'elemento primordiale, il seme che deve marcire per germogliare",
+    numero:"12 — Il numero della resa e del completamento superiore (3×4 = la trinità moltiplicata per la stabilità materiale). 1+2 = 3: il sacrificio porta alla creazione. 12 sono i mesi dell'anno, i segni dello zodiaco, gli apostoli — tutti sistemi che richiedono di comprendere l'intero ciclo per vedere il senso.",
+    astrologia:"Nettuno / Acqua — Nettuno governa il sacrificio, l'illusione, la dissoluzione dell'ego, la connessione con l'oceano dell'inconscio collettivo. È il pianeta della resa mistica, della compassione senza confini, del sogno come realtà alternativa.",
+    lettera_ebraica:"Mem (מ) — L'acqua, la seconda lettera madre. Mem è la grande dissoluzione: l'identità che si scioglie come il sale nell'oceano. L'Appeso è immerso nel Mem — non annegato, ma sospeso nell'acqua dello spirito, in uno stato di liminale trasformazione.",
+    parole_chiave:["sacrificio","resa","prospettiva rovesciata","sospensione","illuminazione","pazienza","lasciar andare","meditazione"],
+    simbolismo:"Un uomo giovane è appeso per un piede a un albero (il Tau — la croce a T, la croce del mondo nella tradizione esoterica, l'Albero di Odin). L'altro piede è libero, piegato a formare un triangolo con le gambe. Le braccia sono legate dietro la schiena formando un triangolo rovesciato — lo stesso simbolo dell'elemento acqua (∇). Intorno alla testa irradia un alone dorato — non sta soffrendo: sta illuminandosi. La sua espressione è serena, quasi sorridente. La serena accettazione è il punto: l'Appeso ha scelto questa posizione.",
+    exp:"Un rapporto sospeso nel tempo, in attesa, o con qualcuno che ti ha insegnato la cosa più difficile: fermarsi e vedere le cose da una prospettiva radicalmente diversa — letteralmente capovolta. Questa persona ha fatto sacrifici reali per il legame, oppure il legame stesso è costato qualcosa di importante. Spesso incompreso dagli altri, a volte doloroso, ma profondamente trasformativo. È il tipo di rapporto che non ha senso all'esterno ma ha un senso profondissimo all'interno.",
+    dritta:"La resa volontaria come atto spirituale supremo. L'Appeso non è una vittima: è un iniziato che sceglie di sospendere la propria prospettiva ordinaria per accedere a una visione più ampia. Porta la capacità di aspettare senza agire, di accettare senza rassegnarsi, di vedere il rovesciamento come illuminazione. È anche la carta del sacrificio autentico — quello che si fa senza aspettarsi una ricompensa ma che porta una trasformazione interiore reale.",
+    rovesciata:"Il martirio senza scopo — il sacrificio che non porta a nulla perché non c'è nessuna resa autentica, solo masochismo. La sospensione che diventa stagnazione, l'attesa che diventa procrastinazione infinita. Può indicare la resistenza a fare il sacrificio necessario — il rifiuto di lasciare andare qualcosa che sta ostacolando la crescita. A volte: finalmente l'uscita dalla sospensione — il momento in cui ci si scolla dalla croce e si torna nella vita.",
+    tappa_nome:"La Grande Pausa", tappa:"Il momento in cui tutto si ferma — per scelta o per necessità esterna (una malattia, una perdita, un fallimento, una crisi esistenziale). Il fare diventa impossibile e l'unica opzione è cambiare il modo in cui si guarda. Chi attraversa questa tappa senza cercare di sfuggirle ne esce con una comprensione della vita che nessun'altra esperienza avrebbe potuto dare."
+  },
+  {
+    id:13, roman:"XIII", name:"La Morte", theme:"Trasformazione · Fine necessaria · Rinascita",
+    color:"#636e72", sym:"✕",
+    elemento:"Acqua — il dominio dello Scorpione, delle profondità oceaniche, di ciò che si dissolve e si rigenera",
+    numero:"13 — Il numero temuto che in realtà è il numero della trasformazione suprema. 1+3 = 4: dalla morte nasce la nuova struttura. 13 è il numero della luna (13 lune in un anno solare), del ciclo femminile, della rigenerazione biologica.",
+    astrologia:"Scorpione / Plutone — Scorpione è il segno della trasformazione profonda, della morte e rinascita, dell'intensità psicologica, dei segreti e dei poteri nascosti. Plutone (signore moderno dello Scorpione) governa la trasformazione radicale, il potere che emerge dalla distruzione, la rigenerazione dopo il crollo totale.",
+    lettera_ebraica:"Nun (נ) — Il pesce, la vita che pullula nelle acque profonde dell'inconscio. Nun rappresenta l'anima individuale immersa nell'oceano dell'esistenza — che muore e rinasce in ogni ciclo, come il pesce che nuota sempre nelle stesse acque senza essere mai lo stesso pesce.",
+    parole_chiave:["trasformazione","fine di ciclo","rinascita","lasciar andare","cambiamento radicale","morte dell'ego","inevitabilità","rigenerazione"],
+    simbolismo:"Uno scheletro in armatura nera cavalca un possente cavallo bianco su un campo di corpi. Lo stendardo che porta è bianco con una rosa nera — la purezza che sopravvive alla morte, la bellezza che persiste nella dissoluzione. Davanti a lui: un vescovo in ginocchio che supplica (la religione non ferma la morte), una donna che sviene (la bellezza non la ferma), un bambino che guarda senza paura (l'innocenza non conosce la paura della fine), un pontefice già caduto. All'orizzonte, il sole sorge (o tramonta) tra due torri — l'eterna ciclicità: ogni fine è un'alba.",
+    exp:"Un legame che ha segnato un vero prima e un vero dopo nella tua vita — non per il dolore in sé, ma per la trasformazione radicale che ha portato. Può essere qualcuno che ti ha aiutato a chiudere un capitolo che si rifiutava di chiudersi, o qualcuno la cui presenza (o la cui perdita) ha completamente ridisegnato chi sei. Questo rapporto non è necessariamente doloroso: può essere profondamente liberatorio. Ma è sempre irreversibile — non si torna alla versione precedente di sé stessi.",
+    dritta:"La fine che è anche seme: la Morte nei Tarocchi non rappresenta la morte biologica ma il termine definitivo di un ciclo — di un'identità, di una relazione, di un modo di essere nel mondo. È la carta del lasciar andare assoluto, senza compromessi e senza mezze misure. Porta anche la capacità di riconoscere quando qualcosa è davvero finito — la chiarezza brutale e liberatoria che segue l'accettazione della fine.",
+    rovesciata:"La resistenza disperata al cambiamento inevitabile — l'aggrappamento a ciò che è già morto ma non ancora sepolto. Il lutto che si rifiuta di elaborare, la relazione finita da cui non ci si separa, l'identità superata che si continua a indossare. Può indicare anche la paura della trasformazione — la preferenza per la stagnazione rispetto al rischio della rigenerazione. A volte: una stagnazione così profonda da sembrare morte.",
+    tappa_nome:"La Fine che è un Inizio", tappa:"Il grande cambiamento non scelto ma necessario: la perdita di una persona cara, la fine di un matrimonio, il crollo di un'identità costruita negli anni, una malattia trasformativa. È la tappa che divide la vita in 'prima' e 'dopo'. Da essa nasce sempre qualcosa di nuovo — ma solo per chi è disposto a seppellire davvero ciò che è finito."
+  },
+  {
+    id:14, roman:"XIV", name:"La Temperanza", theme:"Alchimia · Moderazione · Integrazione",
+    color:"#00b894", sym:"≋",
+    elemento:"Fuoco — il fuoco del processo alchemico che trasforma, che fonde gli opposti senza distruggerli",
+    numero:"14 — Il numero dell'alchimia pratica: 1+4 = 5, il numero della mediazione. Il 14 è il punto di equilibrio del viaggio — dopo la crisi della Morte (13) e prima degli abissi del Diavolo (15). Il centro del labirinto.",
+    astrologia:"Sagittario / Giove — Sagittario è il segno della filosofia, del viaggio, dell'espansione della coscienza, della ricerca del significato superiore. Giove porta abbondanza, saggezza, fede e la capacità di vedere il quadro più grande.",
+    lettera_ebraica:"Samekh (ס) — Il supporto, il sostegno, la struttura circolare chiusa. Samekh è la lettera dell'equilibrio perfetto — la ruota che si sostiene da sola, il ciclo che si auto-alimenta. La Temperanza è il Samekh vivente: il processo di integrazione continua.",
+    parole_chiave:["alchimia","moderazione","integrazione","pazienza","guarigione","flusso","armonia","processo"],
+    simbolismo:"Un angelo androgino dalle grandi ali — né maschile né femminile, perfettamente integrato — versa acqua da una coppa dorata a una coppa d'argento. L'acqua scorre all'incontrario rispetto alla gravità: il miracolo è già in atto. Un piede è nell'acqua (l'inconscio, l'emozione), uno sulla terra (la realtà materiale). Sul petto, un triangolo dentro un quadrato: il fuoco (△) dentro la struttura terrena (□). In distanza, una corona luminosa su un sentiero che sale — la promessa del completamento. Le iris che crescono — sacre a Iride, dea dell'arcobaleno e messaggera tra mondi.",
+    exp:"Un'amica o un amico equilibrato, stabile, pacifico — qualcuno che porta armonia semplicemente con la sua presenza. Il rapporto con questa persona non conosce estremi: niente drammi, niente crisi, niente esaltazioni eccessive. C'è un flusso naturale e costante, come un fiume che scorre senza fretta. È il tipo di legame che dura decenni senza che ci si accorga del tempo che passa — perché non ci sono attriti che usurano.",
+    dritta:"L'arte alchemica dell'integrazione: la capacità di mescolare con precisione assoluta elementi contrari — caldo e freddo, veloce e lento, celeste e terreno — per ottenere qualcosa di armonioso che nessuno dei due aveva da solo. La Temperanza non è mediocrità né compromesso: è la maestria del dosaggio. Porta pazienza senza rassegnazione, visione a lungo termine, la comprensione che i processi più preziosi richiedono tempo e cura.",
+    rovesciata:"L'equilibrio si rompe in modo violento — eccessi di ogni tipo, squilibrio fisico o emotivo, la miscela sbagliata che produce qualcosa di tossico. Può indicare impazienza che distrugge ciò che si stava costruendo con cura, incapacità di integrare aspetti contraddittori di sé stessi, o una vita divisa in compartimenti stagni che non comunicano. A volte: il conflitto tra quel che si 'dovrebbe' essere e quel che si è.",
+    tappa_nome:"L'Integrazione", tappa:"Il periodo di consolidamento e guarigione che segue grandi cambiamenti o traumi. Non è una tappa drammatica — è quella silenziosa e fondamentale in cui si metabolizza tutto ciò che è accaduto, si trovano nuovi equilibri, si costruisce una vita stabile dopo la tempesta. Spesso sottovalutata proprio perché non spettacolare, è in realtà quella che rende possibile tutto il resto."
+  },
+  {
+    id:15, roman:"XV", name:"Il Diavolo", theme:"Ombre · Catene scelte · Il materiale che lega",
+    color:"#d63031", sym:"⛦",
+    elemento:"Terra — la materia che intrappola, il corpo che domina la mente quando si dimentica la propria natura spirituale",
+    numero:"15 — 1+5 = 6 (gli Amanti): il Diavolo è la parodia degli Amanti — la stessa unione, ma basata sulla dipendenza invece che sulla scelta libera. Le stesse due figure, ma incatenate. Il 15 è anche il prodotto di 3 (creatività) × 5 (cambiamento) — la creatività usata per intrappolare.",
+    astrologia:"Capricorno / Saturno — Capricorno è il segno dell'ambizione materiale, della struttura, della paura come motivatore, del potere mondano. Saturno porta i limiti, le strutture rigide, la legge del karma, la realtà pesante che non ammette scorciatoie.",
+    lettera_ebraica:"Ayin (ע) — L'occhio. Ma l'occhio del Diavolo è l'occhio che vede solo la materia, che non riconosce la dimensione spirituale dell'esistenza. L'Ayin è anche il numero 70 — l'occhio che moltiplicato vede in tutte le direzioni, ma se distorto non vede che il proprio desiderio.",
+    parole_chiave:["ombra","dipendenza","materia","illusione","catene scelte","pulsioni","proiezione","liberazione possibile"],
+    simbolismo:"Una figura demoniaca ispirata al Baphomet di Éliphas Lévi siede su un piedistallo di pietra nera. Ha ali di pipistrello (al contrario dell'angelo che ha ali d'aquila), corna di capro, un pentacolo rovesciato sulla fronte. Sotto di lui, due figure umane (Adamo ed Eva, come negli Amanti) sono incatenate al piedistallo — ma le catene sono larghe, potrebbero essere tolte facilmente. Questo è il messaggio centrale: siamo noi a scegliere di restare incatenati. Il Diavolo non ci trattiene con la forza: ci trattiene con le nostre stesse illusioni e dipendenze.",
+    exp:"Un legame di intensità rara e scomoda — qualcuno che conosce i tuoi lati più nascosti, le tue ombre, i tuoi eccessi. Non è necessariamente un rapporto negativo: può essere una delle connessioni più oneste della tua vita, proprio perché non c'è la possibilità di fingere. Hai condiviso eccessi, segreti, momenti in cui eri meno della versione migliore di te. Con questa persona hai fatto i conti con parti di te stesso che avresti preferito non guardare.",
+    dritta:"Le catene che ci si mette da soli — e la cui serratura, crucialmente, è sempre aperta. Il Diavolo porta alla luce le dipendenze, le illusioni materiali, i pattern di comportamento che si ripetono compulsivamente, le relazioni tossiche a cui si torna nonostante tutto. Non è una carta del male: è la carta dell'onestà brutale sulle proprie ombre. La prima condizione per liberarsi è riconoscere le catene come proprie.",
+    rovesciata:"Rovesciata, il Diavolo segna la rottura delle catene: la liberazione da una dipendenza, il riconoscimento di un pattern tossico, la fine di una relazione basata sulla paura o sulla compulsione. È una delle inversioni più positive dell'intero mazzo. Ma può anche indicare il rigetto di tutto ciò che è materiale in modo oppositivo — l'ascetismo ossessivo come altra forma di dipendenza. O: il rifiuto di riconoscere le proprie ombre proiettandole interamente sugli altri.",
+    tappa_nome:"Il Confronto con le Ombre", tappa:"La tappa in cui si riconoscono — spesso con shock — le proprie catene: le dipendenze, i pattern compulsivi, le strutture di pensiero limitanti, le relazioni che fanno male ma a cui non si riesce a rinunciare. Non è necessariamente un periodo drammatico dall'esterno: può essere il momento silenzioso in cui si vede finalmente ciò che si ha sempre evitato di guardare."
+  },
+  {
+    id:16, roman:"XVI", name:"La Torre", theme:"Rivelazione improvvisa · Crollo delle strutture false · Liberazione",
+    color:"#e84393", sym:"⚡",
+    elemento:"Fuoco — il fulmine che distrugge, il fuoco che purifica ciò che non era autentico",
+    numero:"16 — 1+6 = 7 (il Carro): la Torre è il Carro rovesciato — il controllo che si credeva di avere salta all'improvviso. Il 16 è anche il numero della scintilla divina che irrompe nell'ordine umano e lo sconvolge.",
+    astrologia:"Marte (tradizione classica) / Urano (aggiunta moderna) — Marte governa l'azione distruttiva, il conflitto, la guerra, la rottura violenta. Urano porta l'imprevedibile, la rivoluzione, la rottura dell'ordine stabilito. Insieme creano l'immagine della crisi improvvisa che cambia tutto.",
+    lettera_ebraica:"Peh (פ) — La bocca. La bocca di Dio che parla e con la parola trasforma — o distrugge. Il fulmine della Torre è la parola divina che non può essere ignorata: la verità che urla ciò che si voleva far tacere.",
+    parole_chiave:["rivelazione","crollo","liberazione","crisi","sconvolgimento","verità improvvisa","rottura","purificazione"],
+    simbolismo:"Una torre alta e slanciata viene colpita da un fulmine che la spezza in cima, facendo volare via la corona che la sormontava. Due figure cadono dalle finestre — un uomo con la corona (il potere mondano) e un uomo comune (tutti). Fiamme escono dalle finestre. Il cielo è scuro. Ma si noti: la torre è costruita su una roccia — il crollo è del sovrastruttura, non delle fondamenta. E le fiamme hanno la forma di bocche, di yod (le scintille divine della Kabbalah): ciò che cade è fatto di luce sacra che torna alla sua fonte.",
+    exp:"Qualcuno che ha sconvolto le tue certezze in modo radicale — spesso involontariamente, a volte dolorosamente. Il rapporto è nato durante una crisi o ne ha provocata una: ha fatto crollare qualcosa che credevi solido e che in realtà non lo era. Le fondamenta sono rimaste intatte — anzi, sono diventate visibili proprio dopo che la sovrastruttura è caduta. Chi ti ha tolto il suolo da sotto i piedi e ti ha dato terreno più solido.",
+    dritta:"La rivelazione che irrompe senza preavviso e senza possibilità di essere ignorata. Ciò che crolla nella Torre non era reale — erano certezze false, strutture ego-centriche, identità costruite su menzogne o illusioni. Il crollo è doloroso ma necessario: solo dopo che le strutture false sono cadute è possibile vedere le fondamenta reali e costruire qualcosa di autentico. È anche la carta della verità che non può essere contenuta — prima o poi esplode.",
+    rovesciata:"Il crollo viene resistito o ritardato a tutti i costi — la tensione si accumula e la distruzione sarà proporzionalmente più violenta quando arriverà. Può indicare una crisi che si è riusciti a evitare, ma a costo di una rigidità sempre maggiore. O: un crollo già avvenuto ma non ancora elaborato — si vive ancora tra le macerie senza aver iniziato a costruire. A volte: la paura del cambiamento che paralizza in strutture ormai morte.",
+    tappa_nome:"Il Crollo", tappa:"La crisi improvvisa che distrugge ciò che non serviva più — anche se ci si era affezionati profondamente. Può essere un fallimento improvviso, una rivelazione devastante, una perdita brutale. È sempre la tappa più dolorosa nell'immediato e quella di cui si capisce il senso solo molto dopo. Da essa nasce sempre qualcosa — ma solo per chi non resta a piangere tra le macerie."
+  },
+  {
+    id:17, roman:"XVII", name:"La Stella", theme:"Speranza · Guarigione · Ispirazione cosmica",
+    color:"#dfe6e9", sym:"★",
+    elemento:"Aria — la levità della speranza, il soffio di rinnovamento dopo la crisi",
+    numero:"17 — 1+7 = 8 (la Forza): la Stella riporta alla forza gentile, ma ora purificata dalla crisi della Torre. Il 17 è anche il numero della stella a otto punte di Istar/Venere — il pianeta Venere che appare come stella della sera e come stella del mattino, sempre rinascente.",
+    astrologia:"Acquario / Urano — Acquario è il segno dell'idealismo, dell'umanità, dell'innovazione, della visione futura. Urano porta la rottura dei paradigmi, la visione rivoluzionaria, l'ispirazione che arriva da fuori del tempo ordinario.",
+    lettera_ebraica:"Tzaddi (צ) — L'amo da pesca, lo strumento che recupera le cose preziose dalle profondità. La Stella è il Tzaddi dell'anima: recupera la speranza dalle profondità in cui la crisi della Torre l'aveva affondata.",
+    parole_chiave:["speranza","guarigione","ispirazione","rinnovamento","autenticità","fede","vulnerabilità","bellezza"],
+    simbolismo:"Una donna nuda — vulnerabile, autentica, senza difese — è inginocchiata su un terreno a metà tra l'acqua e la terra. Versa acqua da due anfore: una verso la terra (nutrendo la vita materiale), una verso l'acqua (ricircolando l'inconscio, il flusso delle emozioni). Nel cielo, una grande stella a otto punte circondata da sette stelle più piccole — le sette stelle classiche (Sole, Luna, Mercurio, Venere, Marte, Giove, Saturno). Un ibis bianco su un albero — l'uccello sacro a Thoth, dio della saggezza. La nudità della donna: nessuna maschera, nessuna protezione, nessuna falsità.",
+    exp:"Una persona che irradia speranza in modo che sembra quasi irrazionale — che crede ancora in qualcosa di grande quando tutto intorno sembra aver ceduto. Un artista, un idealista, qualcuno che vede bellezza dove gli altri vedono solo macerie. Il legame ti ricarica in modo misterioso: dopo aver parlato con questa persona, il futuro sembra di nuovo possibile. Chi ti restituisce la fede in te stesso nei momenti in cui stai per abbandonarla.",
+    dritta:"La luce che rimane accesa dopo il buio della Torre. La Stella porta guarigione, speranza autentica (non ottimismo cieco, ma fede fondata sull'esperienza della sopravvivenza), connessione con qualcosa di più grande di sé. È anche la carta dell'ispirazione artistica e spirituale — quel tipo di creatività che arriva come dono dall'esterno, che non sembra provenire interamente da sé stessi. Porta anche la guarigione del corpo e dell'anima dopo periodi di stress o malattia.",
+    rovesciata:"La speranza diventa ingenuità — la fede in qualcosa senza nessun fondamento reale, il wishful thinking che sostituisce l'azione. Può indicare la disconnessione dal proprio scopo autentico, l'idealismo che si rifiuta di atterrare nel mondo reale. O: la disperazione mascherata da ottimismo — il sorriso di chi ha smesso di credere ma non riesce ad ammetterlo. A volte: la stella che si vede ma non si riesce a raggiungere.",
+    tappa_nome:"La Guarigione", tappa:"Il periodo di rinnovamento, recupero e ritrovata speranza che segue la crisi della Torre. Non è ancora la vittoria finale — c'è ancora il buio della Luna da attraversare — ma è la ritrovata certezza interiore che ce la si farà. È la tappa in cui si torna a sognare, con più consapevolezza e con una profondità che prima non si aveva."
+  },
+  {
+    id:18, roman:"XVIII", name:"La Luna", theme:"Inconscio · Illusione · Le profondità della psiche",
+    color:"#c39bd3", sym:"☾",
+    elemento:"Acqua — le acque profonde dell'inconscio, il primordiale, ciò che precede la coscienza",
+    numero:"18 — 1+8 = 9 (l'Eremita): la Luna porta la saggezza dell'Eremita nell'oscurità, ma senza la sua lanterna. Il 18 è anche 6+6+6 — il numero della triplice illusione, del velo che rende impenetrabile la realtà.",
+    astrologia:"Pesci / Nettuno (e Luna come astro diretto) — Pesci è il segno dell'inconscio collettivo, della dissoluzione dei confini, della compassione universale e dell'illusione. Nettuno governa i sogni, le dipendenze, le rivelazioni mistiche, l'arte come accesso al divino.",
+    lettera_ebraica:"Qoph (ק) — La parte posteriore della testa, il cervello rettiliano, la coscienza più primitiva e più profonda. Qoph è la lettera dell'inconscio animale — quella parte della mente che il pensiero razionale non riesce a raggiungere ma che governa silenziosamente molte delle nostre scelte.",
+    parole_chiave:["inconscio","illusione","sogno","paura","intuizione profonda","ambiguità","mistero","il buio da attraversare"],
+    simbolismo:"Una luna con un volto umano brilla in un cielo scuro. Ha tre fasi visibili (luna piena con luna crescente dentro — le tre dee: vergine, madre, vecchia). Sul terreno, due torri ai lati del sentiero — il confine tra il mondo conosciuto e l'ignoto. Un gambero/aragosta emerge dall'acqua — la coscienza primitiva, gli istinti più antichi che emergono dall'inconscio. Due cani/lupi ululano alla luna — la dualità della natura animale: il cane domesticato (la mente cosciente addomesticata) e il lupo selvatico (l'inconscio irdomabile). Il sentiero serpeggia verso l'orizzonte senza meta visibile — il viaggio attraverso l'inconscio non ha mappa.",
+    exp:"Una persona enigmatica e profondamente intuitiva, con cui non si riesce mai a stabilire con certezza dove si è. Il legame è onirico, magnetico, a volte confuso — ma esercita una forza di attrazione inesplicabile. Con questa persona si entra in contatto con parti di sé che normalmente non si riconosce: paure antiche, desideri nascosti, intuizioni che la mente razionale rifiuta. Non è necessariamente un rapporto difficile — ma non è mai semplice.",
+    dritta:"L'accesso alle profondità dell'inconscio — sia individuale che collettivo. La Luna porta intuizione straordinaria, la capacità di 'sapere' cose che non si possono spiegare razionalmente, il sogno come linguaggio parallelo della psiche. È anche la carta dell'ambiguità fertile: non tutto deve essere chiarito per essere reale. Le paure irrazionali che emergono durante questo periodo non sono ostacoli — sono messaggi dell'inconscio da ascoltare e integrare.",
+    rovesciata:"Le illusioni si dissolvono — finalmente si vede con chiarezza ciò che si era velato. Ma può anche indicare il polo opposto: le paure prendono il sopravvento totale, l'inconscio erutta senza controllo, la distinzione tra realtà e fantasia diventa impossibile. Stati di paranoia, dissociazione, ossessione. A volte: l'uscita da un periodo di confusione profonda — la luce dell'alba dopo la notte della Luna.",
+    tappa_nome:"La Notte Oscura dell'Anima", tappa:"La tappa di massima confusione interiore — quando non si riesce a vedere il proprio cammino, le paure sembrano realtà, il futuro sembra impossibile. Questo concetto (coniato da San Giovanni della Croce) è universale: quasi ogni percorso spirituale e psicologico profondo attraversa questo territorio. Chi la attraversa senza perdere completamente la bussola — guidato dall'intuizione piuttosto che dalla ragione — emerge trasformato in modo definitivo."
+  },
+  {
+    id:19, roman:"XIX", name:"Il Sole", theme:"Gioia · Chiarezza · Trionfo della coscienza",
+    color:"#f9ca24", sym:"☀",
+    elemento:"Fuoco — il fuoco solare che nutre senza bruciare, la luce che illumina senza accecare",
+    numero:"19 — 1+9 = 10 = 1: la coscienza individuale (1) che ritorna all'unità originale (1) dopo aver percorso tutto il ciclo. Il 19 è anche il numero del ciclo metotonico lunare — il numero di anni dopo i quali le fasi lunari si ripetono negli stessi giorni. Il Sole che integra anche la Luna.",
+    astrologia:"Sole / Leone — Il Sole è la fonte di tutta la vita nel sistema solare, il centro consapevole dell'identità, la luce che permette la visibilità. Leone è il segno del cuore, del coraggio, della dignità, della generosità spontanea.",
+    lettera_ebraica:"Resh (ר) — La testa, il volto, la parte frontale — ciò che è rivolto verso la luce. Resh è la lettera della coscienza esplicita, di ciò che è visibile e conosciuto. Il Sole è la Resh del cosmo: la coscienza esplicita che illumina tutto.",
+    parole_chiave:["gioia","luce","chiarezza","autenticità","successo","infanzia","vitalità","celebrazione"],
+    simbolismo:"Un sole radioso con un volto umano domina il cielo. I raggi sono di due tipi alternati: diritti (energia diretta) e ondulati (energia calda, vitale). In primo piano, un bambino nudo cavalca un cavallo bianco con una bandiera rossa in mano. Il bambino è incoronato di girasoli e porta sulla testa una piuma rossa (la piuma di Maat — la verità nell'iconografia egizia). Sullo sfondo, un muro di girasoli che si rivolgono sempre verso la luce. La nudità del bambino: nessuna maschera, nessuna falsità, nessuna vergogna. Il cavallo bianco: la purezza trionfante. Il bambino, non un adulto: la gioia autentica è sempre un po' infantile — spontanea, immediata, senza calcolo.",
+    exp:"Un legame di gioia pura e autenticità immediata — qualcuno con cui si è completamente se stessi senza filtri né maschere né performance. Può essere un bambino, un amico spensierato, qualcuno che ha la rara capacità di rendere ogni momento leggero senza renderlo banale. Il rapporto porta luce, calore, semplicità genuina. Chi ti fa ridere davvero — di quella risata che non si può fingere. Con questa persona il tempo non pesa mai.",
+    dritta:"La carta più positiva dell'intero mazzo, senza ambiguità. Il Sole porta chiarezza assoluta — nessun segreto, nessuna zona d'ombra, nessuna ambiguità. Porta successo celebrato alla luce del giorno, vitalità inesauribile, la gioia come stato naturale dell'essere anziché come eccezione. È anche la carta dell'infanzia recuperata — non la regressione infantile ma la capacità di meravigliarsi, di giocare, di stare nel momento presente senza peso.",
+    rovesciata:"L'eccessiva positività diventa cecità — si rifiuta di vedere gli aspetti in ombra della realtà, si nega il dolore proprio e altrui in nome di un ottimismo di facciata. Può indicare arroganza mascherata da fiducia, egocentrismo mascherato da calore, la performance della felicità invece della felicità autentica. O semplicemente: un periodo di minor energia e vitalità — il sole è temporaneamente coperto dalle nuvole, non scomparso.",
+    tappa_nome:"Il Trionfo", tappa:"Il periodo di massima espressione, vitalità e successo — il momento in cui tutti i pezzi si allineano. Non è necessariamente il più importante della vita, ma è il più luminoso. Corrisponde a volte all'infanzia felice, a volte al periodo di massimo successo professionale e personale, a volte a un breve periodo di grazia in mezzo a una vita più complessa. Non dura per sempre — non deve durare: è il dono del momento perfetto."
+  },
+  {
+    id:20, roman:"XX", name:"Il Giudizio", theme:"Risveglio · Redenzione · La chiamata che non si può ignorare",
+    color:"#f0f0f0", sym:"☆",
+    // CORREZIONE: Plutone/Saturno era impreciso. Tradizione GD: Fuoco (lettera Shin).
+    // Plutone per il tema resurrezione/trasformazione radicale è moderno ma giustificato.
+    // Saturno meno pertinente qui — più della Morte o del Mondo.
+    elemento:"Fuoco — il fuoco divino della resurrezione, la fiamma dello Shin che brucia le impurità e risveglia l'essenziale",
+    numero:"20 — 2+0 = 2 (la Papessa): il Giudizio riporta alla dualità, ma ora illuminata. Il 20 è anche 4×5 — la struttura (4) che si trasforma attraverso il cambiamento (5). Il penultimo atto prima del completamento.",
+    astrologia:"Plutone (modernità) / Fuoco come elemento primario (tradizione GD) — Plutone governa la trasformazione radicale attraverso la crisi, la morte e la resurrezione simbolica, il potere che emerge dalle profondità. Il fuoco (Shin) della tradizione Golden Dawn è il fuoco dello spirito divino che scende e ridesta.",
+    lettera_ebraica:"Shin (ש) — Il dente, il fuoco, la lettera madre del fuoco. Shin è il fuoco divino che trasforma senza distruggere — come il fuoco che bruciava nel roveto ardente di Mosè. È anche la lettera iniziale di Shalom (pace) e Shaddai (un nome di Dio): il fuoco che porta la pace attraverso il risveglio.",
+    parole_chiave:["risveglio","redenzione","chiamata","trasformazione finale","perdono","vocazione","resurrezione","chiarezza definitiva"],
+    simbolismo:"L'arcangelo Gabriele soffia in una grande tromba d'oro, con uno stendardo bianco decorato con una croce rossa (la croce di San Giorgio — la purificazione attraverso il sacrificio). Dal basso emergono uomini, donne e bambini da bare aperte — non scheletri ma corpi rinati, con le braccia alzate in gesto di supplica o gioia. La scena è sul mare — le acque primordiali dell'inconscio (la Luna) che ora restituiscono i loro tesori sepolti. Sullo sfondo, montagne di ghiaccio — le difese che si sciolgono davanti alla forza del risveglio. Non è la fine del mondo: è la fine dell'illusione che il mondo sia questo.",
+    exp:"Qualcuno che ti ha aiutato a risvegliarti — nel senso più profondo del termine. Non a capire qualcosa di teorico, ma a vedere onestamente chi sei, cosa hai fatto, cosa stai evitando. Il rapporto ha comportato un momento di resa dei conti autentica — non giudizio esterno ma auto-riconoscimento senza filtri. Dopo questa persona, alcune verità su te stesso non sono più ignorabili. È uno dei rapporti più rari e più preziosi — e spesso uno dei più difficili.",
+    dritta:"La chiamata al risveglio — quella voce interiore (o quell'evento esterno) che non può essere messa a tacere ulteriormente. Il Giudizio porta una chiarezza definitiva sulla propria vita, sulla propria vocazione, sul proprio percorso autentico. Porta anche la possibilità di redenzione — il perdono di sé stessi e degli altri per ciò che è stato, la comprensione che il passato non può essere cambiato ma può essere integrato e superato. È la carta della seconda possibilità che si guadagna con la piena consapevolezza.",
+    rovesciata:"L'incapacità di rispondere alla chiamata — si sente la tromba ma si finge di non sentirla. L'auto-giudizio che diventa paralisi invece di liberazione, il senso di colpa che non produce trasformazione ma solo sofferenza sterile. Può indicare il rifiuto di guardare il proprio passato onestamente, la preferenza per l'amnesia alla comprensione. O: il giudizio degli altri come sostituto del giudizio interiore — lasciarsi definire dall'esterno invece di ascoltare la propria voce.",
+    tappa_nome:"La Resa dei Conti", tappa:"Il momento in cui si guarda indietro sull'intero percorso e si valuta onestamente — non per condannarsi ma per comprendere. Spesso coincide con grandi anniversari, con la mezza età, con una crisi spirituale profonda, o con la guarigione da qualcosa che durava da anni. Da questa tappa emerge una vocazione più autentica e definitiva — la versione più vera di sé stessi."
+  },
+  {
+    id:21, roman:"XXI", name:"Il Mondo", theme:"Completamento · Integrazione · La danza dell'esistenza",
+    color:"#55efc4", sym:"◯",
+    elemento:"Terra (sintesi di tutti e quattro gli elementi — toro/terra, leone/fuoco, aquila/acqua, angelo/aria nei quattro angoli)",
+    numero:"21 — 2+1 = 3 (l'Imperatrice): il completamento ritorna alla creatività originale, ma ora integrata. Il 21 è anche 7×3 — la saggezza (7) moltiplicata per la creatività (3). Il numero del Grande Completamento.",
+    astrologia:"Saturno / Sintesi planetaria — Saturno è il pianeta del tempo, dei limiti, della struttura, del completamento dei cicli. Ma il Mondo evoca tutti i pianeti, tutte le sfere, l'intero sistema cosmico. Saturno come 'il Vecchio' che chiude ogni ciclo con la falce del tempo.",
+    lettera_ebraica:"Tau (ת) — La croce, l'ultima lettera dell'alfabeto ebraico. Tau è il sigillo della creazione — l'ultima lettera, il completamento del linguaggio divino. È anche la croce di ogni possibilità umana: le quattro direzioni, i quattro elementi, il centro che li integra tutti.",
+    parole_chiave:["completamento","integrazione","totalità","libertà guadagnata","realizzazione","pienezza","il cerchio che si chiude","la danza"],
+    simbolismo:"Una figura androgina danza dentro una ghirlanda ovale intrecciata di alloro verde — un cerchio di vittoria e di eternità. La figura è avvolta in un velo viola (il colore della saggezza e del mistero) e tiene in ciascuna mano una bacchetta — come il Mago, ma ora il potere è pienamente integrato e gioioso. Nei quattro angoli della carta: il toro alato (Toro/Terra), il leone (Leone/Fuoco), l'aquila (Scorpione/Acqua nella sua versione elevata), l'angelo (Acquario/Aria) — i quattro evangelisti, i quattro elementi, i quattro punti cardinali. Sono gli stessi della Ruota della Fortuna (X), ma ora non girano: sono arrivati al riposo del completamento. La ghirlanda è una yoni — il portale della creazione, l'utero del mondo.",
+    exp:"Il legame più completo e realizzato — qualcuno con cui è stato condiviso un percorso intero, che rappresenta un capitolo pienamente vissuto della propria vita. Con questa persona ci si sente interi — non perché sia tutto, ma perché insieme si è attraversato tutto: l'inizio, la crescita, le crisi, la trasformazione, la stabilità. Il rapporto dà un senso di totalità e realizzazione che pochi altri riescono ad eguagliare. Spesso è il legame di più lunga durata.",
+    dritta:"Il completamento assoluto — non come fine ma come pienezza. Il Mondo rappresenta il momento in cui il viaggio del Matto si conclude: il Matto (0) che ha attraversato tutti gli arcani è diventato il Mondo stesso — integrato, completo, libero. Porta integrazione di tutte le esperienze vissute, senso di realizzazione profonda che non dipende dalle circostanze esterne, libertà autentica (non la libertà ingenua del Matto ma quella guadagnata attraverso ogni prova). È anche la carta del successo totale — materiale e spirituale insieme.",
+    rovesciata:"Il completamento viene rimandato — il cerchio non si chiude perché si ha paura di cosa succede dopo la fine. La stagnazione proprio sul punto di traguardo, l'incapacità di riconoscere che qualcosa si è davvero compiuto e che è il momento di ricominciare come il Matto. A volte: il perfezionismo che impedisce di dichiarare qualcosa finito, perché 'non è ancora abbastanza'. O: la dipendenza da un'identità che era valida ma che ha esaurito il suo ciclo.",
+    tappa_nome:"Il Grande Completamento", tappa:"La fine del Grande Ciclo — che poi ricomincia immediatamente come il Matto (0). È la tappa in cui si guarda indietro e si vede finalmente tutto il senso del percorso. Non è la fine della vita: è la fine di una fase fondamentale dell'esistenza. Da qui si riparte — ma come persone radicalmente più intere di quanto non si fosse all'inizio. Il cerchio che si chiude è la porta del cerchio successivo."
+  }
+];
+
+const STATI=[
+  {key:'stabile',label:'Stabile',color:'#00b894'},
+  {key:'difficolta',label:'In Difficoltà',color:'#fdcb6e'},
+  {key:'rovesciato',label:'Rovesciato',color:'#d63031'},
+  {key:'bloccato',label:'Bloccato',color:'#636e72'},
+];
+const STATO_C={stabile:'#00b894',difficolta:'#fdcb6e',rovesciato:'#d63031',bloccato:'#636e72'};
+
+const ANN_TIPI={
+  compleanno:{icon:'🎂',label:'Compleanno'},
+  primo_incontro:{icon:'🤝',label:'Prima volta insieme'},
+  anniversario:{icon:'💫',label:'Anniversario'},
+  altro:{icon:'📌',label:'Data speciale'},
+};
+const MESI=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+const MESI_S=['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────────────────────
+let sel=0, data={}, logType='incontro', pendingDel=null, detailOpen=false, currentView='arcani';
+
+const getD=id=>data[id]||null;
+const setD=(id,d)=>{data[id]=d;save();};
+function save(){try{localStorage.setItem('sl-v5',JSON.stringify(data));}catch(e){}}
+function load(){try{data=JSON.parse(localStorage.getItem('sl-v5')||'{}');}catch(e){data={};}}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DATE HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
+function today(){return new Date().toISOString().slice(0,10);}
+
+function nextOccurrence(month,day){
+  const now=new Date();
+  const thisYear=now.getFullYear();
+  let d=new Date(thisYear,month-1,day);
+  // normalise (e.g. Feb 30 → next valid date)
+  if(d.getMonth()!==month-1) d=new Date(thisYear,month,0); // last day of month
+  if(d<now) d=new Date(thisYear+1,month-1,day);
+  return d;
+}
+
+function daysUntil(date){
+  const now=new Date(); now.setHours(0,0,0,0);
+  const d=new Date(date); d.setHours(0,0,0,0);
+  return Math.round((d-now)/86400000);
+}
+
+function fmtDate(ds){
+  if(!ds)return'';
+  const M=['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+  const[y,m,d]=ds.split('-');
+  return`${parseInt(d)} ${M[parseInt(m)-1]} ${y}`;
+}
+
+function fmtAnnDate(month,day,anno){
+  return`${day} ${MESI[month-1]}${anno?' '+anno:''}`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SUGGESTIONS ENGINE
+// ─────────────────────────────────────────────────────────────────────────────
+function computeSuggestions(d,a){
+  const suggs=[];
+  const now=new Date(); now.setHours(0,0,0,0);
+  const log=d.log||[];
+  const incontri=log.filter(e=>e.type==='incontro');
+  const lastInc=incontri.length?incontri.reduce((a,b)=>a.date>b.date?a:b):null;
+  const daysSince=lastInc?daysUntil(new Date(lastInc.date)):null;
+  // negative daysSince means last encounter was N days ago
+  const daysAgo=daysSince!==null?-daysSince:null;
+
+  const inc7=incontri.filter(e=>e.date&&(now-new Date(e.date))/86400000<=7).length;
+  const inc30=incontri.filter(e=>e.date&&(now-new Date(e.date))/86400000<=30).length;
+  const lastLvl=[...log].reverse().find(e=>e.type==='lvl');
+  const daysSinceLvl=lastLvl?Math.round((now-new Date(lastLvl.date))/86400000):null;
+  const stato=d.stato||'stabile';
+
+  // anniversari imminenti (≤14gg)
+  const anns=(d.anniversari||[]);
+  anns.forEach(an=>{
+    const nxt=nextOccurrence(an.month,an.day);
+    const du=daysUntil(nxt);
+    if(du>=0&&du<=14){
+      const tipo=ANN_TIPI[an.tipo]||ANN_TIPI.altro;
+      const when=du===0?'oggi!':`tra ${du} giorn${du===1?'o':'i'}`;
+      suggs.push({icon:'🗓',color:'#fd79a8',text:`${tipo.icon} ${an.label||tipo.label}: <strong>${when}</strong>${an.note?` — ${an.note}`:''}`});
+    }
+  });
+
+  // incontri recenti
+  if(daysAgo!==null&&daysAgo>45){
+    suggs.push({icon:'⏳',color:'#fdcb6e',text:`Non vi vedete da <strong>${daysAgo} giorni</strong>. Potrebbe essere il momento di un incontro.`});
+  }else if(daysAgo!==null&&daysAgo>20&&stato==='difficolta'){
+    suggs.push({icon:'⏳',color:'#fdcb6e',text:`Distanza di <strong>${daysAgo} giorni</strong> con un legame in difficoltà — la lontananza può aggravare la situazione.`});
+  }
+
+  if(inc7>=3){
+    suggs.push({icon:'✦',color:'#55efc4',text:`<strong>${inc7} incontri</strong> nell'ultima settimana — il legame è molto attivo in questo periodo.`});
+  }
+
+  // stato
+  if(stato==='rovesciato'){
+    suggs.push({icon:'⚡',color:'#e84393',text:'Legame in stato <strong>Rovesciato</strong>. Un confronto diretto e onesto potrebbe essere il primo passo per cambiare la direzione.'});
+  }else if(stato==='bloccato'){
+    suggs.push({icon:'⚖',color:'#636e72',text:'Legame <strong>Bloccato</strong>. Anche una piccola iniziativa — un messaggio, una proposta — può sbloccare la situazione.'});
+  }else if(stato==='difficolta'&&inc30===0){
+    suggs.push({icon:'∿',color:'#fdcb6e',text:'Legame in difficoltà e nessun incontro nell\'ultimo mese. La pazienza è importante, ma anche la presenza.'});
+  }
+
+  // stagnazione di livello
+  if(d.level>0&&d.level<10&&daysSinceLvl!==null&&daysSinceLvl>75){
+    suggs.push({icon:'📈',color:a.color,text:`Al livello <strong>${d.level}</strong> da ${daysSinceLvl} giorni. Il legame potrebbe essere pronto per crescere.`});
+  }
+
+  // nessun incontro registrato ma ci sono voci
+  if(incontri.length===0&&log.length>0){
+    suggs.push({icon:'🤝',color:'#74b9ff',text:'Hai voci nel diario ma nessun <strong>incontro registrato</strong>. Inizia a tracciarli per statistiche più precise.'});
+  }
+
+  // molti incontri, livello ancora 0
+  if(incontri.length>=4&&d.level===0){
+    suggs.push({icon:'★',color:a.color,text:`<strong>${incontri.length} incontri</strong> registrati e il legame è ancora al livello 0. Ha già superato una soglia importante?`});
+  }
+
+  // nessuna nota/appunto per legami consolidati
+  if(d.level>=3&&!(d.notes||'').trim()&&log.filter(e=>e.type==='nota').length===0){
+    suggs.push({icon:'📝',color:'#a29bfe',text:'Nessun appunto o nota per questo legame. Cosa rappresenta davvero per te?'});
+  }
+
+  return suggs;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// VIEW SWITCHING
+// ─────────────────────────────────────────────────────────────────────────────
+function setView(v){
+  currentView=v;
+  ['arcani','panoramica','statistiche','impostazioni'].forEach(k=>{
+    document.getElementById('view-'+k).style.display=k===v?'block':'none';
+  });
+  document.querySelectorAll('.nav-tab').forEach((el,i)=>{
+    el.classList.toggle('active',['arcani','panoramica','statistiche','impostazioni'][i]===v);
+  });
+  if(v==='panoramica')rPanoramica();
+  if(v==='statistiche')rStatistiche();
+  if(v==='impostazioni'){rImpostazioni();setTimeout(()=>{updateBackupStatus();checkBackupReminder();},50);}
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER LEFT
+// ─────────────────────────────────────────────────────────────────────────────
+function rLeft(){
+  document.getElementById('left').innerHTML=ARCANA.map(a=>{
+    const d=getD(a.id);
+    const sc=d&&d.stato?STATO_C[d.stato]:null;
+    // check upcoming ann
+    const hasUpcomingAnn=d&&(d.anniversari||[]).some(an=>{
+      const du=daysUntil(nextOccurrence(an.month,an.day));
+      return du>=0&&du<=14;
+    });
+    return`<div class="arc-row${sel===a.id?' sel':''}" onclick="selArc(${a.id})">
+      <div class="arc-ico" style="border:1px solid ${a.color}30;background:${a.color}12;color:${a.color}">${a.roman}</div>
+      <div class="arc-info">
+        <div class="arc-nm" style="color:${d?'#ccc':'#3a3a3a'}">${a.name}</div>
+        ${d?`<div class="arc-person-lbl">${esc(d.name||'—')}</div>`:''}
+      </div>
+      ${d?`<div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0">
+        <div class="lvl-chip" style="background:${a.color}18;color:${a.color}">Lv.${d.level}</div>
+        <div style="display:flex;gap:3px;align-items:center">
+          ${sc?`<div class="stato-dot" style="background:${sc}"></div>`:''}
+          ${hasUpcomingAnn?`<div style="width:5px;height:5px;border-radius:50%;background:#fd79a8"></div>`:''}
+        </div>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER ARC TOP + DETAIL
+// ─────────────────────────────────────────────────────────────────────────────
+function rTop(){
+  const a=ARCANA[sel];
+  document.getElementById('arc-top').innerHTML=`
+    <div class="tarot-card" style="background:linear-gradient(155deg,#0c0c18,${a.color}1a);border:1px solid ${a.color}50;box-shadow:0 0 28px ${a.color}14">
+      <div class="t-roman" style="color:${a.color}">${a.roman}</div>
+      <div class="t-sym" style="color:${a.color};filter:drop-shadow(0 0 10px ${a.color}88)">${a.sym}</div>
+      <div class="t-name" style="color:${a.color}bb">${a.name.toUpperCase()}</div>
+    </div>
+    <div class="arc-exp">
+      <div class="exp-lbl" style="color:${a.color}">ARCANO ${a.roman} — TIPO DI LEGAME</div>
+      <div class="exp-title">${a.name}</div>
+      <div class="exp-theme">${a.theme}</div>
+      <div class="exp-text">${a.exp}</div>
+    </div>`;
+}
+
+function rDetail(){
+  const a=ARCANA[sel];
+  document.getElementById('arc-detail').innerHTML=`
+    <div class="det-toggle" onclick="toggleDetail()">
+      <div class="det-line"></div>
+      <span class="detail-toggle-lbl">APPROFONDIMENTO DELLA CARTA</span>
+      <span class="det-arrow${detailOpen?' open':''}" id="det-arrow">▶</span>
+      <div class="det-line"></div>
+    </div>
+    <div id="detail-body" ${detailOpen?'':'style="display:none"'}>
+
+      <!-- Chips: elemento / numero / astrologia / lettera ebraica -->
+      <div class="chips-row">
+        <span class="chip" style="color:${a.color};border-color:${a.color}40;background:${a.color}0e">⬡ ${a.elemento.split('—')[0].trim()}</span>
+        <span class="chip" style="color:#f0c040;border-color:#1c1c2e;background:#0a0a14">✦ ${a.astrologia.split('—')[0].split('/')[0].trim()}</span>
+        ${a.lettera_ebraica?`<span class="chip" style="color:#a29bfe;border-color:#a29bfe40;background:#a29bfe0e">ℵ ${a.lettera_ebraica.split('—')[0].split('(')[0].trim()}</span>`:''}
+      </div>
+
+      <!-- Parole chiave -->
+      ${a.parole_chiave&&a.parole_chiave.length?`
+      <div style="margin-bottom:14px;display:flex;gap:6px;flex-wrap:wrap">
+        ${a.parole_chiave.map(k=>`<span style="font-size:10px;font-family:var(--fb);color:${a.color}bb;border:1px solid ${a.color}30;padding:2px 8px;border-radius:2px;letter-spacing:1px">${k}</span>`).join('')}
+      </div>`:''}
+
+      <!-- Simbolismo della carta -->
+      ${a.simbolismo?`
+      <div class="det-block" style="border-left:2px solid ${a.color}44;margin-bottom:12px">
+        <div class="det-block-title" style="color:${a.color}88">ICONOGRAFIA E SIMBOLISMO</div>
+        <div class="det-block-text">${a.simbolismo}</div>
+      </div>`:''}
+
+      <!-- Lettera ebraica + numero — testo esteso -->
+      <div class="detail-grid" style="margin-bottom:12px">
+        ${a.lettera_ebraica?`
+        <div class="det-block" style="border-left:2px solid #a29bfe55">
+          <div class="det-block-title" style="color:#a29bfe">LETTERA EBRAICA</div>
+          <div class="det-block-text">${a.lettera_ebraica}</div>
+        </div>`:'<div></div>'}
+        <div class="det-block" style="border-left:2px solid #55555544">
+          <div class="det-block-title" style="color:#f0c040">NUMEROLOGIA</div>
+          <div class="det-block-text">${a.numero}</div>
+        </div>
+      </div>
+
+      <!-- Astrologia testo esteso -->
+      <div class="det-block" style="border-left:2px solid #fdcb6e44;margin-bottom:12px">
+        <div class="det-block-title" style="color:#fdcb6e">CORRISPONDENZE ASTROLOGICHE</div>
+        <div class="det-block-text">${a.astrologia}</div>
+      </div>
+
+      <!-- Dritta / Rovesciata -->
+      <div class="detail-grid">
+        <div class="det-block" style="border-left:2px solid ${a.color}55">
+          <div class="det-block-title" style="color:${a.color}">SIGNIFICATO DRITTA</div>
+          <div class="det-block-text">${a.dritta}</div>
+        </div>
+        <div class="det-block" style="border-left:2px solid #333">
+          <div class="det-block-title" style="color:#f0c040">SIGNIFICATO ROVESCIATA</div>
+          <div class="det-block-text">${a.rovesciata}</div>
+        </div>
+      </div>
+
+      <!-- Tappa -->
+      <div class="det-stage" style="background:${a.color}0a;border-left:3px solid ${a.color}">
+        <div class="det-stage-lbl" style="color:${a.color}">TAPPA DELLA VITA</div>
+        <div class="det-stage-title">${a.tappa_nome}</div>
+        <div class="det-stage-text" style="color:#f0c040">${a.tappa}</div>
+      </div>
+    </div>`;
+}
+
+function toggleDetail(){
+  detailOpen=!detailOpen;
+  const body=document.getElementById('detail-body');
+  const arrow=document.getElementById('det-arrow');
+  if(body)body.style.display=detailOpen?'block':'none';
+  if(arrow)arrow.className='det-arrow'+(detailOpen?' open':'');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER LEGAME
+// ─────────────────────────────────────────────────────────────────────────────
+function rLegame(){
+  const a=ARCANA[sel];const d=getD(sel);
+  let html=`<div class="leg-hdr">
+    <div class="leg-lbl">IL TUO LEGAME · ${a.name.toUpperCase()}</div>
+    <div class="btn-row">`;
+  if(!d)html+=`<button class="btn btn-r" onclick="assignPerson()">+ Assegna persona</button>`;
+  else  html+=`<button class="btn btn-g btn-sm" onclick="removePerson()">✕ Rimuovi</button>`;
+  html+=`</div></div>`;
+  if(!d){
+    html+=`<div class="empty-leg">NESSUN LEGAME ASSEGNATO<br><span style="font-size:11px;color:#f0c040;display:block;margin-top:10px">Clicca "+ Assegna persona" per iniziare</span></div>`;
+    document.getElementById('legame').innerHTML=html;return;
+  }
+
+  const bars=Array.from({length:10},(_,i)=>`<div class="lbar" style="${i<d.level?`background:${a.color}`:''}"></div>`).join('');
+  const ph=d.photo?`<img src="${d.photo}" alt="">`:`<span style="color:${a.color}">${(d.name||'?').charAt(0).toUpperCase()}</span>`;
+  const stato=d.stato||'stabile';
+  const statoBtns=STATI.map(s=>`<button class="stato-btn s-${s.key}${stato===s.key?' active':''}" onclick="setStato('${s.key}')">${s.label}</button>`).join('');
+
+  // suggestions
+  const suggs=computeSuggestions(d,a);
+  const suggHTML=suggs.length?`<div class="sugg-section">${suggs.map(s=>`
+    <div class="sugg-item" style="border-left-color:${s.color}">
+      <span class="sugg-icon">${s.icon}</span>
+      <span class="sugg-text">${s.text}</span>
+    </div>`).join('')}</div>`:'';
+
+  // anniversari
+  const annHTML=rAnniversari(d,a);
+
+  html+=`<div id="person-box">
+    <div class="p-head">
+      <div class="p-photo" onclick="triggerPhoto()" style="background:${a.color}14;border:2px solid ${a.color}40">${ph}</div>
+      <input type="file" id="photo-inp" accept="image/*" style="display:none" onchange="handlePhoto(event)">
+      <div class="p-meta">
+        <input class="p-name-inp" id="p-name" value="${esc(d.name||'')}" placeholder="Nome del legame…" onchange="saveName()" onblur="saveName()">
+        <div class="p-lvl-row">
+          <div class="lvl-big" style="color:${a.color}">${d.level}</div>
+          <div class="lvl-of">/10</div>
+          <div class="lvl-bars">${bars}</div>
+        </div>
+      </div>
+    </div>
+    <div class="stato-row"><span class="stato-lbl">STATO</span>${statoBtns}</div>
+    ${suggHTML}
+    <div class="p-actions">
+      <button class="btn btn-g btn-sm" onclick="openLog('incontro')">🤝 Segna incontro</button>
+      <button class="btn btn-r btn-sm" onclick="openLog('lvl')" ${d.level>=10?'disabled':''}>📈 Sali di livello</button>
+      <button class="btn btn-g btn-sm" onclick="openLog('nota')">📝 Nota</button>
+      ${d.level>0?`<button class="btn btn-g btn-sm" onclick="decLevel()">↩ −1</button>`:''}
+    </div>
+    <div class="log-sec">
+      <div class="sec-title">DIARIO DEL LEGAME</div>
+      ${rLog(d,a)}
+    </div>
+    ${annHTML}
+    <div class="notes-sec">
+      <div class="sec-title">APPUNTI GENERALI</div>
+      <textarea class="notes-ta" id="notes-ta" placeholder="Pensieri, riflessioni, ricordi…" onblur="saveNotes()">${esc(d.notes||'')}</textarea>
+    </div>
+  </div>`;
+  document.getElementById('legame').innerHTML=html;
+}
+
+function rLog(d,a){
+  const log=(d.log||[]).slice().reverse();
+  if(!log.length)return`<div class="log-empty">Nessuna voce ancora.</div>`;
+  const TYPE_META={
+    lvl:{dot:a.color,badge:e=>`<span class="log-badge" style="background:${a.color}20;color:${a.color}">→ Livello ${e.newLevel}</span>`},
+    incontro:{dot:'#4a9eff',badge:e=>{
+      const parts=['Incontro'];if(e.tod)parts.push(e.tod);if(e.luogo)parts.push(e.luogo);
+      return`<span class="log-badge" style="background:#4a9eff20;color:#4a9eff">${parts.join(' · ')}</span>`;
+    }},
+    nota:{dot:'#2a2a3a',badge:()=>''},
+  };
+  return log.map(e=>{
+    const m=TYPE_META[e.type]||TYPE_META.nota;
+    return`<div class="log-entry">
+      <div class="log-dot" style="background:${m.dot}"></div>
+      <div class="log-body">
+        <div class="log-top"><span class="log-date">${fmtDate(e.date)}</span>${m.badge(e)}<button class="log-del" onclick="askDel('${e.id}')">✕</button></div>
+        ${e.text?`<div class="log-text" style="color:#f0c040">${esc(e.text)}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function rAnniversari(d,a){
+  const anns=d.anniversari||[];
+  const annItems=anns.length?anns.map(an=>{
+    const tipo=ANN_TIPI[an.tipo]||ANN_TIPI.altro;
+    const nxt=nextOccurrence(an.month,an.day);
+    const du=daysUntil(nxt);
+    let upcoming='';
+    if(du>=0&&du<=14){
+      const when=du===0?'OGGI!':`tra ${du}gg`;
+      upcoming=`<span class="ann-upcoming" style="background:#fd79a860;color:#fd79a8">${when}</span>`;
+    }else if(du>=0&&du<=30){
+      upcoming=`<span class="ann-upcoming" style="background:#6c5ce720;color:#6c5ce7">fra ${du}gg</span>`;
+    }
+    return`<div class="ann-item">
+      <div class="ann-icon">${tipo.icon}</div>
+      <div class="ann-body">
+        <div class="ann-label">${esc(an.label||tipo.label)}</div>
+        <div class="ann-date">${fmtAnnDate(an.month,an.day,an.anno)}${an.note?` · ${esc(an.note)}`:''}</div>
+      </div>
+      ${upcoming}
+      <button class="ann-del" onclick="delAnn('${an.id}')">✕</button>
+    </div>`;
+  }).join('') : `<div class="log-empty">Nessuna data ancora.</div>`;
+
+  return`<div class="ann-sec">
+    <div class="sec-title">
+      DATE IMPORTANTI
+      <button class="btn btn-g btn-xs" onclick="openAnnModal()">+ Aggiungi</button>
+    </div>
+    ${annItems}
+  </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PANORAMICA
+// ─────────────────────────────────────────────────────────────────────────────
+function rPanoramica(){
+  const cards=ARCANA.map(a=>{
+    const d=getD(a.id);
+    const empty=!d;
+    const stato=d?d.stato||'stabile':null;
+    const sc=stato?STATO_C[stato]:null;
+    const bars=d?Array.from({length:10},(_,i)=>`<div class="pan-lbar" style="${i<d.level?`background:${a.color}`:''}"></div>`).join(''):'';
+    const hasAnn=d&&(d.anniversari||[]).some(an=>daysUntil(nextOccurrence(an.month,an.day))<=14&&daysUntil(nextOccurrence(an.month,an.day))>=0);
+    return`<div class="pan-card${empty?' empty':''}"
+      style="background:linear-gradient(135deg,${a.color}${empty?'08':'13'},#08080f);border-color:${a.color}${empty?'15':'33'}"
+      onclick="selArcGo(${a.id})">
+      ${hasAnn?'<div class="ann-ping"></div>':''}
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="pan-roman" style="color:${a.color}">${a.roman}</div>
+        ${sc?`<div style="width:7px;height:7px;border-radius:50%;background:${sc}"></div>`:''}
+      </div>
+      <div class="pan-sym" style="color:${a.color};filter:drop-shadow(0 0 6px ${a.color}66)">${a.sym}</div>
+      <div>
+        <div class="pan-arcname" style="color:${empty?'#2a2a2a':a.color+'cc'}">${a.name}</div>
+        ${d?`<div class="pan-person">${esc(d.name||'—')}</div>`:`<div class="pan-person" style="color:#f0c040">Non assegnato</div>`}
+      </div>
+      ${d?`<div class="pan-lvl-row">${bars}</div>`:''}
+    </div>`;
+  }).join('');
+
+  document.getElementById('view-panoramica').innerHTML=`
+    <div class="pan-title">PANORAMICA — TUTTI GLI ARCANI</div>
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+      ${STATI.map(s=>`<div style="display:flex;align-items:center;gap:5px;font-size:11px;font-family:var(--fb);color:#f0c040;letter-spacing:1px">
+        <div style="width:7px;height:7px;border-radius:50%;background:${s.color}"></div>${s.label}
+      </div>`).join('')}
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;font-family:var(--fb);color:#f0c040;letter-spacing:1px">
+        <div style="width:7px;height:7px;border-radius:50%;background:#fd79a8;animation:ping 2s infinite"></div>Anniversario imminente
+      </div>
+    </div>
+    <div class="pan-grid">${cards}</div>`;
+}
+
+function selArcGo(id){sel=id;setView('arcani');rAll();}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATISTICHE
+// ─────────────────────────────────────────────────────────────────────────────
+function rStatistiche(){
+  const el=document.getElementById('view-statistiche');
+  const now=new Date();now.setHours(0,0,0,0);
+
+  const legami=ARCANA.map(a=>{
+    const d=getD(a.id);if(!d)return null;
+    const log=d.log||[];
+    const incontri=log.filter(e=>e.type==='incontro');
+    const inc30=incontri.filter(e=>e.date&&(now-new Date(e.date))/86400000<=30);
+    const lastInc=incontri.length?incontri.reduce((a,b)=>a.date>b.date?a:b):null;
+    const daysAgo=lastInc?Math.round((now-new Date(lastInc.date))/86400000):null;
+    return{a,d,log,incontri,inc30,lastInc,daysAgo};
+  }).filter(Boolean);
+
+  const totLeg=legami.length;
+  const totInc=legami.reduce((s,l)=>s+l.incontri.length,0);
+  const totLog=legami.reduce((s,l)=>s+l.log.length,0);
+  const avgLvl=totLeg?(legami.reduce((s,l)=>s+l.d.level,0)/totLeg).toFixed(1):'—';
+
+  const piuVisti=[...legami].filter(l=>l.inc30.length>0).sort((a,b)=>b.inc30.length-a.inc30.length).slice(0,5);
+  const maxV=piuVisti[0]?.inc30.length||1;
+  const privilegiati=[...legami].filter(l=>l.log.length>0).sort((a,b)=>b.log.length-a.log.length).slice(0,5);
+  const maxP=privilegiati[0]?.log.length||1;
+  const daLavorare=legami.filter(l=>{
+    if(l.d.stato==='bloccato')return true;
+    if(l.inc30.length===0&&l.incontri.length>0)return true;
+    if(l.d.level<3&&l.incontri.length<2)return true;
+    return false;
+  }).slice(0,5);
+
+  // heatmap
+  const DAYS=['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+  const TODS=['Mattina','Pomeriggio','Sera','Notte'];
+  const cal={};
+  DAYS.forEach(d=>{cal[d]={};TODS.forEach(t=>{cal[d][t]=0;});});
+  legami.forEach(l=>l.incontri.forEach(e=>{
+    if(!e.date)return;
+    const d=DAYS[new Date(e.date).getDay()];
+    const t=e.tod||'Sera';
+    if(cal[d]&&cal[d][t]!==undefined)cal[d][t]++;
+  }));
+  const calMax=Math.max(1,...DAYS.flatMap(d=>TODS.map(t=>cal[d][t])));
+
+  // prossimi anniversari (60gg)
+  const upcoming=[];
+  legami.forEach(l=>{
+    (l.d.anniversari||[]).forEach(an=>{
+      const nxt=nextOccurrence(an.month,an.day);
+      const du=daysUntil(nxt);
+      if(du>=0&&du<=60){
+        const tipo=ANN_TIPI[an.tipo]||ANN_TIPI.altro;
+        upcoming.push({du,an,tipo,d:l.d,a:l.a,nxt});
+      }
+    });
+  });
+  upcoming.sort((a,b)=>a.du-b.du);
+
+  el.innerHTML=`
+  <div class="stat-section">
+    <div class="stat-section-title">RIEPILOGO</div>
+    <div class="stat-cards">
+      <div class="stat-card"><div class="stat-card-val">${totLeg}</div><div class="stat-card-lbl">LEGAMI ATTIVI</div></div>
+      <div class="stat-card"><div class="stat-card-val">${totInc}</div><div class="stat-card-lbl">INCONTRI TOTALI</div></div>
+      <div class="stat-card"><div class="stat-card-val">${totLog}</div><div class="stat-card-lbl">VOCI NEL DIARIO</div></div>
+      <div class="stat-card"><div class="stat-card-val">${avgLvl}</div><div class="stat-card-lbl">LIVELLO MEDIO</div></div>
+    </div>
+  </div>
+
+  <div class="stat-section">
+    <div class="stat-section-title">📅 PROSSIMI ANNIVERSARI (60 GIORNI)</div>
+    ${upcoming.length?`<div class="cal-events-list">${upcoming.map(ev=>{
+      const when=ev.du===0?'OGGI':ev.du===1?'Domani':`tra ${ev.du} giorni`;
+      const whenColor=ev.du<=3?'#fd79a8':ev.du<=14?'#fdcb6e':ev.a.color;
+      return`<div class="cal-event" style="border-left-color:${whenColor}">
+        <div class="cal-event-days" style="color:${whenColor}">${ev.du===0?'✦':ev.du}</div>
+        <div class="cal-event-body">
+          <div class="cal-event-label">${ev.tipo.icon} ${esc(ev.an.label||ev.tipo.label)}</div>
+          <div class="cal-event-who">${esc(ev.d.name||'—')} — ${ev.a.roman} ${ev.a.name}</div>
+          <div class="cal-event-date">${when} · ${fmtAnnDate(ev.an.month,ev.an.day,ev.an.anno)}</div>
+        </div>
+        <div class="cal-event-go"><button class="btn btn-g btn-xs" onclick="selArcGo(${ev.a.id})">→</button></div>
+      </div>`;}).join('')}</div>`:
+      `<div class="stat-empty">Nessun anniversario nei prossimi 60 giorni.</div>`}
+  </div>
+
+  <div class="stat-section">
+    <div class="stat-section-title">PIÙ VISTI — ULTIMI 30 GIORNI</div>
+    ${piuVisti.length?piuVisti.map(l=>`
+      <div class="stat-row">
+        <div class="stat-row-name" title="${esc(l.d.name||'—')}">${esc(l.d.name||'—')} <span style="color:#f0c040">(${l.a.name})</span></div>
+        <div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.round(l.inc30.length/maxV*100)}%;background:${l.a.color}"></div></div>
+        <div class="stat-val" style="color:${l.a.color}">${l.inc30.length} inc.</div>
+      </div>`).join(''):`<div class="stat-empty">Nessun incontro nell'ultimo mese.</div>`}
+  </div>
+
+  <div class="stat-section">
+    <div class="stat-section-title">PIÙ PRIVILEGIATI — VOCI NEL DIARIO</div>
+    ${privilegiati.length?privilegiati.map(l=>`
+      <div class="stat-row">
+        <div class="stat-row-name">${esc(l.d.name||'—')} <span style="color:#f0c040">(${l.a.name})</span></div>
+        <div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.round(l.log.length/maxP*100)}%;background:${l.a.color}88"></div></div>
+        <div class="stat-val">${l.log.length} voci</div>
+      </div>`).join(''):`<div class="stat-empty">Nessuna voce ancora.</div>`}
+  </div>
+
+  <div class="stat-section">
+    <div class="stat-section-title">DA NON TRASCURARE</div>
+    ${daLavorare.length?daLavorare.map(l=>{
+      let reason='';
+      if(l.d.stato==='bloccato')reason='Stato Bloccato — richiede una tua iniziativa';
+      else if(l.inc30.length===0&&l.incontri.length>0)reason=`Nessun incontro nell'ultimo mese (ultimo: ${l.daysAgo}gg fa)`;
+      else reason=`Livello ${l.d.level}, pochi incontri registrati`;
+      return`<div class="stat-warn" style="border-color:${l.a.color}44">
+        <div class="stat-warn-icon" style="color:${l.a.color}">${l.a.sym}</div>
+        <div class="stat-warn-body">
+          <div class="stat-warn-name">${esc(l.d.name||'—')} <span style="color:#f0c040;font-weight:400;font-size:11px">${l.a.roman} · ${l.a.name}</span></div>
+          <div class="stat-warn-reason">${reason}</div>
+        </div>
+        <button class="btn btn-g btn-xs" onclick="selArcGo(${l.a.id})" style="align-self:center">→</button>
+      </div>`;}).join(''):`<div class="stat-empty" style="color:#55aa55">✓ Tutti i legami ricevono attenzione regolare.</div>`}
+  </div>
+
+  <div class="stat-section">
+    <div class="stat-section-title">HEATMAP INCONTRI — GIORNO × MOMENTO</div>
+    ${totInc===0?`<div class="stat-empty">Registra incontri per vedere la distribuzione.</div>`:`
+    <div class="heatmap-wrap"><div class="heatmap">
+      <div class="hm-empty"></div>
+      ${DAYS.map(d=>`<div class="hm-day-lbl">${d}</div>`).join('')}
+      ${TODS.map(t=>`
+        <div class="hm-tod-lbl">${t}</div>
+        ${DAYS.map(d=>{
+          const v=cal[d][t];
+          const int=v>0?Math.max(0.12,v/calMax):0;
+          return`<div class="hm-cell" style="background:${v>0?`rgba(200,16,46,${int})`:'#0a0a14'}" title="${d} ${t}: ${v} incontri">
+            ${v>0?`<span style="color:rgba(255,255,255,${Math.min(1,int+.4)})">${v}</span>`:''}
+          </div>`;}).join('')}`).join('')}
+    </div></div>`}
+  </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ACTIONS
+// ─────────────────────────────────────────────────────────────────────────────
+function selArc(id){sel=id;rAll();}
+function rTotal(){document.getElementById('total-n').textContent=Object.keys(data).length;}
+function rAll(){rLeft();rTop();rDetail();rLegame();rTotal();}
+
+function assignPerson(){
+  setD(sel,{name:'',photo:null,level:0,log:[],notes:'',stato:'stabile',anniversari:[]});
+  rAll();
+  setTimeout(()=>{const n=document.getElementById('p-name');if(n)n.focus();},60);
+}
+
+function removePerson(){
+  if(!confirm(`Rimuovere il legame da "${ARCANA[sel].name}"?\nTutti i dati verranno eliminati.`))return;
+  delete data[sel];save();rAll();
+}
+
+function saveName(){
+  const d=getD(sel);if(!d)return;
+  const el=document.getElementById('p-name');if(!el)return;
+  d.name=el.value.trim();setD(sel,d);rLeft();
+}
+
+function saveNotes(){
+  const d=getD(sel);if(!d)return;
+  const el=document.getElementById('notes-ta');if(!el)return;
+  d.notes=el.value;setD(sel,d);
+}
+
+function setStato(s){
+  const d=getD(sel);if(!d)return;
+  d.stato=s;setD(sel,d);rLegame();rLeft();
+}
+
+function decLevel(){
+  const d=getD(sel);if(!d||d.level<=0)return;
+  if(!confirm('Diminuire il livello di 1?'))return;
+  d.level=Math.max(0,d.level-1);
+  const idx=[...d.log].reverse().findIndex(e=>e.type==='lvl');
+  if(idx!==-1)d.log.splice(d.log.length-1-idx,1);
+  setD(sel,d);rAll();
+}
+
+// LOG
+function openLog(type){
+  const d=getD(sel);if(!d)return;
+  const a=ARCANA[sel];
+  document.getElementById('mlog-arc').textContent=`DIARIO · ${a.name.toUpperCase()}`;
+  document.getElementById('mlog-arc').style.color=a.color;
+  document.getElementById('log-date').value=today();
+  document.getElementById('log-txt').value='';
+  document.getElementById('log-tod').value='';
+  document.getElementById('log-luogo').value='';
+  setLogType(type);
+  openModal('m-log');
+  setTimeout(()=>document.getElementById('log-txt').focus(),60);
+}
+
+function setLogType(t){
+  logType=t;
+  ['i','n','l'].forEach(k=>document.getElementById('tog-'+k).classList.remove('active'));
+  document.getElementById('tog-'+(t==='incontro'?'i':t==='nota'?'n':'l')).classList.add('active');
+  const d=getD(sel)||{level:0};
+  const ttl={incontro:'Segna un incontro',nota:'Aggiungi nota',lvl:`Aumento Livello → ${d.level+1}`};
+  document.getElementById('mlog-ttl').textContent=ttl[t];
+  document.getElementById('log-tlbl').textContent=t==='lvl'?'Perché è salito il livello?':t==='incontro'?'Note sull\'incontro (opzionale)':'Descrizione';
+  const isInc=t==='incontro';
+  document.getElementById('log-todfield').style.display=isInc?'block':'none';
+  document.getElementById('log-luogof').style.display=isInc?'block':'none';
+}
+
+function saveLog(){
+  const d=getD(sel);if(!d)return;
+  const txt=document.getElementById('log-txt').value.trim();
+  const date=document.getElementById('log-date').value||today();
+  const tod=document.getElementById('log-tod').value;
+  const luogo=document.getElementById('log-luogo').value.trim();
+  if(!txt&&logType!=='incontro'){document.getElementById('log-txt').focus();return;}
+  const entry={id:Date.now().toString(),date,text:txt,type:logType};
+  if(logType==='incontro'){if(tod)entry.tod=tod;if(luogo)entry.luogo=luogo;}
+  if(logType==='lvl'){if(d.level>=10){closeModal('m-log');return;}d.level++;entry.newLevel=d.level;}
+  d.log.push(entry);
+  setD(sel,d);closeModal('m-log');rAll();
+}
+
+function askDel(id){pendingDel=id;openModal('m-del');}
+function doDelLog(){
+  const d=getD(sel);if(!d||!pendingDel)return;
+  d.log=d.log.filter(e=>e.id!==pendingDel);
+  setD(sel,d);pendingDel=null;closeModal('m-del');rAll();
+}
+
+// ANNIVERSARI
+function updateAnnLabel(){
+  const tipo=document.getElementById('ann-tipo').value;
+  document.getElementById('ann-label-field').style.display=tipo==='altro'||tipo==='anniversario'?'block':'none';
+}
+
+function openAnnModal(){
+  const a=ARCANA[sel];
+  document.getElementById('mann-arc').textContent=`DATE IMPORTANTI · ${a.name.toUpperCase()}`;
+  document.getElementById('ann-tipo').value='compleanno';
+  document.getElementById('ann-day').value=1;
+  document.getElementById('ann-month').value=1;
+  document.getElementById('ann-anno').value='';
+  document.getElementById('ann-note').value='';
+  document.getElementById('ann-label-inp').value='';
+  updateAnnLabel();
+  openModal('m-ann');
+}
+
+function saveAnn(){
+  const d=getD(sel);if(!d)return;
+  const tipo=document.getElementById('ann-tipo').value;
+  const label=document.getElementById('ann-label-inp').value.trim();
+  const month=parseInt(document.getElementById('ann-month').value);
+  const day=parseInt(document.getElementById('ann-day').value);
+  const anno=document.getElementById('ann-anno').value.trim();
+  const note=document.getElementById('ann-note').value.trim();
+  if(!d.anniversari)d.anniversari=[];
+  d.anniversari.push({id:Date.now().toString(),tipo,label,month,day,anno:anno?parseInt(anno):null,note});
+  setD(sel,d);closeModal('m-ann');rLegame();rLeft();
+}
+
+function delAnn(id){
+  const d=getD(sel);if(!d)return;
+  d.anniversari=(d.anniversari||[]).filter(a=>a.id!==id);
+  setD(sel,d);rLegame();rLeft();
+}
+
+// PHOTO
+function triggerPhoto(){document.getElementById('photo-inp').click();}
+function handlePhoto(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      const c=document.createElement('canvas');
+      const MAX=300;let w=img.width,h=img.height;
+      if(w>h){if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}}else{if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}}
+      c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
+      const d=getD(sel);if(!d)return;
+      d.photo=c.toDataURL('image/jpeg',.72);setD(sel,d);rLegame();
+    };img.src=ev.target.result;
+  };reader.readAsDataURL(file);e.target.value='';
+}
+
+// ORACLE
+async function askOracle(){
+  const key=getSavedKey();
+  const desc=document.getElementById('ora-desc').value.trim();
+  if(!key){alert('Inserisci prima la tua API Key nelle Impostazioni (⚙).');return;}
+  if(!desc){alert('Descrivi prima il rapporto.');return;}
+  const btn=document.getElementById('ora-btn');
+  const resEl=document.getElementById('ora-res');
+  btn.textContent='◌  Consultando…';btn.disabled=true;
+  resEl.style.display='none';
+
+  // Try multiple models in order — fallback if one isn't available on the key
+  const MODELS=['claude-opus-4-5','claude-sonnet-4-5','claude-haiku-4-5'];
+  let lastErr=null;
+
+  for(const model of MODELS){
+    try{
+      const res=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'x-api-key':key,
+          'anthropic-version':'2023-06-01',
+          'anthropic-dangerous-direct-browser-calls':'true'
+        },
+        body:JSON.stringify({
+          model,
+          max_tokens:500,
+          system:`Sei un esperto dei Social Links dei giochi Persona di Atlus. Suggerisci l'arcano più adatto (id 0-21). Rispondi SOLO con JSON valido, niente altro: {"arcanaId":<numero 0-21>,"reason":"<2-3 frasi in italiano>"}`,
+          messages:[{role:'user',content:desc}]
+        })
+      });
+
+      if(!res.ok){
+        const errBody=await res.json().catch(()=>({}));
+        // 404 = model not found → try next
+        if(res.status===404){lastErr=`Modello ${model} non disponibile`;continue;}
+        // 401 = bad key
+        if(res.status===401){throw new Error('API Key non valida. Controllala nelle Impostazioni.');}
+        // 429 = rate limit
+        if(res.status===429){throw new Error('Troppe richieste. Attendi qualche secondo e riprova.');}
+        throw new Error(errBody.error?.message||`Errore API (${res.status})`);
+      }
+
+      const json=await res.json();
+      const raw=(json.content||[]).find(b=>b.type==='text')?.text||'{}';
+      const p=JSON.parse(raw.replace(/```json|```/g,'').trim());
+      showOraRes(p);
+      btn.textContent='✦ Rivela l\'Arcano';btn.disabled=false;
+      return; // success
+
+    }catch(e){
+      if(e.message.includes('fetch')||e.message.includes('Failed')||e.message.includes('NetworkError')){
+        // CORS / network error — give specific guidance
+        resEl.innerHTML=`
+          <div style="margin-top:14px;padding:14px 16px;background:#0a0a14;border-left:3px solid var(--red)">
+            <div style="font-size:13px;color:var(--red);font-weight:700;margin-bottom:8px">Errore di rete (CORS)</div>
+            <div style="font-size:11px;font-family:var(--fb);color:#f0c040;line-height:1.7">
+              Il browser blocca le chiamate API quando il file è aperto da disco (file://).<br><br>
+              <b>Soluzioni:</b><br>
+              1. Pubblica l'app su GitHub Pages e aprila da lì<br>
+              2. Avvia un server locale: apri il terminale nella cartella del file e scrivi:<br>
+              <code style="background:#1c1c2e;padding:4px 8px;border-radius:2px;display:inline-block;margin-top:4px;color:#f0c040">python3 -m http.server 8080</code><br>
+              poi apri <code style="background:#1c1c2e;padding:4px 8px;border-radius:2px;color:#f0c040">http://localhost:8080</code> nel browser.
+            </div>
+          </div>`;
+        resEl.style.display='block';
+        btn.textContent='✦ Rivela l\'Arcano';btn.disabled=false;
+        return;
+      }
+      lastErr=e.message;
+      break; // non-network error, don't retry
+    }
+  }
+
+  // All models failed or non-network error
+  resEl.innerHTML=`<div style="margin-top:14px;padding:12px 14px;background:#0a0a14;border-left:3px solid var(--red)">
+    <div style="font-size:13px;color:var(--red);font-weight:700;margin-bottom:6px">Errore</div>
+    <div style="font-size:11px;font-family:var(--fb);color:#f0c040;line-height:1.6">${lastErr||'Errore sconosciuto. Controlla la chiave API nelle Impostazioni.'}</div>
+  </div>`;
+  resEl.style.display='block';
+  btn.textContent='✦ Rivela l\'Arcano';btn.disabled=false;
+}
+
+function showOraRes(p){
+  const el=document.getElementById('ora-res');
+  if(!p||p.arcanaId===undefined){el.innerHTML=`<p style="color:var(--red);font-family:var(--fb);font-size:13px;margin-top:12px">Risposta non valida.</p>`;el.style.display='block';return;}
+  const a=ARCANA[p.arcanaId];
+  el.innerHTML=`<div class="ai-box" style="border:1px solid ${a.color}30;border-left:3px solid ${a.color}">
+    <div class="ai-sub" style="color:${a.color}">ARCANO SUGGERITO</div>
+    <div class="ai-arc">${a.roman} · ${a.name}</div>
+    <div class="ai-reason">${esc(p.reason)}</div>
+    <div class="btn-row">
+      <button class="btn btn-r btn-sm" onclick="goArc(${p.arcanaId})">Vai a questo arcano</button>
+      <button class="btn btn-g btn-sm" onclick="closeModal('m-oracle')">Chiudi</button>
+    </div>
+  </div>`;
+  el.style.display='block';
+}
+
+function goArc(id){closeModal('m-oracle');sel=id;setView('arcani');rAll();}
+
+// UTILS
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function closeBg(e,id){if(e.target===document.getElementById(id))closeModal(id);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// API KEY
+function getSavedKey(){
+  try { return localStorage.getItem('sl-apikey')||''; } catch(e){ return ''; }
+}
+function setSavedKey(k){
+  try { if(k) localStorage.setItem('sl-apikey',k); else localStorage.removeItem('sl-apikey'); } catch(e){}
+}
+
+// IMPOSTAZIONI
+function rImpostazioni(){
+  const el=document.getElementById('view-impostazioni');
+  const key=getSavedKey();
+  const hasKey=!!key;
+  const masked=hasKey?'sk-ant-…'+key.slice(-4):'';
+  el.innerHTML=`
+    <div style="padding:22px 24px;max-width:600px">
+      <div style="font-size:10px;letter-spacing:5px;color:var(--red);font-family:var(--fb);margin-bottom:14px">IMPOSTAZIONI</div>
+
+      <div style="background:var(--card);border:1px solid var(--border);margin-bottom:16px">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+          <div style="font-size:13px;font-weight:700;letter-spacing:2px;margin-bottom:3px">API KEY ANTHROPIC</div>
+          <div style="font-size:12px;font-family:var(--fb);color:#c8a030;line-height:1.6">
+            Necessaria per usare l'Oracolo AI. Salvata localmente sul tuo dispositivo, mai inviata altrove.
+            Ottienila su <span style="color:var(--red)">console.anthropic.com</span>.
+          </div>
+        </div>
+        <div style="padding:16px 20px">
+          ${hasKey?`
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:10px 14px;background:#0a0a14;border:1px solid #00b89444">
+            <span style="font-size:16px">✓</span>
+            <div>
+              <div style="font-size:12px;font-family:var(--fb);color:#00b894;font-weight:600;letter-spacing:1px">API KEY SALVATA</div>
+              <div style="font-size:12px;font-family:var(--fb);color:#c8a030;margin-top:2px">${masked}</div>
+            </div>
+          </div>`:
+          `<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:10px 14px;background:#0a0a14;border:1px solid #c8102e44">
+            <span style="font-size:16px;color:var(--red)">✕</span>
+            <div style="font-size:12px;font-family:var(--fb);color:#c8a030">Nessuna API Key configurata. L'Oracolo AI non è disponibile.</div>
+          </div>`}
+          <div style="display:flex;gap:8px;align-items:center">
+            <input class="inp" id="set-apikey" type="password" placeholder="sk-ant-api03-…" style="flex:1;font-family:monospace;font-size:14px">
+            <button class="btn btn-g btn-sm" onclick="toggleSetKeyVis()" id="set-key-eye" style="padding:9px 10px;font-size:14px">👁</button>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn btn-r btn-sm" onclick="saveSettingsKey()">Salva chiave</button>
+            ${hasKey?`<button class="btn btn-g btn-sm" onclick="deleteSettingsKey()">Rimuovi</button>`:''}
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--card);border:1px solid var(--border)">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+          <div style="font-size:13px;font-weight:700;letter-spacing:2px;margin-bottom:3px">DATI DELL'APP</div>
+          <div style="font-size:12px;font-family:var(--fb);color:#c8a030;line-height:1.6">
+            Tutti i legami, diari, anniversari e foto sono salvati nel localStorage di questo browser.
+          </div>
+        </div>
+        <div style="padding:16px 20px">
+          <div style="font-size:12px;font-family:var(--fb);color:#c8a030;margin-bottom:12px">
+            Legami attivi: <span style="color:#fff;font-weight:700">${Object.keys(data).length}</span> &nbsp;·&nbsp;
+            Voci nel diario: <span style="color:#fff;font-weight:700">${Object.values(data).reduce((s,d)=>s+(d.log||[]).length,0)}</span>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+            <button class="btn btn-r btn-sm" onclick="exportData()">⬇ Esporta backup</button>
+            <button class="btn btn-g btn-sm" onclick="document.getElementById('import-file').click()">⬆ Importa backup</button>
+            <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+          </div>
+          <div id="backup-status-msg" style="font-size:11px;font-family:var(--fb);line-height:1.7;padding:10px 14px;border:1px solid var(--border);background:#0a0a14;color:#f0c040"></div>
+        </div>
+      </div>
+
+    </div>`;
+
+  // Update oracle key status if modal is open
+  updateOracleKeyStatus();
+}
+
+function toggleSetKeyVis(){
+  const inp=document.getElementById('set-apikey');
+  const btn=document.getElementById('set-key-eye');
+  if(!inp)return;
+  inp.type=inp.type==='password'?'text':'password';
+  btn.textContent=inp.type==='password'?'👁':'🙈';
+}
+
+function saveSettingsKey(){
+  const inp=document.getElementById('set-apikey');
+  if(!inp)return;
+  const k=inp.value.trim();
+  if(!k){alert('Inserisci una chiave valida.');return;}
+  if(!k.startsWith('sk-')){alert('La chiave deve iniziare con sk-');return;}
+  setSavedKey(k);
+  inp.value='';
+  rImpostazioni();
+  updateOracleKeyStatus();
+}
+
+function deleteSettingsKey(){
+  if(!confirm('Rimuovere la API Key salvata?'))return;
+  setSavedKey('');
+  rImpostazioni();
+  updateOracleKeyStatus();
+}
+
+function updateOracleKeyStatus(){
+  const el=document.getElementById('ora-key-status');
+  if(!el)return;
+  const key=getSavedKey();
+  if(key){
+    el.style.borderColor='#00b89444';
+    el.innerHTML=`<span style="color:#00b894;font-weight:700">✓ API Key configurata</span> <span style="color:#c8a030">— pronto per usare l'Oracolo</span>
+      <span style="float:right"><a href="#" onclick="setView('impostazioni');closeModal('m-oracle');return false" style="color:var(--red);font-size:11px;letter-spacing:1px;text-decoration:none">GESTISCI ⚙</a></span>`;
+  } else {
+    el.style.borderColor='#c8102e44';
+    el.innerHTML=`<span style="color:var(--red)">✕ Nessuna API Key</span> — <a href="#" onclick="setView('impostazioni');closeModal('m-oracle');return false" style="color:var(--red);text-decoration:underline;font-size:12px">Configurala nelle Impostazioni ⚙</a>`;
+  }
+}
+
+function exportData(){
+  const json=JSON.stringify(data,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  const d=new Date();
+  const stamp=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  a.download=`all-is-revealed-backup-${stamp}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  // record export date
+  try{ localStorage.setItem('sl-last-export', Date.now().toString()); }catch(e){}
+  updateBackupStatus();
+}
+
+function importData(e){
+  const file=e.target.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const imported=JSON.parse(ev.target.result);
+      // validate: should be an object with numeric-ish keys
+      if(typeof imported!=='object'||Array.isArray(imported))
+        throw new Error('Formato non valido');
+      const count=Object.keys(imported).length;
+      if(!confirm(`Importare ${count} legami dal backup?\nAttenzione: i dati attuali verranno SOSTITUITI.`))return;
+      data=imported;
+      save();
+      rAll();
+      rImpostazioni();
+      alert(`✓ Importati ${count} legami con successo.`);
+    }catch(err){
+      alert('Errore durante l\'importazione: '+err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+function getLastExport(){
+  try{ return parseInt(localStorage.getItem('sl-last-export')||'0'); }catch(e){return 0;}
+}
+
+function getDaysSinceExport(){
+  const last=getLastExport();
+  if(!last)return null;
+  return Math.floor((Date.now()-last)/86400000);
+}
+
+function updateBackupStatus(){
+  const el=document.getElementById('backup-status-msg');
+  if(!el)return;
+  const days=getDaysSinceExport();
+  const entries=Object.keys(data).length;
+  if(entries===0){
+    el.innerHTML='<span style="color:#c8a030">Nessun dato da esportare ancora.</span>';
+    return;
+  }
+  if(days===null){
+    el.style.borderColor='#c8102e44';
+    el.innerHTML='<span style="color:#c8102e;font-weight:700">⚠ Nessun backup eseguito.</span> Esporta subito per non rischiare di perdere i tuoi dati.';
+  } else if(days<7){
+    el.style.borderColor='#00b89444';
+    el.innerHTML=`<span style="color:#00b894;font-weight:700">✓ Backup recente</span> — eseguito ${days===0?'oggi':days===1?'ieri':days+' giorni fa'}.`;
+  } else if(days<30){
+    el.style.borderColor='#fdcb6e44';
+    el.innerHTML=`<span style="color:#fdcb6e;font-weight:700">⚠ Backup di ${days} giorni fa.</span> Ti consigliamo di esportare un backup aggiornato.`;
+  } else {
+    el.style.borderColor='#c8102e44';
+    el.innerHTML=`<span style="color:#c8102e;font-weight:700">⚠ Backup di ${days} giorni fa!</span> I tuoi dati potrebbero non essere al sicuro. Esporta subito.`;
+  }
+}
+
+// Auto-snapshot: save a second copy in localStorage on every open
+// so even a cache clear might leave a recoverable copy under a different key
+function autoSnapshot(){
+  try{
+    if(Object.keys(data).length===0)return;
+    localStorage.setItem('sl-v5-snapshot', JSON.stringify(data));
+    localStorage.setItem('sl-v5-snapshot-date', Date.now().toString());
+  }catch(e){}
+}
+
+function checkBackupReminder(){
+  // Show floating reminder badge on ⚙ tab if overdue
+  const days=getDaysSinceExport();
+  const entries=Object.keys(data).length;
+  const tabs=document.querySelectorAll('.nav-tab');
+  const settingsTab=tabs[tabs.length-1];
+  if(!settingsTab)return;
+  const existingBadge=settingsTab.querySelector('.backup-badge');
+  if(existingBadge)existingBadge.remove();
+  if(entries>0 && (days===null||days>=7)){
+    const badge=document.createElement('span');
+    badge.className='backup-badge';
+    badge.textContent='!';
+    badge.style.cssText='display:inline-block;background:#c8102e;color:#fff;border-radius:50%;width:14px;height:14px;font-size:9px;line-height:14px;text-align:center;margin-left:5px;font-family:var(--fb);font-weight:700;vertical-align:middle';
+    settingsTab.appendChild(badge);
+  }
+}
+
+
+
+// INIT
+load();rAll();
+setTimeout(()=>{autoSnapshot();checkBackupReminder();},500);
+</script>
+</body>
+</html>
