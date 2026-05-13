@@ -199,7 +199,7 @@ body{font-family:var(--fd);color:var(--text-main);display:flex;flex-direction:co
 
 /* BUTTONS */
 .btn{border:none;cursor:pointer;font-family:var(--fd);letter-spacing:1.5px;font-size:13px;text-transform:uppercase;padding:11px 20px;transition:all .2s;color:#fff}
-.btn-r{background:var(--red);color:#fff}.btn-r:hover{background:#e01030;transform:translateY(-1px)}.btn-r:disabled{opacity:.4;cursor:default;transform:none}
+.btn-r{background:var(--red);color:#fff}.btn-r:hover{background:color-mix(in srgb,var(--red) 80%,#000);transform:translateY(-1px)}.btn-r:disabled{opacity:.4;cursor:default;transform:none}
 .btn-g{background:transparent;border:1px solid var(--border);color:var(--text-title)}.btn-g:hover{border-color:var(--red);color:#fff}
 .btn-sm{padding:8px 15px;font-size:12px;color:#fff}
 .btn-xs{padding:6px 12px;font-size:11px;letter-spacing:1px;color:#fff}
@@ -428,7 +428,7 @@ select.inp{cursor:pointer}
   100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}
 }
 #anim-card-wrap{position:relative;z-index:2;perspective:900px;margin-bottom:20px}
-#anim-card{width:140px;height:233px;border-radius:10px;position:relative;transform-style:preserve-3d;animation:cardReveal 1s cubic-bezier(.4,0,.2,1) forwards;transition:box-shadow .4s ease}
+#anim-card{width:210px;height:350px;border-radius:10px;position:relative;transform-style:preserve-3d;animation:cardReveal 1s cubic-bezier(.4,0,.2,1) forwards;transition:box-shadow .4s ease}
 @keyframes cardReveal{
   0%{transform:rotateY(-80deg) scale(.8);opacity:0;filter:brightness(1.2)}
   45%{transform:rotateY(5deg) scale(1.03);opacity:1;filter:brightness(1.05)}
@@ -501,7 +501,7 @@ select.inp{cursor:pointer}
 .pan-circle-stage{position:relative;width:560px;height:560px;margin:0 auto;display:inline-block}
 .pan-circ-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
 .pan-circ-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;background:var(--red);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;font-weight:900;letter-spacing:1px;color:#fff;z-index:5;box-shadow:0 0 20px color-mix(in srgb,var(--red) 40%,transparent);cursor:default}
-.pan-circ-card{position:absolute;width:52px;height:52px;border-radius:50%;border:1px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transform:translate(-50%,-50%);transition:transform .2s,box-shadow .2s;z-index:2;overflow:hidden;text-align:center}
+.pan-circ-card{position:absolute;width:70px;height:70px;border-radius:50%;border:1px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transform:translate(-50%,-50%);transition:transform .2s,box-shadow .2s;z-index:2;overflow:hidden;text-align:center}
 .pan-circ-card:hover{transform:translate(-50%,-50%) scale(1.25);z-index:10}
 .pan-circ-card.empty{opacity:.28}
 /* Lista */
@@ -675,10 +675,25 @@ select.inp{cursor:pointer}
   #search-results{left:0}
 
   /* Onboarding tour */
-  #ob-tooltip{width:88vw!important;font-size:13px}
+  #ob-tooltip{
+    width:calc(100vw - 16px)!important;
+    font-size:14px;
+    border-radius:8px 8px 0 0;
+    bottom:66px;
+    top:auto!important;
+    left:8px!important;
+    right:8px!important;
+    padding:18px 16px 14px;
+    border-top:2px solid var(--red);
+    border-left:none;border-right:none;border-bottom:none;
+    box-shadow:0 -4px 24px rgba(0,0,0,.4);
+  }
+  #ob-arrow{display:none}
+  .ob-tip-text{font-size:13px;line-height:1.6}
+  .ob-tip-title{font-size:15px}
 
   /* Animazione carta */
-  #anim-card{width:110px;height:183px}
+  #anim-card{width:160px;height:267px}
 
   /* Guida */
   .guida-table{font-size:12px}
@@ -701,7 +716,7 @@ select.inp{cursor:pointer}
 <!-- MOBILE: drawer overlay -->
 <div id="mob-drawer-overlay" onclick="closeDrawer()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:150;backdrop-filter:blur(3px)"></div>
 <!-- MOBILE: bottom nav -->
-<nav id="mob-nav">
+<nav id="mob-nav" style="display:none">
   <div class="mob-nav-item active" id="mn-arcani" onclick="setView('arcani');closeMobMenu()">
     <span class="mob-nav-icon">✦</span><span class="mob-nav-lbl">Arcani</span>
   </div>
@@ -1157,6 +1172,73 @@ select.inp{cursor:pointer}
 </div>
 
 <script>
+// ─────────────────────────────────────────────────────────────────────────────
+// MOBILE — drawer, bottom nav, cerchio responsivo
+// ─────────────────────────────────────────────────────────────────────────────
+function isMobile(){ return window.innerWidth <= 768; }
+
+function toggleDrawer(){
+  const left = document.getElementById('left');
+  const overlay = document.getElementById('mob-drawer-overlay');
+  const isOpen = left.classList.contains('open');
+  if(isOpen){ closeDrawer(); }
+  else {
+    left.classList.add('open');
+    overlay.style.display = 'block';
+  }
+}
+
+function closeDrawer(){
+  document.getElementById('left').classList.remove('open');
+  document.getElementById('mob-drawer-overlay').style.display = 'none';
+}
+
+function toggleMobMenu(){
+  const menu = document.getElementById('mob-menu');
+  const isOpen = menu.style.display !== 'none';
+  menu.style.display = isOpen ? 'none' : 'block';
+}
+
+function closeMobMenu(){
+  const menu = document.getElementById('mob-menu');
+  if(menu) menu.style.display = 'none';
+  closeDrawer();
+}
+
+function updateMobNav(v){
+  if(!isMobile()) return;
+  const map = {arcani:'mn-arcani',panoramica:'mn-panoramica',storia:'mn-storia',calendario:'mn-calendario'};
+  document.querySelectorAll('.mob-nav-item').forEach(el=>el.classList.remove('active'));
+  if(map[v]){
+    const el = document.getElementById(map[v]);
+    if(el) el.classList.add('active');
+  } else {
+    // Statistiche, impostazioni, guida → evidenzia "Altro"
+    const mn = document.getElementById('mn-more');
+    if(mn) mn.classList.add('active');
+  }
+}
+
+// Cerchio panoramica: ricalcola dimensioni per mobile
+function getMobileCircleSize(){
+  if(!isMobile()) return { size:560, R:230, CX:280, CY:280 };
+  const vw = Math.min(window.innerWidth - 28, 320);
+  const R = Math.round(vw * 0.44);
+  const C = Math.round(vw / 2);
+  return { size: vw, R, CX:C, CY:C };
+}
+
+// Chiudi menu quando si clicca fuori
+document.addEventListener('click', e=>{
+  const menu = document.getElementById('mob-menu');
+  const mnMore = document.getElementById('mn-more');
+  if(menu && menu.style.display !== 'none'){
+    if(!menu.contains(e.target) && e.target !== mnMore && !mnMore?.contains(e.target)){
+      menu.style.display = 'none';
+    }
+  }
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // PROFILO UTENTE
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2039,6 +2121,8 @@ function setView(v){
   if(v==='statistiche')rStatistiche();
   if(v==='impostazioni'){rImpostazioni();setTimeout(()=>{updateBackupStatus();checkBackupReminder();},50);}
   if(v==='guida')rGuida();
+  // Mobile: aggiorna bottom nav e chiudi drawer
+  updateMobNav(v);
   // Oracle FAB: disabilitato su impostazioni
   const fab=document.getElementById('oracle-fab');
   if(fab){
@@ -2088,7 +2172,7 @@ function rTop(){
   const cardVis=getCardVisual(a.id);
   const hasSvg=!!cardVis;
   const flipClass=cardFlipped&&hasSvg?' flipped':'';
-  const flipHint=hasSvg?`<div style="font-size:8px;font-family:var(--fb);color:${a.color}66;letter-spacing:2px;text-align:center;margin-top:4px;transition:opacity .3s">${cardFlipped?'← GIRA':'ILLUSTRAZIONE →'}</div>`:'';
+  const flipHint=hasSvg?`<div style="font-size:8px;font-family:var(--fb);color:${a.color}44;letter-spacing:2px;text-align:center;margin-top:6px;transition:opacity .3s">${cardFlipped?'← torna':'↻ gira'}</div>`:'';
   document.getElementById('arc-top').innerHTML=`
     ${hasSvg?`
     <div class="tarot-wrap${flipClass}" onclick="flipCard()" title="Clicca per girare la carta">
@@ -2123,19 +2207,23 @@ const ARCANA_IMG_PATHS={}; // populate at runtime after checking
 let _imgCache={}; // {arcId: 'img'|'svg'|null}
 
 function getCardVisual(arcId){
-  // SVG inline ha sempre la precedenza se definito
+  // Immagine esterna ha priorità se già verificata
+  if(_imgCache[arcId]==='img')return{type:'img',content:`img/tarot-${String(arcId).padStart(2,'0')}.png`};
+  if(_imgCache[arcId]==='none'){
+    // Nessuna immagine esterna: fallback SVG inline
+    if(ARCANA_SVG[arcId])return{type:'svg',content:ARCANA_SVG[arcId]};
+    return null;
+  }
+  // Non ancora verificata: usa SVG inline se disponibile come placeholder
   if(ARCANA_SVG[arcId])return{type:'svg',content:ARCANA_SVG[arcId]};
-  // Immagine esterna se era già stata verificata
-  if(_imgCache[arcId]==='img')return{type:'img',content:`img/tarot-${String(arcId).padStart(2,'0')}.webp`};
-  if(_imgCache[arcId]==='none')return null;
-  return null; // verrà verificata al primo click
+  return null;
 }
 
 function checkExternalImg(arcId,callback){
   if(_imgCache[arcId]!==undefined){callback(_imgCache[arcId]==='img');return;}
   const img=new Image();
   const path=`img/tarot-${String(arcId).padStart(2,'0')}.png`;
-  img.onload=()=>{_imgCache[arcId]='img';callback(true);};
+  img.onload=()=>{_imgCache[arcId]='img';callback(true);if(arcId===sel)rTop();};
   img.onerror=()=>{_imgCache[arcId]='none';callback(false);};
   img.src=path;
 }
@@ -2161,22 +2249,7 @@ function rDetail(){
     </div>
     <div id="detail-body" ${detailOpen?'':'style="display:none"'} style2="animation:fu .2s ease">
 
-      <!-- Illustrazione arcano -->
-      ${(()=>{
-        const vis=getCardVisual(a.id);
-        if(!vis)return'';
-        const imgHtml=vis.type==='svg'
-          ?`<div style="width:140px;height:234px;flex-shrink:0;border-radius:6px;overflow:hidden;border:1px solid ${a.color}44;box-shadow:0 0 20px ${a.color}18">${vis.content}</div>`
-          :`<img src="${vis.content}" style="width:140px;height:234px;object-fit:cover;flex-shrink:0;border-radius:6px;border:1px solid ${a.color}44;box-shadow:0 0 20px ${a.color}18" alt="${a.name}">`;
-        return`<div class="det-section" style="display:flex;gap:20px;align-items:flex-start">
-          ${imgHtml}
-          <div style="flex:1">
-            <div class="det-section-label" style="color:${a.color}">Illustrazione</div>
-            <div style="font-size:13px;font-family:var(--fb);color:var(--text-dim);line-height:1.7;margin-top:4px">${a.simbolismo?a.simbolismo.slice(0,200)+'…':''}</div>
-            <div style="margin-top:10px;font-size:10px;font-family:var(--fb);color:${a.color}66;letter-spacing:1px">Clicca sulla carta per girarla</div>
-          </div>
-        </div>`;
-      })()}
+
 
       <!-- Parole chiave -->
       ${a.parole_chiave&&a.parole_chiave.length?`
@@ -2514,6 +2587,10 @@ function rStoria(){
     el.innerHTML=`<div style="font-size:10px;letter-spacing:5px;color:var(--red);font-family:var(--fb);margin-bottom:20px">STORIA DEI LEGAMI</div>
     ${searchBar}
     <div class="tl-empty">${storiaQuery?`Nessun risultato per "<strong>${esc(storiaQuery)}</strong>"`:' ✦ NESSUN EVENTO NEL DIARIO<br><span style="font-size:11px">Registra incontri e contatti per vedere la tua storia.</span>'}</div>`;
+    if(storiaQuery){
+      const inp=document.getElementById('storia-search');
+      if(inp){inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);}
+    }
     return;
   }
 
@@ -2654,7 +2731,7 @@ function rPanoramica(){
 
   else if(panView==='cerchio'){
     // 22 arcani disposti in cerchio, "IO" al centro
-    const R=230; const CX=280; const CY=280;
+    const {size:_csize, R, CX, CY} = getMobileCircleSize();
     const N=22;
     // Disegna linee di connessione SVG tra arcani assegnati adiacenti
     let svgLines='';
@@ -2700,22 +2777,22 @@ function rPanoramica(){
       const opacity=hidden?'0.1':empty?'0.3':'1';
       const pe=hidden?'none':'auto';
       // Sotto il cerchio: nome persona
-      const nameTag=d?`<div style="position:absolute;top:54px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:9px;font-family:var(--fb);color:var(--text-body);letter-spacing:.3px;max-width:80px;overflow:hidden;text-overflow:ellipsis;text-align:center">${esc(d.name||'')}</div>`:'';
+      const nameTag=d?`<div style="position:absolute;top:72px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:9px;font-family:var(--fb);color:var(--text-body);letter-spacing:.3px;max-width:90px;overflow:hidden;text-overflow:ellipsis;text-align:center">${esc(d.name||'')}</div>`:'';
       return`<div class="pan-circ-card${empty?' empty':''}"
         style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;width:50px;height:50px;border-color:${a.color}${empty?'30':'88'};background:linear-gradient(135deg,${a.color}${empty?'08':'20'},var(--bg));opacity:${opacity};pointer-events:${pe}"
         onclick="selArcGo(${a.id})" title="${a.name}${d?' — '+d.name:''}">
         ${hasAnn?`<div style="position:absolute;top:2px;right:2px;width:6px;height:6px;border-radius:50%;background:#fd79a8;animation:ping 2s infinite"></div>`:''}
-        <div style="font-size:7px;font-weight:700;color:${a.color};letter-spacing:1px">${a.roman}</div>
-        <div style="font-size:20px;line-height:1;color:${a.color};filter:drop-shadow(0 0 4px ${a.color}88)">${a.sym}</div>
-        ${sc?`<div style="width:5px;height:5px;border-radius:50%;background:${sc};margin-top:2px"></div>`:''}
+        <div style="font-size:8px;font-weight:700;color:${a.color};letter-spacing:1px">${a.roman}</div>
+        <div style="font-size:24px;line-height:1;color:${a.color};filter:drop-shadow(0 0 4px ${a.color}88)">${a.sym}</div>
+        ${sc?`<div style="width:6px;height:6px;border-radius:50%;background:${sc};margin-top:2px"></div>`:''}
         ${nameTag}
         ${d?`<div style="display:flex;gap:1px;margin-top:2px">${bars}</div>`:''}
       </div>`;
     }).join('');
 
     contentHTML=`<div class="pan-circle-wrap">
-      <div class="pan-circle-stage" style="width:560px;height:560px">
-        <svg class="pan-circ-svg" viewBox="0 0 560 560">${svgLines}
+      <div class="pan-circle-stage" style="width:${_csize}px;height:${_csize}px">
+        <svg class="pan-circ-svg" viewBox="0 0 ${_csize} ${_csize}">${svgLines}
           <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4 6" opacity="0.4"/>
         </svg>
         <div class="pan-circ-center" style="background:var(--red);box-shadow:0 0 24px color-mix(in srgb,var(--red) 40%,transparent);overflow:hidden" title="Il tuo profilo" onclick="openProfileEdit()">
@@ -3164,8 +3241,10 @@ function rStatistiche(){
 function selArc(id){
   sel=id;
   cardFlipped=false;
+  detailOpen=false;
   setView('arcani');
   rAll();
+  if(isMobile()) closeDrawer();
 }
 function rTotal(){const n=Object.keys(data).length;document.getElementById('total-n').innerHTML=n+' <span style="font-size:14px;color:#888;font-weight:400">su 21</span>';}
 function rAll(){rLeft();rTop();rDetail();rLegame();rTotal();}
@@ -3728,7 +3807,7 @@ function rImpostazioni(){
   const hasKey=!!key;
   const masked=hasKey?'sk-ant-…'+key.slice(-4):'';
   el.innerHTML=`
-    <div style="padding:22px 24px;max-width:600px">
+    <div style="padding:22px 24px;max-width:900px">
       <div style="font-size:10px;letter-spacing:5px;color:var(--red);font-family:var(--fb);margin-bottom:14px">IMPOSTAZIONI</div>
 
       ${(()=>{
@@ -4215,7 +4294,8 @@ function doSearch(q){
 // ONBOARDING TOUR INTERATTIVO
 // ─────────────────────────────────────────────────────────────────────────────
 // Ogni step: { target: fn()→Element|null, title, text, position: 'bottom'|'top'|'right'|'left'|'center' }
-const OB_STEPS=[
+// Step desktop e mobile separati
+const OB_STEPS_DESKTOP=[
   {
     target:()=>document.getElementById('left'),
     title:'I 22 Arcani',
@@ -4253,6 +4333,48 @@ const OB_STEPS=[
     position:'bottom'
   },
 ];
+
+const OB_STEPS_MOBILE=[
+  {
+    target:()=>document.getElementById('mob-burger'),
+    title:'I 22 Arcani',
+    text:'Tocca ☰ per aprire il pannello degli arcani. Ogni arcano rappresenta un tipo di legame. Selezionane uno per iniziare.',
+    position:'bottom'
+  },
+  {
+    target:()=>document.getElementById('arc-top'),
+    title:'La carta e il legame',
+    text:'Qui trovi il significato dell\'arcano. Scorri verso il basso per la scheda dove assegni una persona e tieni il diario del rapporto.',
+    position:'bottom'
+  },
+  {
+    target:()=>document.querySelector('.p-actions, #legame .leg-hdr'),
+    title:'Assegna e registra',
+    text:'Tocca "+ Assegna persona" per collegare un nome all\'arcano. Poi registra incontri, contatti e note.',
+    position:'top'
+  },
+  {
+    target:()=>document.getElementById('mob-nav'),
+    title:'Le sezioni',
+    text:'La barra in basso ti porta in tutte le sezioni — Mappa, Storia, Calendario, Statistiche. Il menu ⋯ contiene Impostazioni e Guida.',
+    position:'top'
+  },
+  {
+    target:()=>document.getElementById('oracle-fab'),
+    title:'L\'Oracolo',
+    text:'Il pulsante ✦ Oracolo ti offre una riflessione contestuale in qualsiasi sezione.',
+    position:'top'
+  },
+  {
+    target:()=>document.getElementById('hdr-profile'),
+    title:'Il tuo profilo',
+    text:'Il tuo avatar è sempre visibile qui. Toccalo per modificare il profilo. Nelle Impostazioni trovi backup e temi visivi.',
+    position:'bottom'
+  },
+];
+
+// Step attivi in base al dispositivo
+const OB_STEPS = window.innerWidth <= 768 ? OB_STEPS_MOBILE : OB_STEPS_DESKTOP;
 
 let _obCurrent=0;
 
@@ -4315,7 +4437,9 @@ function renderObStep(){
   const sl=document.getElementById('ob-shade-left');
   const sr=document.getElementById('ob-shade-right');
   st.style.cssText=`top:0;left:0;right:0;height:${top}px`;
-  sb.style.cssText=`bottom:0;left:0;right:0;height:${bottom}px`;
+  // Su mobile: il tooltip è in basso, lo shade bottom non deve coprirlo
+  const sbHeight = isMobile() ? Math.max(bottom, 140) : bottom;
+  sb.style.cssText=`bottom:0;left:0;right:0;height:${sbHeight}px`;
   sl.style.cssText=`top:${top}px;left:0;width:${left}px;height:${h}px`;
   sr.style.cssText=`top:${top}px;right:0;width:${right}px;height:${h}px`;
 
@@ -4323,8 +4447,12 @@ function renderObStep(){
   const hl=document.getElementById('ob-highlight');
   hl.style.cssText=`top:${top}px;left:${left}px;width:${w}px;height:${h}px;opacity:1`;
 
-  // Posiziona tooltip
-  positionTooltip(tooltip, r, s.position, vw, vh, PAD);
+  // Posiziona tooltip — su mobile sempre in basso
+  if(isMobile()){
+    positionTooltipBottom(tooltip, vw, vh);
+  } else {
+    positionTooltip(tooltip, r, s.position, vw, vh, PAD);
+  }
 }
 
 function setObShadesFull(){
@@ -4366,8 +4494,26 @@ function positionTooltip(tooltip, r, pos, vw, vh, pad){
 
 function positionTooltipCenter(tooltip){
   const vw=window.innerWidth, vh=window.innerHeight;
-  tooltip.style.left=Math.round(vw/2-145)+'px';
-  tooltip.style.top=Math.round(vh/2-100)+'px';
+  if(isMobile()){
+    positionTooltipBottom(tooltip, vw, vh);
+  } else {
+    tooltip.style.left=Math.round(vw/2-145)+'px';
+    tooltip.style.top=Math.round(vh/2-100)+'px';
+    tooltip.style.width='290px';
+    tooltip.style.borderRadius='';
+  }
+}
+
+function positionTooltipBottom(tooltip, vw, vh){
+  // Bottom sheet su mobile: tocca tutta la larghezza, posizionato in basso
+  // Lascia spazio per la bottom nav (58px) + gap
+  const bottom = 58 + 8;
+  tooltip.style.left = '8px';
+  tooltip.style.right = '8px';
+  tooltip.style.width = (vw - 16) + 'px';
+  tooltip.style.top = 'auto';
+  tooltip.style.bottom = bottom + 'px';
+  tooltip.style.borderRadius = '8px 8px 0 0';
 }
 
 function obNav(dir){
@@ -4556,363 +4702,31 @@ function exportICS(){
 
 function rGuida(){
   const el=document.getElementById('view-guida');
-  el.innerHTML=`<div class="guida-wrap">
-
-  <!-- INTESTAZIONE -->
-  <div style="text-align:center;padding:32px 0 40px;border-bottom:2px solid var(--red);margin-bottom:40px">
-    <div style="font-size:48px;color:var(--red);filter:drop-shadow(0 0 12px color-mix(in srgb,var(--red) 50%,transparent));margin-bottom:10px">✦</div>
-    <div style="font-size:26px;font-weight:900;letter-spacing:4px;margin-bottom:6px">ALL IS REVEALED</div>
-    <div style="font-size:12px;letter-spacing:5px;color:var(--muted);font-family:var(--fb)">GUIDA UFFICIALE IN ITALIANO</div>
-    <div style="font-size:14px;font-family:var(--fb);color:var(--text-dim);margin-top:14px;font-style:italic">Il velo si solleva. I legami si rivelano.</div>
-  </div>
-
-  <!-- INDICE -->
-  <div class="guida-toc">
-    <div class="guida-toc-title">INDICE</div>
-    <a href="#g1">1. Cos'è All is Revealed</a>
-    <a href="#g2">2. Avvio e accesso</a>
-    <a href="#g3">3. Primo avvio — profilo e tour guidato</a>
-    <a href="#g4">4. L'interfaccia — panoramica visiva</a>
-    <a href="#g5">5. Gli Arcani Maggiori</a>
-    <a href="#g6">6. Creare e gestire un Legame</a>
-    <a href="#g7">7. Il Diario del Legame</a>
-    <a href="#g8">8. Lo Stato del Legame</a>
-    <a href="#g9">9. Anniversari e Date Importanti</a>
-    <a href="#g10">10. I Suggerimenti Automatici</a>
-    <a href="#g11">11. Le Connessioni tra Arcani</a>
-    <a href="#g12">12. La Panoramica</a>
-    <a href="#g13">13. La Storia</a>
-    <a href="#g14">14. Il Calendario</a>
-    <a href="#g15">15. Le Statistiche</a>
-    <a href="#g16">16. L'Oracolo</a>
-    <a href="#g17">17. I Temi Visivi</a>
-    <a href="#g18">18. Backup, Dati e Reset</a>
-    <a href="#g19">19. Consigli di utilizzo</a>
-    <a href="#g20">20. Come massimizzare l'uso</a>
-  </div>
-
-  <!-- 1 -->
-  <div id="g1" class="guida-h1">1 · COS'È ALL IS REVEALED</div>
-  <p class="guida-p">All is Revealed è un'applicazione personale ispirata al sistema dei Social Links dei videogiochi Persona 3, 4 e 5 di Atlus — dove ogni relazione significativa è associata a uno dei 22 Arcani Maggiori dei Tarocchi e cresce attraverso esperienze condivise.</p>
-  <p class="guida-p">Non stai classificando le persone. Stai riconoscendo il ruolo che ricoprono nella tua vita in questo momento — l'archetipo che incarnano per te. La stessa persona potrebbe corrispondere ad arcani diversi in momenti diversi della vita.</p>
-  <ul class="guida-ul">
-    <li>Associare ogni persona importante a uno dei 22 Arcani Maggiori</li>
-    <li>Tracciare la crescita del legame attraverso livelli da 1 a 10, fino allo stato <span class="guida-max">✦ MAX</span></li>
-    <li>Registrare incontri, contatti e note con data, luogo e momento del giorno</li>
-    <li>Tenere un diario narrativo con campi di contesto: prima impressione, momento definitivo, intenzione</li>
-    <li>Collegare persone che si conoscono tra loro e visualizzare la rete nel Cerchio</li>
-    <li>Gestire anniversari, compleanni e date importanti con promemoria automatici</li>
-    <li>Esportare le date nel calendario di sistema per ricevere notifiche anche con il sito chiuso</li>
-    <li>Visualizzare statistiche, grafici per singolo legame e heatmap degli incontri</li>
-    <li>Consultare l'Oracolo per riflessioni contestuali su ogni legame e sezione</li>
-    <li>Scegliere tra 15 temi visivi o personalizzare completamente i colori</li>
-  </ul>
-  <div class="guida-note"><div class="guida-note-label">✦ FILOSOFIA</div><p>All is Revealed è uno specchio, non una sentenza. Usalo per vedere con più chiarezza, non per classificare le persone come oggetti.</p></div>
-
-  <!-- 2 -->
-  <div id="g2" class="guida-h1">2 · AVVIO E ACCESSO</div>
-  <p class="guida-p">All is Revealed è disponibile come applicazione web. Non richiede installazione. Tutti i dati vengono salvati localmente nel browser su cui usi il sito.</p>
-  <div class="guida-h2">Indirizzo</div>
-  <p class="guida-p" style="font-family:var(--fd);font-size:16px;color:var(--red);font-weight:700;text-align:center;padding:10px;border:1px solid var(--border);background:var(--bg3)">thomasleepatrick.github.io/allisrevealed</p>
-  <div class="guida-h2">Aggiungere alla schermata home</div>
-  <ul class="guida-ul">
-    <li><strong>Windows Chrome:</strong> menu ⋮ → Salva e condividi → Installa pagina come app</li>
-    <li><strong>Mac Safari:</strong> menu Condividi → Aggiungi alla Dock</li>
-    <li><strong>Mac Chrome:</strong> menu ⋮ → Salva e condividi → Installa All is Revealed</li>
-  </ul>
-  <div class="guida-note"><div class="guida-note-label">■ ATTENZIONE</div><p>I dati vivono nel localStorage del browser. Svuotare la cache o usare la navigazione privata li cancella. Non usare mai la modalità di navigazione privata. Fai backup regolari dalle Impostazioni.</p></div>
-
-  <!-- 3 -->
-  <div id="g3" class="guida-h1">3 · PRIMO AVVIO — PROFILO E TOUR</div>
-  <p class="guida-p">La prima volta che apri il sito vengono mostrate due schermate, nell'ordine:</p>
-  <div class="guida-h2">Schermata profilo</div>
-  <ul class="guida-ul">
-    <li><strong>Avatar:</strong> clicca il cerchio per caricare una foto. Se non carichi nulla, verrà mostrata l'iniziale del nome.</li>
-    <li><strong>Nome:</strong> obbligatorio. Apparirà nell'header e al centro del Cerchio nella Panoramica.</li>
-  </ul>
-  <p class="guida-p">Clicca "Inizia il viaggio" per confermare. Il profilo è modificabile dalle Impostazioni o cliccando il cerchio in alto a destra in qualsiasi momento.</p>
-  <div class="guida-h2">Tour interattivo — 6 passi</div>
-  <p class="guida-p">Lo schermo si oscura lasciando visibile l'elemento spiegato. Ogni passo ha titolo, spiegazione e pulsanti "Salta" / "Avanti".</p>
-  <ul class="guida-ul">
-    <li>Passo 1 — Il pannello degli arcani (lista a sinistra)</li>
-    <li>Passo 2 — La carta e la scheda del legame</li>
-    <li>Passo 3 — I tasti di azione (assegna persona, registra voci)</li>
-    <li>Passo 4 — La barra di navigazione (le 6 sezioni)</li>
-    <li>Passo 5 — Il pulsante Oracolo</li>
-    <li>Passo 6 — Il tuo profilo</li>
-  </ul>
-
-  <!-- 4 -->
-  <div id="g4" class="guida-h1">4 · L'INTERFACCIA — PANORAMICA VISIVA</div>
-  <div class="guida-h2">Header — sempre visibile</div>
-  <ul class="guida-ul">
-    <li><strong>Logo:</strong> SISTEMA ARCANO / SOCIAL LINKS</li>
-    <li><strong>Navigazione:</strong> Arcani · Panoramica · Storia · Calendario · Statistiche · ⚙ · ?</li>
-    <li><strong>🔍 Ricerca globale:</strong> cerca in nomi, voci di diario e appunti. Scorciatoia: Ctrl+K (Mac: Cmd+K). Chiudi con Esc.</li>
-    <li><strong>Profilo e contatore:</strong> cerchio iniziale/foto + nome → clicca per modificare. Accanto: contatore "X su 21".</li>
-  </ul>
-  <div class="guida-h2">Pannello sinistro</div>
-  <ul class="guida-ul">
-    <li>22 arcani in lista scrollabile. Per ogni arcano assegnato: numero romano, nome, persona, badge, chip livello, pallino stato, pallino rosa se anniversario entro 14 giorni.</li>
-  </ul>
-  <div class="guida-h2">Area principale destra</div>
-  <ul class="guida-ul">
-    <li><strong>Carta tarocchi:</strong> clicca per girarla e vedere l'illustrazione.</li>
-    <li><strong>Testo arcano:</strong> descrizione del tipo di legame.</li>
-    <li><strong>Approfondimento:</strong> espandibile — corrispondenze esoteriche, simbolismo, significato dritta/rovesciata, tappa della vita.</li>
-    <li><strong>Scheda persona:</strong> visibile se l'arcano ha una persona assegnata.</li>
-    <li><strong>✦ Oracolo:</strong> fisso in basso a destra, sempre accessibile (tranne in Impostazioni e Guida).</li>
-  </ul>
-
-  <!-- 5 -->
-  <div id="g5" class="guida-h1">5 · GLI ARCANI MAGGIORI</div>
-  <p class="guida-p">I 22 Arcani Maggiori sono archetipi universali. Ogni arcano rappresenta un tipo di relazione e il modo in cui quella relazione ti trasforma. Non stai classificando chi sei l'altro: stai riconoscendo cosa rappresenta per te.</p>
-  <table class="guida-table">
-    <thead><tr><th>Arcano</th><th>Nome</th><th>Tema</th><th>Tipo di rapporto</th></tr></thead>
-    <tbody>
-      ${ARCANA.map(a=>`<tr><td>${a.roman}</td><td>${a.name}</td><td>${a.theme.split('·')[0].trim()}</td><td>${a.exp.slice(0,80)}…</td></tr>`).join('')}
-    </tbody>
-  </table>
-  <div class="guida-note"><div class="guida-note-label">✦ CONSIGLIO</div><p>Quando hai dubbi su dove collocare una persona, apri l'Approfondimento di ogni arcano e leggi la descrizione del tipo di legame. Trovare l'arcano giusto è già un atto di comprensione.</p></div>
-
-  <!-- 6 -->
-  <div id="g6" class="guida-h1">6 · CREARE E GESTIRE UN LEGAME</div>
-  <p class="guida-p">Seleziona un arcano e clicca <strong>+ Assegna persona</strong>. Ogni arcano ospita una sola persona.</p>
-  <div class="guida-h2">Campi disponibili</div>
-  <ul class="guida-ul">
-    <li><strong>Nome *</strong> — obbligatorio. Modificabile cliccando il testo nella scheda.</li>
-    <li><strong>Tipo di legame</strong> — Amicizia · Amore · Familiare · Collega · Mentore · Conoscenza · Gruppo · Animale · Altro.</li>
-    <li><strong>Badge (Tono)</strong> — Leggero, Intenso, Conflittuale, Sereno, Appassionato, Ironico, Malinconico, Giocoso, Profondo, Superficiale, Grato, Nostalgico, Silenzioso, Caotico, Caldo, Freddo, Ambivalente, Complice</li>
-    <li><strong>Badge (Natura)</strong> — Ispirante, Protettivo, Sfidante, Trasformativo, Prezioso, Misterioso, Vitale, Frammentato, Radicato, Inaspettato, Curativo, Destabilizzante, Formativo, Reciproco, Asimmetrico, Rivelatore, Rifugio, Specchio, Catalizzatore, Eredità, Sospeso, In divenire, Definitivo</li>
-    <li><strong>Foto</strong> — opzionale. Compressa automaticamente.</li>
-    <li><strong>Legame a distanza</strong> — se attivo, anche i contatti digitali contano per lo stato.</li>
-    <li><strong>Date importanti</strong> — compleanni, anniversari, prime volte.</li>
-    <li><strong>Appunti iniziali</strong> — campo libero.</li>
-    <li><strong>Prima impressione</strong> — com'era quando vi siete conosciuti.</li>
-    <li><strong>Momento definitivo</strong> — il momento che ha cambiato tutto.</li>
-    <li><strong>Intenzione</strong> — cosa vuoi fare con questo legame.</li>
-    <li><strong>Frequenza abituale</strong> — giorni della settimana in cui tipicamente vi incontrate.</li>
-  </ul>
-  <div class="guida-h2">I Livelli</div>
-  <div class="guida-lvl-row"><div class="guida-lvl-num">1–2</div><div class="guida-lvl-desc">Legame appena iniziato o ripreso. Ci si conosce ancora poco.</div></div>
-  <div class="guida-lvl-row"><div class="guida-lvl-num">3–4</div><div class="guida-lvl-desc">Il rapporto ha trovato una sua forma. Ci sono stati momenti significativi.</div></div>
-  <div class="guida-lvl-row"><div class="guida-lvl-num">5–6</div><div class="guida-lvl-desc">Legame consolidato. C'è fiducia, storia condivisa, conoscenza reciproca.</div></div>
-  <div class="guida-lvl-row"><div class="guida-lvl-num">7–9</div><div class="guida-lvl-desc">Rapporto profondo. Momenti di crisi attraversati insieme, trasformazione reciproca.</div></div>
-  <div class="guida-lvl-row" style="background:color-mix(in srgb,var(--red) 6%,var(--bg))"><div class="guida-lvl-num" style="background:var(--bg3)"><span class="guida-max">✦ MAX</span></div><div class="guida-lvl-desc">Completamento. Il badge numerico diventa <span class="guida-max">✦ MAX</span> con effetto luminoso. Il legame ha raggiunto la sua forma più piena.</div></div>
-  <div class="guida-note"><div class="guida-note-label">✦ CONSIGLIO</div><p>Non affrettare i livelli. Prima di aumentare, chiediti: cosa è cambiato che non era presente prima? Scrivi la risposta come voce nel diario.</p></div>
-
-  <!-- 7 -->
-  <div id="g7" class="guida-h1">7 · IL DIARIO DEL LEGAME</div>
-  <p class="guida-p">Il Diario è il cuore dell'app. Tre tipi di voce:</p>
-  <div class="guida-h2">🤝 Incontro</div>
-  <ul class="guida-ul">
-    <li><strong>Data</strong> — quando è avvenuto.</li>
-    <li><strong>Momento del giorno</strong> — Mattina · Pomeriggio · Sera · Notte.</li>
-    <li><strong>Luogo</strong> — facoltativo.</li>
-    <li><strong>Note</strong> — facoltativo.</li>
-    <li><strong>Salita di livello</strong> — checkbox opzionale: spunta se l'incontro ha approfondito davvero il legame.</li>
-  </ul>
-  <div class="guida-h2">💬 Contatto</div>
-  <ul class="guida-ul">
-    <li><strong>Data, Note, Salita di livello</strong> — come per gli incontri.</li>
-    <li><strong>Mezzo</strong> — WhatsApp · Chiamata · Videochiamata · SMS · Email · Lettera · Altro.</li>
-  </ul>
-  <div class="guida-h2">📝 Nota</div>
-  <p class="guida-p">Una riflessione, un pensiero. Non richiede che ci sia stato un incontro. Ideale quando pensi a quella persona senza vederla. Testo obbligatorio.</p>
-  <div class="guida-h2">Gestire le voci</div>
-  <ul class="guida-ul">
-    <li><strong>Filtri:</strong> Tutti · Incontri · Contatti · Note · Livelli.</li>
-    <li><strong>Modifica:</strong> clicca ✎ su qualsiasi voce (non sulle salite di livello).</li>
-    <li><strong>Elimina:</strong> clicca ✕. Per 5 secondi appare "↩ Annulla" per ripristinare.</li>
-    <li><strong>Abbassa livello:</strong> il pulsante ↓ Lv.X rimuove l'ultima salita di livello.</li>
-  </ul>
-
-  <!-- 8 -->
-  <div id="g8" class="guida-h1">8 · LO STATO DEL LEGAME</div>
-  <ul class="guida-ul">
-    <li><strong style="color:var(--stabile)">🟢 Stabile</strong> — il legame va bene. Stato di default.</li>
-    <li><strong style="color:var(--trascurato)">🟡 Trascurato</strong> — si attiva automaticamente dopo 30 giorni senza incontri (o contatti per i legami a distanza). Per tornare a Stabile serve almeno un incontro/contatto negli ultimi 30 giorni.</li>
-    <li><strong style="color:var(--rovesciato)">🔴 Rovesciato</strong> — crisi, conflitto aperto, tensione irrisolta. Va impostato manualmente.</li>
-  </ul>
-  <div class="guida-note"><div class="guida-note-label">✦ CONSIGLIO</div><p>Se dopo un incontro difficile il legame è ancora "Stabile", stai probabilmente evitando di registrare come ti senti davvero. L'onestà con sé stessi è il valore principale di questo strumento.</p></div>
-
-  <!-- 9 -->
-  <div id="g9" class="guida-h1">9 · ANNIVERSARI E DATE IMPORTANTI</div>
-  <p class="guida-p">Ogni legame può avere un numero illimitato di date. Aggiungile dalla sezione Date Importanti nella scheda o durante la creazione del legame.</p>
-  <div class="guida-h2">Tipi di data</div>
-  <ul class="guida-ul">
-    <li><strong>🎂 Compleanno</strong> — fondamentale per i promemoria.</li>
-    <li><strong>🤝 Prima volta</strong> — la prima volta che vi siete conosciuti.</li>
-    <li><strong>💫 Anniversario</strong> — una ricorrenza del rapporto.</li>
-    <li><strong>📌 Data speciale</strong> — qualsiasi altra data con nome personalizzato.</li>
-  </ul>
-  <div class="guida-h2">Promemoria nell'app</div>
-  <ul class="guida-ul">
-    <li>Entro <strong>14 giorni</strong> — badge rosa pulsante nella lista arcani e nella scheda.</li>
-    <li>Entro <strong>7 giorni</strong> — promemoria automatico alla prima apertura del sito nella giornata.</li>
-    <li>Nel <strong>Calendario</strong> — tutte le date appaiono come eventi nella griglia mensile.</li>
-  </ul>
-  <div class="guida-h2">Esportare nel calendario di sistema (.ics)</div>
-  <p class="guida-p">Da Impostazioni → Anniversari nel calendario → <strong>Esporta .ics</strong>. Il file generato è compatibile con Google Calendar, Apple Calendar e Outlook. Ogni data si ripete ogni anno automaticamente e include un promemoria il giorno prima.</p>
-  <ul class="guida-ul">
-    <li><strong>Google Calendar:</strong> Impostazioni → Importa ed esporta → Importa</li>
-    <li><strong>Apple Calendar:</strong> File → Importa → seleziona il file .ics</li>
-    <li><strong>Outlook:</strong> File → Apri ed esporta → Importa/Esporta → iCalendar</li>
-  </ul>
-  <div class="guida-h2">Notifiche nel browser</div>
-  <p class="guida-p">Da Impostazioni → pulsante <strong>🔔 Attiva notifiche</strong>. Una volta attivato, il browser mostrerà avvisi per gli anniversari di oggi e domani anche se la tab è in background.</p>
-
-  <!-- 10 -->
-  <div id="g10" class="guida-h1">10 · I SUGGERIMENTI AUTOMATICI</div>
-  <p class="guida-p">Appaiono in cima alla scheda, tra lo stato e i pulsanti di azione. Calcolati in tempo reale su frequenza, stato, livello e prossimità di date.</p>
-  <ul class="guida-ul">
-    <li><strong>📅</strong> Anniversario entro 14 giorni → avviso con conto alla rovescia.</li>
-    <li><strong>⏳</strong> Nessun incontro da 45+ giorni → suggerisce di rivedersi.</li>
-    <li><strong>✦</strong> 3+ incontri nell'ultima settimana → conferma il momento positivo.</li>
-    <li><strong>⚡</strong> Stato Rovesciato → suggerisce un confronto diretto.</li>
-    <li><strong>📈</strong> Livello fermo da 75+ giorni → chiede se il legame è pronto per crescere.</li>
-    <li><strong>🗓</strong> Giorno di frequenza abituale → promemoria.</li>
-    <li><strong>◎</strong> Intenzione impostata ma nessun contatto nell'ultimo mese.</li>
-    <li><strong>✦</strong> Livello MAX raggiunto → messaggio speciale di completamento.</li>
-  </ul>
-
-  <!-- 11 -->
-  <div id="g11" class="guida-h1">11 · LE CONNESSIONI TRA ARCANI</div>
-  <p class="guida-p">Puoi segnare le relazioni che esistono tra le persone dei tuoi legami — amici in comune, colleghi, familiari. Le connessioni compaiono nella scheda e nel Cerchio della Panoramica.</p>
-  <div class="guida-h2">Come creare una connessione</div>
-  <ul class="guida-ul">
-    <li>Apri la scheda di un legame → sezione <strong>Connessioni</strong> → clicca <strong>+ Collega</strong>.</li>
-    <li>Seleziona una o più persone. Il cerchio ○ diventa ● per le connessioni attive.</li>
-    <li>La connessione è <strong>bidirezionale automatica</strong>: collegare A a B collega anche B ad A.</li>
-  </ul>
-  <p class="guida-p">Nel Cerchio della Panoramica, le connessioni appaiono come linee colorate con gradiente tra i colori dei due arcani. Il grafo è unico per ogni utente.</p>
-
-  <!-- 12 -->
-  <div id="g12" class="guida-h1">12 · LA PANORAMICA</div>
-  <p class="guida-p">Visione d'insieme di tutti e 22 gli arcani. Tre layout selezionabili:</p>
-  <ul class="guida-ul">
-    <li><strong>⊞ Griglia</strong> — 22 card colorate. Gli arcani non assegnati appaiono semi-trasparenti.</li>
-    <li><strong>◎ Cerchio</strong> — corona circolare con il tuo avatar al centro. Linee dal centro agli arcani assegnati e tra i nodi connessi.</li>
-    <li><strong>≡ Lista</strong> — tabella compatta con simbolo, arcano, persona, stato, livello, ultima voce.</li>
-  </ul>
-  <div class="guida-h2">Filtri disponibili</div>
-  <p class="guida-p">Stabile · Trascurato · Rovesciato · A distanza · Anniversario imminente. Clicca lo stesso filtro per azzerarlo.</p>
-
-  <!-- 13 -->
-  <div id="g13" class="guida-h1">13 · LA STORIA</div>
-  <p class="guida-p">Timeline verticale di tutti gli incontri, contatti e salite di livello di tutti i legami, in ordine cronologico inverso, raggruppati per mese. Le note non compaiono. Clicca su qualsiasi card per andare al legame.</p>
-  <div class="guida-h2">Ricerca nella Storia</div>
-  <p class="guida-p">Digita nella barra in cima per filtrare in tempo reale. Cerca su: nome persona, nome arcano, testo voce, luogo, mezzo, momento del giorno. I termini trovati sono evidenziati. Clicca ✕ per tornare alla timeline completa.</p>
-
-  <!-- 14 -->
-  <div id="g14" class="guida-h1">14 · IL CALENDARIO</div>
-  <p class="guida-p">Vista mensile di tutti gli eventi. Usa ← → per cambiare mese. Il selettore anno copre dal 2022 al 2035. Pallini colorati per tipo: blu incontri, viola contatti, rosa anniversari. Clicca una cella per i dettagli del giorno.</p>
-  <p class="guida-p">Sotto la griglia: prossimi anniversari nei 90 giorni con conto alla rovescia e pulsante diretto al legame.</p>
-
-  <!-- 15 -->
-  <div id="g15" class="guida-h1">15 · LE STATISTICHE</div>
-  <ul class="guida-ul">
-    <li><strong>Riepilogo</strong> — legami attivi, incontri totali, voci diario, livello medio.</li>
-    <li><strong>Grafico singolo legame</strong> — seleziona dal menù a tendina: barre ultimi 12 mesi + distribuzione incontri/contatti/note.</li>
-    <li><strong>Più visti 30gg</strong> — top 5 per incontri recenti.</li>
-    <li><strong>Più privilegiati</strong> — top 5 per volume totale di voci.</li>
-    <li><strong>Da non trascurare</strong> — legami in stato critico con motivazione e link diretto.</li>
-    <li><strong>Distribuzione livelli</strong> — istogramma per fasce 1–2, 3–4, 5–6, 7–8, 9–10.</li>
-    <li><strong>Stati</strong> — barre Stabile / Trascurato / Rovesciato.</li>
-    <li><strong>Uso app</strong> — 9 dati: voci 7gg, 30gg, contatti, note, salite, a distanza, con badge, date, giorni attivo.</li>
-    <li><strong>Heatmap</strong> — griglia giorno × momento del giorno, intensità proporzionale agli incontri.</li>
-  </ul>
-
-  <!-- 16 -->
-  <div id="g16" class="guida-h1">16 · L'ORACOLO</div>
-  <p class="guida-p">Il pulsante <strong>✦ Oracolo</strong> in basso a destra è disponibile in tutte le sezioni tranne Impostazioni e Guida. Offre una riflessione breve e contestuale — non una risposta, ma uno stimolo. Clicca "Consulta ancora" per una frase diversa.</p>
-  <table class="guida-table">
-    <thead><tr><th>Sezione</th><th>Pool</th></tr></thead>
-    <tbody>
-      <tr><td>Arcani</td><td>15 frasi × 22 arcani = 330 totali, specifiche per tipo di legame</td></tr>
-      <tr><td>Panoramica</td><td>26 frasi sul sistema dei legami nel suo insieme</td></tr>
-      <tr><td>Storia</td><td>23 frasi su memoria, tempo e pattern</td></tr>
-      <tr><td>Calendario</td><td>23 frasi su tempo, date e presenza</td></tr>
-      <tr><td>Statistiche</td><td>20 frasi su bilancio, abitudini e numeri</td></tr>
-      <tr><td>Impostazioni / Guida</td><td>Non disponibile</td></tr>
-    </tbody>
-  </table>
-
-  <!-- 17 -->
-  <div id="g17" class="guida-h1">17 · I TEMI VISIVI</div>
-  <p class="guida-p">Da Impostazioni → Tema visivo. 15 temi predefiniti + personalizzato.</p>
-  <div class="guida-h2">Temi scuri (7)</div>
-  <ul class="guida-ul">
-    <li><strong>Abisso</strong> — nero profondo, rosso sangue, oro arcano (tema originale)</li>
-    <li><strong>Oceano</strong> — blu notte, turchese, argento</li>
-    <li><strong>Foresta</strong> — verde muschio, oro antico, avorio</li>
-    <li><strong>Cenere</strong> — grigio antracite, arancione bruciato</li>
-    <li><strong>Viola Arcano</strong> — porpora profonda, oro pallido</li>
-    <li><strong>Sangue e Inchiostro</strong> — rosso intenso, nero assoluto</li>
-    <li><strong>Notte Araba</strong> — turchese su nero, oro speziato</li>
-  </ul>
-  <div class="guida-h2">Temi chiari (7)</div>
-  <ul class="guida-ul">
-    <li><strong>Abisso di Luce</strong> — sfondo chiaro, accenti rosso e oro</li>
-    <li><strong>Pergamena</strong> — avorio caldo, viola, terracotta</li>
-    <li><strong>Alba</strong> — bianco puro, viola elettrico, arancione</li>
-    <li><strong>Carta da Lettere</strong> — grigio carta, inchiostro navy, bordeaux</li>
-    <li><strong>Smeraldo</strong> — verde chiaro, oro, crema</li>
-    <li><strong>Nebbia di Marzo</strong> — grigio perla, teal, luce diffusa</li>
-    <li><strong>Cipria</strong> — rosa cipria, bordeaux, carta velina</li>
-  </ul>
-  <div class="guida-h2">Tema personalizzato</div>
-  <p class="guida-p">6 color picker per: accento, titoli, testo, sfondo, sfondo card, bordi. Le modifiche si applicano in tempo reale. Clicca "Applica personalizzato" per salvarlo.</p>
-  <div class="guida-note"><div class="guida-note-label">✦ NOTA</div><p>I colori degli arcani non cambiano mai con i temi — sono parte dell'identità simbolica di ogni carta.</p></div>
-
-  <!-- 18 -->
-  <div id="g18" class="guida-h1">18 · BACKUP, DATI E RESET</div>
-  <ul class="guida-ul">
-    <li><strong>Esporta backup</strong> — file .json con tutti i dati. Il nome include la data corrente.</li>
-    <li><strong>Importa backup</strong> — carica un .json precedente. I dati attuali vengono sostituiti.</li>
-    <li><strong>Backup automatico</strong> — se attivo, scarica un .json ad ogni apertura del sito.</li>
-    <li><strong>Cancella dati</strong> — elimina tutti i legami e il diario. Profilo e tema vengono conservati. Utile per test.</li>
-    <li><strong>Reset completo</strong> — cancella tutto (legami, profilo, tema, impostazioni) e ricarica la pagina come al primo avvio. Utile per passare il sito a un'altra persona.</li>
-  </ul>
-  <div class="guida-note"><div class="guida-note-label">■ ATTENZIONE</div><p>Prima di fare Reset completo, esporta sempre un backup. Il reset è irreversibile.</p></div>
-
-  <!-- 19 -->
-  <div id="g19" class="guida-h1">19 · CONSIGLI DI UTILIZZO</div>
-  <ul class="guida-ul">
-    <li><strong>01 — Inizia con pochi legami.</strong> Non cercare di riempire tutti e 22 gli arcani subito. Inizia con le 3–5 persone più significative.</li>
-    <li><strong>02 — Aggiorna subito dopo un incontro.</strong> Il momento migliore è quando il ricordo è ancora vivo. Anche due righe bastano.</li>
-    <li><strong>03 — Non mentire a te stesso.</strong> Se un legame è in crisi, segnalo come Rovesciato. L'onestà è il valore principale dello strumento.</li>
-    <li><strong>04 — Usa lo stato come bussola.</strong> Aggiornalo ogni volta che senti che qualcosa è cambiato.</li>
-    <li><strong>05 — Leggi la spiegazione dell'arcano.</strong> Ogni arcano ha una descrizione e un approfondimento. Leggili quando hai dubbi su dove collocare una persona.</li>
-    <li><strong>06 — Distingui incontri e note.</strong> Un incontro è un evento concreto. Una nota è un pensiero. Avere 10 note e 0 incontri dice già qualcosa.</li>
-    <li><strong>07 — Usa le connessioni.</strong> Collegare le persone che si conoscono trasforma il Cerchio in una mappa vera.</li>
-    <li><strong>08 — Usa gli anniversari come rituali.</strong> Esporta il file .ics per ricevere i promemoria nel tuo calendario di sistema.</li>
-  </ul>
-
-  <!-- 20 -->
-  <div id="g20" class="guida-h1">20 · COME MASSIMIZZARE L'USO</div>
-  <div class="guida-h2">Routine settimanale — 5 minuti</div>
-  <ul class="guida-ul">
-    <li>Statistiche → "Da non trascurare" e "Più visti"</li>
-    <li>Calendario → chi festeggia nei prossimi 7 giorni</li>
-    <li>Per ogni legame aggiornato, verifica che lo stato sia corretto</li>
-    <li>Aggiungi una nota ai legami vissuti intensamente nella settimana</li>
-  </ul>
-  <div class="guida-h2">Usare i livelli con intenzione</div>
-  <p class="guida-p">Prima di aumentare un livello, chiediti: cosa è cambiato in questo rapporto? Scrivi la risposta come voce nel diario. Il livello MAX non è un traguardo da raggiungere in fretta — molti dei rapporti più belli restano a 6 o 7 per anni.</p>
-  <div class="guida-h2">Usare la Storia per leggere il percorso</div>
-  <p class="guida-p">Apri la Storia ogni tanto e scorri qualche mese indietro. I periodi di intensa attività, i mesi di silenzio, le salite di livello concentrate — raccontano qualcosa di reale sul modo in cui vivi i tuoi rapporti.</p>
-  <div class="guida-h2">Il valore degli archivi nel tempo</div>
-  <p class="guida-p">Il vero valore di All is Revealed si rivela dopo mesi o anni di uso. Rileggere il diario di un legame — i suoi alti e bassi, i momenti Rovesciati che poi sono diventati Stabili — è una forma di memoria assistita difficile da ottenere in altri modi.</p>
-  <div class="guida-note"><div class="guida-note-label">✦ ULTIMO CONSIGLIO</div><p>Usa l'app per le persone che ami — ma non dimenticare di vivere i rapporti invece di limitarti a registrarli. All is Revealed è uno specchio, non un sostituto.</p></div>
-
-  <div style="text-align:center;padding:60px 0 20px;border-top:1px solid var(--border);margin-top:60px">
-    <div style="font-size:32px;color:var(--red);margin-bottom:10px">✦</div>
-    <div style="font-size:11px;letter-spacing:4px;color:var(--text-dim);font-family:var(--fb)">ALL IS REVEALED · SOCIAL LINKS SIMULATOR</div>
-    <div style="font-size:13px;color:var(--text-dim);font-family:var(--fb);margin-top:8px;font-style:italic">Il velo si solleva. I legami si rivelano.</div>
-  </div>
-
-</div>`;
+  el.innerHTML=`
+  <div style="padding:40px 24px;max-width:700px;text-align:center;margin:0 auto">
+    <div style="font-size:10px;letter-spacing:5px;color:var(--red);font-family:var(--fb);margin-bottom:40px">GUIDA UFFICIALE</div>
+    <div style="font-size:52px;filter:drop-shadow(0 0 14px color-mix(in srgb,var(--red) 50%,transparent));margin-bottom:20px">✦</div>
+    <div style="font-size:22px;font-weight:900;letter-spacing:4px;margin-bottom:8px">ALL IS REVEALED</div>
+    <div style="font-size:13px;font-family:var(--fb);color:var(--text-title);letter-spacing:3px;margin-bottom:32px">SOCIAL LINKS SIMULATOR</div>
+    <div style="font-size:15px;font-family:var(--fb);color:var(--text-body);line-height:1.9;margin-bottom:40px;max-width:520px;margin-left:auto;margin-right:auto">
+      La guida completa dell'app è disponibile come documento PDF scaricabile.<br>
+      Include tutte le sezioni: arcani, diario, stati, anniversari, statistiche, temi e molto altro.
+    </div>
+    <a href="guida_all_is_revealed.pdf" download style="display:inline-flex;align-items:center;gap:12px;background:var(--red);color:#fff;font-family:var(--fd);font-size:13px;letter-spacing:2px;padding:14px 28px;text-decoration:none;transition:all .2s;border:none" onmouseover="this.style.background='color-mix(in srgb,var(--red) 80%,#000)'" onmouseout="this.style.background='var(--red)'">
+      ⬇ Scarica la Guida PDF
+    </a>
+    <div style="margin-top:16px;font-size:11px;font-family:var(--fb);color:var(--text-dim)">
+      guida_all_is_revealed.pdf
+    </div>
+    <div style="margin-top:60px;padding-top:32px;border-top:1px solid var(--border)">
+      <div style="font-size:10px;letter-spacing:3px;font-family:var(--fb);color:var(--text-dim);margin-bottom:20px">ACCESSO RAPIDO</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+        ${['Arcani','Panoramica','Storia','Calendario','Statistiche'].map(s=>`
+          <button onclick="setView('${s.toLowerCase()}')" class="btn btn-g btn-sm">${s}</button>
+        `).join('')}
+      </div>
+    </div>
+  </div>`;
 }
 
 function getAutoDownload(){
@@ -5432,7 +5246,7 @@ function showAnimOverlay(arcId, mode, levelNum){
   }
 
   // Chiudi dopo durata
-  const dur = mode === 'arcano' ? 4200 : 3200;
+  const dur = mode === 'arcano' ? 5500 : 4500;
   setTimeout(()=>{
     ov.classList.remove('show');
     // Pulisci particelle dopo il fade-out
