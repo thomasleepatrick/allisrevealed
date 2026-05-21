@@ -40,6 +40,13 @@ body{font-family:var(--fd);color:var(--text-main);display:flex;flex-direction:co
 [data-theme=light] .p-lvl-row .lvl-of{color:var(--text-dim)}
 [data-theme=light] .log-date{color:var(--text-dim)}
 [data-theme=light] .log-filter-btn{color:var(--text-dim)}
+[data-theme=light] .btn{color:var(--text-main)}
+[data-theme=light] .btn-r{color:#fff}
+[data-theme=light] .btn-r:hover{color:#fff}
+[data-theme=light] .btn-g{color:var(--text-title);border-color:var(--border);background:color-mix(in srgb,var(--text-title) 6%,transparent)}
+[data-theme=light] .btn-g:hover{color:#fff;border-color:var(--red)}
+[data-theme=light] .btn-sm{color:var(--text-main)}
+[data-theme=light] .btn-xs{color:var(--text-main)}
 [data-theme=light] .lbar{background:var(--border)}
 [data-theme=light] .cal-cell{background:var(--bg4)}
 [data-theme=light] .stat-warn-name{color:var(--text-body)}
@@ -90,10 +97,10 @@ body{font-family:var(--fd);color:var(--text-main);display:flex;flex-direction:co
 .tarot-face{display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:11px 8px 10px}
 .tarot-face::before{content:'';position:absolute;inset:6px;border-radius:4px;border:1px solid rgba(255,255,255,.07);pointer-events:none}
 .tarot-back{transform:rotateY(180deg);overflow:hidden}
-.tarot-wrap:not(.flipped):hover .tarot-flip{transform:translateY(-5px) rotate(1.5deg)}
+.tarot-wrap:not(.flipped):hover .tarot-flip{transform:scale(1.03)}
 /* legacy for non-flip cards */
 .tarot-card{flex-shrink:0;width:108px;height:180px;border-radius:8px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:11px 8px 10px;transition:transform .35s}
-.tarot-card:hover{transform:translateY(-5px) rotate(1.5deg)}
+.tarot-card:hover{transform:scale(1.03)}
 .tarot-card::before{content:'';position:absolute;inset:6px;border-radius:4px;border:1px solid rgba(255,255,255,.07);pointer-events:none}
 .t-roman{font-size:13px;letter-spacing:3px;font-weight:700}.t-sym{font-size:53px;line-height:1}.t-name{font-size:10px;letter-spacing:1.5px;text-align:center;font-weight:700}
 .arc-exp{flex:1;min-width:0;align-self:flex-start}
@@ -238,7 +245,7 @@ select.inp{cursor:pointer}
 #view-panoramica{padding:22px 24px}
 .pan-title{font-size:12px;letter-spacing:5px;color:var(--red);font-family:var(--fb);margin-bottom:14px}
 .pan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:11px}
-.pan-card{padding:13px 11px;border-radius:4px;cursor:pointer;transition:transform .2s,box-shadow .2s;display:flex;flex-direction:column;gap:6px;border:1px solid transparent;position:relative}
+.pan-card{padding:13px 11px;border-radius:4px;cursor:pointer;transition:transform .2s,box-shadow .2s;display:flex;flex-direction:column;gap:6px;border:1px solid transparent;position:relative;contain:layout style}
 .pan-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
 .pan-card.empty{opacity:.35}.pan-card.empty:hover{opacity:.55}
 .pan-roman{font-size:12px;letter-spacing:2px;font-weight:700}
@@ -535,6 +542,14 @@ select.inp{cursor:pointer}
    ═══════════════════════════════════════════════════════════ */
 @media(max-width:768px){
 
+  /* Scroll performance: disabilita effetti GPU-intensivi durante scroll */
+  .pan-sym{filter:none!important}
+  .pan-card{transition:none!important;will-change:auto}
+  .pan-circ-card{transition:none!important}
+  .pan-list-row{transition:none!important}
+  .ann-ping{animation:none!important;opacity:1}
+  .lvl-chip{animation:none!important}
+
   /* Body: permetti scroll verticale, no overflow hidden */
   html,body{overflow:auto;height:auto;min-height:100%;min-height:100dvh}
   #right{overflow-y:visible}
@@ -600,7 +615,7 @@ select.inp{cursor:pointer}
 
   /* Arc top: verticale */
   #arc-top{flex-direction:column;align-items:center;padding:14px 16px;gap:14px}
-  .tarot-wrap,.tarot-card{width:88px;height:147px}
+  .tarot-wrap,.tarot-card{width:104px;height:173px}
   .arc-exp{width:100%;text-align:center}
   .exp-title{font-size:20px}
   .exp-theme{font-size:13px}
@@ -613,7 +628,7 @@ select.inp{cursor:pointer}
   .detail-grid{grid-template-columns:1fr}
 
   /* Legame */
-  #legame{padding:12px 14px 28px}
+  #legame{padding:12px 14px 80px}
   .p-head{padding:12px 14px}
   .p-actions{gap:5px;padding:8px 12px}
   .btn-sm{padding:7px 11px;font-size:11px}
@@ -624,11 +639,13 @@ select.inp{cursor:pointer}
   .notes-sec,.ann-sec,.narr-sec{padding:10px 12px}
 
   /* Panoramica */
-  #view-panoramica{padding:14px}
+  #view-panoramica{padding:14px 14px 80px}
   .pan-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
   .pan-circle-wrap{padding:10px 0 20px}
   .pan-circle-stage{width:320px!important;height:320px!important;transform:scale(1)}
   .pan-list-row{padding:8px 10px}
+  .pan-list-arc{width:70px;font-size:10px}
+  .pan-list-bars-mobile{display:none}
 
   /* Storia */
   #view-storia{padding:14px 12px 80px;max-width:100%}
@@ -655,7 +672,11 @@ select.inp{cursor:pointer}
   .stat-cards{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}
   .stat-card{padding:10px 12px}
   .stat-card-val{font-size:26px}
-  .heatmap{min-width:280px}
+  .stat-row-name{width:100px;font-size:13px}
+  .heatmap{min-width:260px}
+  .hm-day-lbl{font-size:10px;letter-spacing:0}
+  .hm-tod-lbl{font-size:10px;letter-spacing:0;padding-right:4px}
+  .hm-cell{height:20px;font-size:11px}
 
   /* Impostazioni e Guida */
   #view-impostazioni > div,.guida-wrap{padding:16px 14px 80px}
@@ -667,7 +688,7 @@ select.inp{cursor:pointer}
   .modal{padding:18px;width:100%!important;max-width:100%!important;
     border-radius:0;margin:0;max-height:92dvh}
   .overlay{align-items:flex-end}
-  .overlay .modal{border-bottom:none;animation:modalSlideUp .25s ease}
+  .overlay .modal{border-bottom:none;animation:modalSlideUp .25s ease;margin-bottom:58px;max-height:calc(92dvh - 58px);border-radius:0}
   @keyframes modalSlideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
   .field-2col,.field-row{grid-template-columns:1fr}
 
@@ -708,6 +729,50 @@ select.inp{cursor:pointer}
   .pan-circle-stage{width:280px!important;height:280px!important}
   #hdr h1{font-size:13px;letter-spacing:1px}
   .stat-cards{grid-template-columns:repeat(3,1fr)}
+}
+
+/* PAUSA ANIMAZIONI DURANTE SCROLL */
+body.is-scrolling .ann-ping,
+body.is-scrolling .lvl-chip,
+body.is-scrolling .pan-card,
+body.is-scrolling .pan-circ-card,
+body.is-scrolling .pan-list-row,
+body.is-scrolling .pan-circ-svg{
+  animation-play-state:paused!important;
+  transition:none!important;
+}
+
+/* LIGHTBOX CARTA */
+#card-lightbox{
+  position:fixed;inset:0;z-index:600;
+  background:rgba(0,0,0,.92);
+  display:none;align-items:center;justify-content:center;
+  cursor:zoom-out;
+  backdrop-filter:blur(8px);
+  animation:fu .2s ease;
+}
+#card-lightbox.open{display:flex;}
+#card-lightbox-inner{
+  max-width:min(340px, 88vw);
+  max-height:88dvh;
+  position:relative;
+}
+#card-lightbox img,#card-lightbox .lb-svg{
+  width:100%;
+  height:auto;
+  max-height:88dvh;
+  object-fit:contain;
+  border-radius:10px;
+  box-shadow:0 0 60px rgba(0,0,0,.8);
+  display:block;
+}
+#card-lightbox .lb-svg{
+  width:min(340px,88vw);
+}
+#card-lightbox-hint{
+  position:absolute;bottom:-28px;left:0;right:0;
+  text-align:center;font-size:10px;font-family:var(--fb);
+  color:rgba(255,255,255,.4);letter-spacing:2px;
 }
 </style>
 </head>
@@ -1168,6 +1233,15 @@ select.inp{cursor:pointer}
       <button class="btn btn-g" onclick="closeModal('m-del')">Annulla</button>
       <button class="btn btn-r" onclick="doDelLog()">Elimina</button>
     </div>
+  </div>
+</div>
+
+
+<!-- LIGHTBOX CARTA -->
+<div id="card-lightbox" onclick="closeLightbox()">
+  <div id="card-lightbox-inner">
+    <div id="card-lightbox-content"></div>
+    <div id="card-lightbox-hint">Tocca per chiudere</div>
   </div>
 </div>
 
@@ -2172,7 +2246,7 @@ function rTop(){
   const cardVis=getCardVisual(a.id);
   const hasSvg=!!cardVis;
   const flipClass=cardFlipped&&hasSvg?' flipped':'';
-  const flipHint=hasSvg?`<div style="font-size:8px;font-family:var(--fb);color:${a.color}44;letter-spacing:2px;text-align:center;margin-top:6px;transition:opacity .3s">${cardFlipped?'← torna':'↻ gira'}</div>`:'';
+  const flipHint=hasSvg?`<div style="font-size:8px;font-family:var(--fb);color:${a.color}55;letter-spacing:2px;text-align:center;margin-top:6px;transition:opacity .3s">${cardFlipped?'↔ ingrandisci':'↻ gira'}</div>`:'';
   document.getElementById('arc-top').innerHTML=`
     ${hasSvg?`
     <div class="tarot-wrap${flipClass}" onclick="flipCard()" title="Clicca per girare la carta">
@@ -2229,13 +2303,46 @@ function checkExternalImg(arcId,callback){
 }
 
 function flipCard(){
+  const a=ARCANA[sel];
+  const vis=getCardVisual(a.id);
+  // Se già girata: click apre lightbox
+  if(cardFlipped && vis){
+    openLightbox(vis);
+    return;
+  }
+  // Altrimenti gira
   cardFlipped=!cardFlipped;
   const wrap=document.querySelector('.tarot-wrap');
   if(wrap)wrap.classList.toggle('flipped',cardFlipped);
-  // aggiorna solo il hint senza re-render completo
+  // aggiorna hint
   const hint=document.querySelector('.arc-exp div:nth-child(4)');
+  if(hint&&vis)hint.textContent=cardFlipped?'↔ ingrandisci':'↻ gira';
+}
+
+function openLightbox(vis){
   const a=ARCANA[sel];
-  if(hint&&ARCANA_SVG[a.id])hint.textContent=cardFlipped?'← GIRA':'ILLUSTRAZIONE →';
+  const content=document.getElementById('card-lightbox-content');
+  if(!content)return;
+  if(vis.type==='img'){
+    content.innerHTML=`<img src="${vis.content}" alt="${a.name}">`;
+  } else {
+    // SVG: avvolgi in div con classe per styling
+    content.innerHTML=`<div class="lb-svg">${vis.content}</div>`;
+  }
+  // Colore hint bordo
+  document.getElementById('card-lightbox').style.setProperty('--arc-color', a.color);
+  document.getElementById('card-lightbox').classList.add('open');
+}
+
+function closeLightbox(){
+  document.getElementById('card-lightbox').classList.remove('open');
+  // Rimette la carta sul dorso
+  cardFlipped=false;
+  const wrap=document.querySelector('.tarot-wrap');
+  if(wrap)wrap.classList.remove('flipped');
+  // aggiorna hint
+  const hint=document.querySelector('.arc-exp div:nth-child(4)');
+  if(hint)hint.textContent='↻ gira';
 }
 
 function rDetail(){
@@ -2689,7 +2796,7 @@ function rPanoramica(){
       <div style="width:7px;height:7px;border-radius:50%;background:#6c5ce7"></div>A distanza
     </div>
     <div onclick="setPanFilter('anniversario')" style="display:flex;align-items:center;gap:5px;font-size:11px;font-family:var(--fb);letter-spacing:1px;cursor:pointer;padding:3px 9px;border-radius:2px;border:1px solid ${panFilter==='anniversario'?'#fd79a888':'var(--border)'};background:${panFilter==='anniversario'?'#fd79a818':'transparent'};color:${panFilter==='anniversario'?'#fff':'var(--text-title)'};transition:all .2s">
-      <div style="width:7px;height:7px;border-radius:50%;background:#fd79a8;animation:ping 2s infinite"></div>Anniversario imminente
+      <div style="width:7px;height:7px;border-radius:50%;background:#fd79a8"></div>Anniversario imminente
     </div>
     ${panFilter?`<div onclick="setPanFilter(null)" style="font-size:10px;font-family:var(--fb);color:var(--muted);cursor:pointer;padding:3px 8px;letter-spacing:1px;border:1px solid var(--border);border-radius:2px">✕ Tutti</div>`:''}
   </div>`;
@@ -2781,9 +2888,9 @@ function rPanoramica(){
       return`<div class="pan-circ-card${empty?' empty':''}"
         style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;width:50px;height:50px;border-color:${a.color}${empty?'30':'88'};background:linear-gradient(135deg,${a.color}${empty?'08':'20'},var(--bg));opacity:${opacity};pointer-events:${pe}"
         onclick="selArcGo(${a.id})" title="${a.name}${d?' — '+d.name:''}">
-        ${hasAnn?`<div style="position:absolute;top:2px;right:2px;width:6px;height:6px;border-radius:50%;background:#fd79a8;animation:ping 2s infinite"></div>`:''}
+        ${hasAnn?`<div style="position:absolute;top:2px;right:2px;width:6px;height:6px;border-radius:50%;background:#fd79a8"></div>`:''}
         <div style="font-size:8px;font-weight:700;color:${a.color};letter-spacing:1px">${a.roman}</div>
-        <div style="font-size:24px;line-height:1;color:${a.color};filter:drop-shadow(0 0 4px ${a.color}88)">${a.sym}</div>
+        <div class="pan-sym" style="font-size:24px;line-height:1;color:${a.color};filter:drop-shadow(0 0 4px ${a.color}88)">${a.sym}</div>
         ${sc?`<div style="width:6px;height:6px;border-radius:50%;background:${sc};margin-top:2px"></div>`:''}
         ${nameTag}
         ${d?`<div style="display:flex;gap:1px;margin-top:2px">${bars}</div>`:''}
@@ -2823,7 +2930,7 @@ function rPanoramica(){
           <div style="font-size:10px;font-family:var(--fb);color:var(--text-dim);letter-spacing:.5px">${a.theme.split('·')[0].trim()}</div>
         </div>
         <div class="pan-list-person">${stStr}${esc(d.name||'—')}${distStr}${annStr}</div>
-        <div style="display:flex;gap:2px;flex-shrink:0;align-items:center">${bars}</div>
+        <div class="pan-list-bars-mobile" style="display:flex;gap:2px;flex-shrink:0;align-items:center">${bars}</div>
         <div class="pan-list-meta" style="width:70px">
           <div style="color:${a.color};font-weight:700">${isArcano(d)?'✦':'Lv.'+d.level}</div>
           <div style="font-size:10px;color:var(--text-dim)">${lastStr}</div>
@@ -5478,7 +5585,25 @@ function checkAnniversariNotify(reg){
   }
 }
 
+// Pausa animazioni durante scroll su mobile per evitare ghosting
+(function(){
+  let scrollTimer=null;
+  const vp=document.getElementById('view-panoramica');
+  function onScroll(){
+    if(scrollTimer)clearTimeout(scrollTimer);
+    document.body.classList.add('is-scrolling');
+    scrollTimer=setTimeout(()=>document.body.classList.remove('is-scrolling'),150);
+  }
+  // Usa window per catturare scroll su body (mobile)
+  window.addEventListener('scroll',onScroll,{passive:true});
+  document.addEventListener('scroll',onScroll,{passive:true});
+})();
+
 document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    const lb=document.getElementById('card-lightbox');
+    if(lb&&lb.classList.contains('open')){closeLightbox();return;}
+  }
   if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();toggleSearch();}
   if(e.key==='Escape')closeSearch();
 });
