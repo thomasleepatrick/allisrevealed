@@ -317,10 +317,10 @@ select.inp{cursor:pointer}
 
 /* HEATMAP */
 .heatmap-wrap{overflow-x:auto}
-.heatmap{display:inline-grid;grid-template-rows:auto repeat(4,1fr);grid-template-columns:60px repeat(7,1fr);gap:4px;min-width:400px}
+.heatmap{display:inline-grid;grid-template-rows:auto repeat(5,1fr);grid-template-columns:90px repeat(7,1fr);gap:4px;min-width:420px}
 .hm-empty{background:transparent}
 .hm-day-lbl{font-size:12px;font-family:var(--fb);color:var(--text-title);letter-spacing:1px;text-align:center;padding-bottom:2px}
-.hm-tod-lbl{font-size:12px;font-family:var(--fb);color:var(--text-title);letter-spacing:1px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px}
+.hm-tod-lbl{font-size:11px;font-family:var(--fb);color:var(--text-title);letter-spacing:0;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;min-width:90px;white-space:nowrap}
 .hm-cell{height:22px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:13px;font-family:var(--fb)}
 
 @keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
@@ -435,7 +435,7 @@ select.inp{cursor:pointer}
   100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}
 }
 #anim-card-wrap{position:relative;z-index:2;perspective:900px;margin-bottom:20px}
-#anim-card{width:210px;height:350px;border-radius:10px;position:relative;transform-style:preserve-3d;animation:cardReveal 1s cubic-bezier(.4,0,.2,1) forwards;transition:box-shadow .4s ease}
+#anim-card{width:280px;height:467px;border-radius:10px;position:relative;transform-style:preserve-3d;animation:cardReveal 1s cubic-bezier(.4,0,.2,1) forwards;transition:box-shadow .4s ease}
 @keyframes cardReveal{
   0%{transform:rotateY(-80deg) scale(.8);opacity:0;filter:brightness(1.2)}
   45%{transform:rotateY(5deg) scale(1.03);opacity:1;filter:brightness(1.05)}
@@ -504,8 +504,8 @@ select.inp{cursor:pointer}
 .pan-view-btn.active{background:var(--red);color:#fff;border-color:var(--red)}
 .pan-view-btn:not(.active):hover{border-color:var(--red);color:#fff}
 /* Cerchio */
-.pan-circle-wrap{overflow:auto;padding:20px 0 40px;text-align:center}
-.pan-circle-stage{position:relative;width:560px;height:560px;margin:0 auto;display:inline-block}
+.pan-circle-wrap{overflow:auto;padding:20px 0 40px;text-align:center;-webkit-overflow-scrolling:touch}
+.pan-circle-stage{position:relative;width:780px;height:780px;margin:0 auto;display:inline-block}
 .pan-circ-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
 .pan-circ-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;background:var(--red);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;font-weight:900;letter-spacing:1px;color:#fff;z-index:5;box-shadow:0 0 20px color-mix(in srgb,var(--red) 40%,transparent);cursor:default}
 .pan-circ-card{position:absolute;width:70px;height:70px;border-radius:50%;border:1px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transform:translate(-50%,-50%);transition:transform .2s,box-shadow .2s;z-index:2;overflow:hidden;text-align:center}
@@ -642,7 +642,7 @@ select.inp{cursor:pointer}
   #view-panoramica{padding:14px 14px 80px}
   .pan-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
   .pan-circle-wrap{padding:10px 0 20px}
-  .pan-circle-stage{width:320px!important;height:320px!important;transform:scale(1)}
+  .pan-circle-stage{width:420px!important;height:420px!important;}
   .pan-list-row{padding:8px 10px}
   .pan-list-arc{width:70px;font-size:10px}
   .pan-list-bars-mobile{display:none}
@@ -673,10 +673,10 @@ select.inp{cursor:pointer}
   .stat-card{padding:10px 12px}
   .stat-card-val{font-size:26px}
   .stat-row-name{width:100px;font-size:13px}
-  .heatmap{min-width:260px}
+  .heatmap{min-width:280px}
   .hm-day-lbl{font-size:10px;letter-spacing:0}
-  .hm-tod-lbl{font-size:10px;letter-spacing:0;padding-right:4px}
-  .hm-cell{height:20px;font-size:11px}
+  .hm-tod-lbl{font-size:10px;letter-spacing:0;padding-right:4px;min-width:70px}
+  .hm-cell{height:18px;font-size:11px}
 
   /* Impostazioni e Guida */
   #view-impostazioni > div,.guida-wrap{padding:16px 14px 80px}
@@ -714,7 +714,7 @@ select.inp{cursor:pointer}
   .ob-tip-title{font-size:15px}
 
   /* Animazione carta */
-  #anim-card{width:160px;height:267px}
+  #anim-card{width:200px;height:333px}
 
   /* Guida */
   .guida-table{font-size:12px}
@@ -750,6 +750,10 @@ body.is-scrolling .pan-circ-svg{
   cursor:zoom-out;
   backdrop-filter:blur(8px);
   animation:fu .2s ease;
+}
+@media(max-width:768px){
+  #card-lightbox{cursor:pointer}
+  #card-lightbox-hint{content:'Tocca per chiudere'}
 }
 #card-lightbox.open{display:flex;}
 #card-lightbox-inner{
@@ -1081,6 +1085,12 @@ body.is-scrolling .pan-circ-svg{
       </div>
 
     </div>
+      <!-- Connessioni (solo in modalità modifica) -->
+      <div id="as-conn-section" style="display:none">
+        <label class="lbl">Connessioni <span style="font-size:10px;color:var(--muted);letter-spacing:1px">persone che si conoscono</span></label>
+        <div id="as-conn-list" style="display:flex;flex-direction:column;gap:3px;max-height:200px;overflow-y:auto"></div>
+      </div>
+
     <div class="modal-footer">
       <button class="btn btn-g" onclick="closeModal('m-assign')">Annulla</button>
       <button class="btn btn-r" onclick="saveAssignPerson()" id="as-save-btn">✦ Salva legame</button>
@@ -1103,6 +1113,7 @@ body.is-scrolling .pan-circ-svg{
             <option value="Pomeriggio">🌤 Pomeriggio</option>
             <option value="Sera">🌆 Sera</option>
             <option value="Notte">🌙 Notte</option>
+          <option value="Giornata intera">🌐 Giornata intera</option>
           </select>
         </div>
       </div>
@@ -1238,10 +1249,10 @@ body.is-scrolling .pan-circ-svg{
 
 
 <!-- LIGHTBOX CARTA -->
-<div id="card-lightbox" onclick="closeLightbox()">
+<div id="card-lightbox" ondblclick="closeLightbox()" title="Doppio click per chiudere">
   <div id="card-lightbox-inner">
     <div id="card-lightbox-content"></div>
-    <div id="card-lightbox-hint">Tocca per chiudere</div>
+    <div id="card-lightbox-hint">Doppio click per chiudere · Esc per uscire</div>
   </div>
 </div>
 
@@ -1295,9 +1306,9 @@ function updateMobNav(v){
 
 // Cerchio panoramica: ricalcola dimensioni per mobile
 function getMobileCircleSize(){
-  if(!isMobile()) return { size:560, R:230, CX:280, CY:280 };
-  const vw = Math.min(window.innerWidth - 28, 320);
-  const R = Math.round(vw * 0.44);
+  if(!isMobile()) return { size:780, R:330, CX:390, CY:390 };
+  const vw = Math.min(window.innerWidth - 16, 420);
+  const R = Math.round(vw * 0.42);
   const C = Math.round(vw / 2);
   return { size: vw, R, CX:C, CY:C };
 }
@@ -1916,117 +1927,7 @@ const BADGE_GRUPPI={
 };
 const BADGE_COLORS={'Tono':'#fd79a8','Natura':'#a29bfe'};
 
-const ARCANA_SVG={
-  16:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 180" width="108" height="180">
-  <defs>
-    <filter id="glow-pink" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="2.5" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <filter id="glow-gold" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="1.5" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <radialGradient id="sky" cx="50%" cy="30%" r="70%">
-      <stop offset="0%" stop-color="#1a0010"/>
-      <stop offset="100%" stop-color="#08080f"/>
-    </radialGradient>
-    <linearGradient id="tower-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#1c0a14"/>
-      <stop offset="50%" stop-color="#2a0f1e"/>
-      <stop offset="100%" stop-color="#1c0a14"/>
-    </linearGradient>
-  </defs>
-
-  <!-- Sfondo -->
-  <rect width="108" height="180" fill="url(#sky)"/>
-  <rect width="108" height="180" fill="none" stroke="#e8439322" stroke-width="2" rx="7"/>
-
-  <!-- Nuvole tempesta -->
-  <ellipse cx="20" cy="28" rx="18" ry="8" fill="#1a0010" opacity=".8"/>
-  <ellipse cx="55" cy="22" rx="22" ry="9" fill="#1a0010" opacity=".9"/>
-  <ellipse cx="88" cy="30" rx="16" ry="7" fill="#1a0010" opacity=".8"/>
-  <ellipse cx="38" cy="18" rx="16" ry="7" fill="#200515" opacity=".95"/>
-  <ellipse cx="72" cy="16" rx="20" ry="8" fill="#200515" opacity=".95"/>
-
-  <!-- Torre — base -->
-  <rect x="30" y="65" width="48" height="95" fill="url(#tower-grad)" stroke="#e84393" stroke-width=".5" opacity=".9"/>
-  <!-- Mattoni stilizzati -->
-  <line x1="30" y1="80" x2="78" y2="80" stroke="#e8439318" stroke-width=".5"/>
-  <line x1="30" y1="95" x2="78" y2="95" stroke="#e8439318" stroke-width=".5"/>
-  <line x1="30" y1="110" x2="78" y2="110" stroke="#e8439318" stroke-width=".5"/>
-  <line x1="30" y1="125" x2="78" y2="125" stroke="#e8439318" stroke-width=".5"/>
-  <line x1="30" y1="140" x2="78" y2="140" stroke="#e8439318" stroke-width=".5"/>
-  <line x1="54" y1="65" x2="54" y2="160" stroke="#e8439314" stroke-width=".5"/>
-  <line x1="40" y1="80" x2="40" y2="95" stroke="#e8439314" stroke-width=".5"/>
-  <line x1="68" y1="95" x2="68" y2="110" stroke="#e8439314" stroke-width=".5"/>
-  <line x1="40" y1="110" x2="40" y2="125" stroke="#e8439314" stroke-width=".5"/>
-  <line x1="68" y1="125" x2="68" y2="140" stroke="#e8439314" stroke-width=".5"/>
-
-  <!-- Torre — finestre -->
-  <rect x="44" y="75" width="8" height="10" fill="#e8439308" stroke="#e8439344" stroke-width=".5"/>
-  <rect x="56" y="75" width="8" height="10" fill="#e8439308" stroke="#e8439344" stroke-width=".5"/>
-  <rect x="44" y="100" width="8" height="10" fill="#e8439308" stroke="#e8439344" stroke-width=".5"/>
-  <rect x="56" y="100" width="8" height="10" fill="#e8439308" stroke="#e8439344" stroke-width=".5"/>
-  <!-- Porta -->
-  <path d="M47 160 L47 140 Q54 134 61 140 L61 160Z" fill="#0c0010" stroke="#e8439344" stroke-width=".5"/>
-
-  <!-- Torre — corona (in cima, che vola via) -->
-  <g transform="translate(54,55) rotate(-12)" opacity=".85" filter="url(#glow-pink)">
-    <polygon points="0,-12 4,-4 13,-4 6,2 9,11 0,5 -9,11 -6,2 -13,-4 -4,-4"
-      fill="none" stroke="#e84393" stroke-width="1.2"/>
-  </g>
-
-  <!-- Fulmine principale -->
-  <polyline points="62,18 50,50 60,50 44,82"
-    fill="none" stroke="#e84393" stroke-width="2.5"
-    stroke-linecap="round" stroke-linejoin="round"
-    filter="url(#glow-pink)" opacity=".95"/>
-  <!-- Alone fulmine -->
-  <polyline points="62,18 50,50 60,50 44,82"
-    fill="none" stroke="#ff69b4" stroke-width="1"
-    stroke-linecap="round" stroke-linejoin="round" opacity=".5"/>
-
-  <!-- Scintille dal fulmine -->
-  <circle cx="58" cy="46" r="1.5" fill="#f0c040" filter="url(#glow-gold)" opacity=".9"/>
-  <circle cx="48" cy="38" r="1" fill="#f0c040" filter="url(#glow-gold)" opacity=".7"/>
-  <circle cx="65" cy="30" r="1" fill="#fff" opacity=".6"/>
-
-  <!-- Figura 1 che cade (sinistra) -->
-  <g filter="url(#glow-pink)" opacity=".9">
-    <circle cx="22" cy="98" r="4" fill="none" stroke="#e84393" stroke-width="1"/>
-    <line x1="22" y1="102" x2="20" y2="114" stroke="#e84393" stroke-width="1"/>
-    <line x1="20" y1="108" x2="14" y2="105" stroke="#e84393" stroke-width="1"/>
-    <line x1="20" y1="108" x2="18" y2="115" stroke="#e84393" stroke-width="1" transform="rotate(-20,20,108)"/>
-    <line x1="20" y1="114" x2="16" y2="120" stroke="#e84393" stroke-width="1"/>
-    <line x1="20" y1="114" x2="24" y2="121" stroke="#e84393" stroke-width="1"/>
-  </g>
-
-  <!-- Figura 2 che cade (destra) -->
-  <g filter="url(#glow-pink)" opacity=".9" transform="rotate(25,88,88)">
-    <circle cx="88" cy="82" r="4" fill="none" stroke="#e84393" stroke-width="1"/>
-    <line x1="88" y1="86" x2="90" y2="98" stroke="#e84393" stroke-width="1"/>
-    <line x1="90" y1="92" x2="96" y2="90" stroke="#e84393" stroke-width="1"/>
-    <line x1="90" y1="92" x2="92" y2="99" stroke="#e84393" stroke-width="1" transform="rotate(15,90,92)"/>
-    <line x1="90" y1="98" x2="86" y2="104" stroke="#e84393" stroke-width="1"/>
-    <line x1="90" y1="98" x2="94" y2="105" stroke="#e84393" stroke-width="1"/>
-  </g>
-
-  <!-- Fiamme alle finestre -->
-  <g filter="url(#glow-pink)" opacity=".7">
-    <path d="M44 75 Q46 70 48 75 Q50 68 52 75" fill="none" stroke="#e84393" stroke-width="1"/>
-    <path d="M56 75 Q58 69 60 75 Q62 67 64 75" fill="none" stroke="#e84393" stroke-width="1"/>
-  </g>
-
-  <!-- Numero romano in basso -->
-  <text x="54" y="173" text-anchor="middle" font-family="serif" font-size="8"
-    fill="#e84393" letter-spacing="3" opacity=".8">XVI</text>
-
-  <!-- Bordo ornamentale -->
-  <rect width="108" height="180" fill="none" stroke="#e84393" stroke-width=".5" rx="7" opacity=".4"/>
-  <rect x="4" y="4" width="100" height="172" fill="none" stroke="#e8439322" stroke-width=".5" rx="5"/>
-</svg>`
-};
+const ARCANA_SVG={};
 
 function isArcano(d){ return d && d.level >= 10; }
 
@@ -2246,7 +2147,7 @@ function rTop(){
   const cardVis=getCardVisual(a.id);
   const hasSvg=!!cardVis;
   const flipClass=cardFlipped&&hasSvg?' flipped':'';
-  const flipHint=hasSvg?`<div style="font-size:8px;font-family:var(--fb);color:${a.color}55;letter-spacing:2px;text-align:center;margin-top:6px;transition:opacity .3s">${cardFlipped?'↔ ingrandisci':'↻ gira'}</div>`:'';
+  const flipHint=''; // hint ora è dentro tarot-wrap
   document.getElementById('arc-top').innerHTML=`
     ${hasSvg?`
     <div class="tarot-wrap${flipClass}" onclick="flipCard()" title="Clicca per girare la carta">
@@ -2260,6 +2161,7 @@ function rTop(){
           ${cardVis.type==='svg'?cardVis.content:`<img src="${cardVis.content}" style="width:100%;height:100%;object-fit:cover" alt="${a.name}">`}
         </div>
       </div>
+    <div id="card-flip-hint" style="font-size:9px;font-family:var(--fb);color:${a.color}77;letter-spacing:1px;text-align:center;margin-top:6px;pointer-events:none">${cardFlipped?'↔ ingrandisci':'↻ gira'}</div>
     </div>`
     :`<div class="tarot-card" style="background:linear-gradient(155deg,#0c0c18,${a.color}1a);border:1px solid ${a.color}50;box-shadow:0 0 28px ${a.color}14">
       <div class="t-roman" style="color:${a.color}">${a.roman}</div>
@@ -2315,8 +2217,8 @@ function flipCard(){
   const wrap=document.querySelector('.tarot-wrap');
   if(wrap)wrap.classList.toggle('flipped',cardFlipped);
   // aggiorna hint
-  const hint=document.querySelector('.arc-exp div:nth-child(4)');
-  if(hint&&vis)hint.textContent=cardFlipped?'↔ ingrandisci':'↻ gira';
+  const hint=document.getElementById('card-flip-hint');
+  if(hint)hint.textContent=cardFlipped?'↔ ingrandisci':'↻ gira';
 }
 
 function openLightbox(vis){
@@ -2326,12 +2228,17 @@ function openLightbox(vis){
   if(vis.type==='img'){
     content.innerHTML=`<img src="${vis.content}" alt="${a.name}">`;
   } else {
-    // SVG: avvolgi in div con classe per styling
     content.innerHTML=`<div class="lb-svg">${vis.content}</div>`;
   }
-  // Colore hint bordo
-  document.getElementById('card-lightbox').style.setProperty('--arc-color', a.color);
-  document.getElementById('card-lightbox').classList.add('open');
+  const lb=document.getElementById('card-lightbox');
+  lb.style.setProperty('--arc-color', a.color);
+  lb.classList.add('open');
+  // Su mobile: tap singolo chiude
+  if(isMobile()){
+    lb.onclick=()=>closeLightbox();
+  } else {
+    lb.onclick=null;
+  }
 }
 
 function closeLightbox(){
@@ -2341,7 +2248,7 @@ function closeLightbox(){
   const wrap=document.querySelector('.tarot-wrap');
   if(wrap)wrap.classList.remove('flipped');
   // aggiorna hint
-  const hint=document.querySelector('.arc-exp div:nth-child(4)');
+  const hint=document.getElementById('card-flip-hint');
   if(hint)hint.textContent='↻ gira';
 }
 
@@ -2670,7 +2577,7 @@ function rStoria(){
       if(!e.date||e.type==='nota')return;
       // Filtro ricerca
       if(q){
-        const hay=[d.name||'',a.name,e.text||'',e.luogo||'',e.mezzo||'',e.tod||''].join(' ').toLowerCase();
+        const hay=[d.name||'',a.name,e.text||'',e.luogo||'',e.mezzo||'',e.tod||'',d.notes||'',d.prima_impressione||'',d.momento_definitivo||'',d.obiettivo||''].join(' ').toLowerCase();
         if(!hay.includes(q))return;
       }
       events.push({date:e.date,a,d,e});
@@ -2727,35 +2634,78 @@ function rStoria(){
   ${searchBar}
   <div class="tl-wrap"><div class="tl-line"></div>`;
 
+  // Raggruppa eventi per nodi: stessa data + stesso arcano + incontro/contatto+lvl → paralleli
+  function buildNodes(evList){
+    const nodes=[];
+    const used=new Set();
+    evList.forEach((ev,idx)=>{
+      if(used.has(idx))return;
+      // Cerca un lvl associato: stesso arcano, stessa data
+      if(ev.e.type==='incontro'||ev.e.type==='contatto'){
+        const pairIdx=evList.findIndex((ev2,i2)=>!used.has(i2)&&i2!==idx&&ev2.e.type==='lvl'&&ev2.a.id===ev.a.id&&ev2.date===ev.date);
+        if(pairIdx!==-1){
+          nodes.push({type:'pair',ev,evLvl:evList[pairIdx],date:ev.date});
+          used.add(idx);used.add(pairIdx);
+          return;
+        }
+      }
+      // Voce singola
+      nodes.push({type:'single',ev,date:ev.date});
+      used.add(idx);
+    });
+    return nodes;
+  }
+
   let nodeIdx=0;
   Object.keys(grouped).sort((a,b)=>b.localeCompare(a)).forEach(key=>{
     const [y,m]=key.split('-');
     const mLabel=MESI[parseInt(m)-1].toUpperCase()+' '+y;
     html2+=`<div class="tl-month"><span class="tl-month-lbl">${mLabel}</span></div>`;
-    grouped[key].forEach(ev=>{
+    const nodes=buildNodes(grouped[key]);
+    nodes.forEach(node=>{
       const side=nodeIdx%2===0?'right':'left';
+      const [,,dd]=node.date.split('-');
+      const ev=node.ev;
       const ti=TYPE_INFO[ev.e.type]||TYPE_INFO.incontro;
       const color=ev.e.type==='lvl'?ev.a.color:ti.color;
-      const [,,dd]=ev.date.split('-');
       let meta=ti.label;
       if(ev.e.type==='incontro'){if(ev.e.tod)meta+=` · ${ev.e.tod}`;if(ev.e.luogo)meta+=` · ${hlq(ev.e.luogo)}`;}
       if(ev.e.type==='contatto'&&ev.e.mezzo)meta+=` · ${ev.e.mezzo}`;
       if(ev.e.type==='lvl')meta=`Livello ${ev.e.newLevel}`;
-      html2+=`<div class="tl-node ${side}">
-        <div class="tl-half">
-          <div class="tl-card" onclick="selArcGo(${ev.a.id})" style="border-color:${color}22">
-            <div class="tl-arc-nm" style="color:${ev.a.color}">${ev.a.sym} ${ev.a.roman} · ${ev.a.name.toUpperCase()}</div>
-            <div class="tl-person">${hlq(ev.d.name||'—')}</div>
-            <div class="tl-meta">${meta}</div>
-            ${ev.e.text?`<div class="tl-date" style="color:var(--text-title);font-size:11px;margin-top:4px;font-style:italic">"${hlq(ev.e.text.slice(0,60))}${ev.e.text.length>60?'…':''}"</div>`:''}
-            <div class="tl-date">${parseInt(dd)} ${MESI[parseInt(m)-1]}</div>
-          </div>
-        </div>
-        <div class="tl-dot-wrap">
-          <div class="tl-dot" style="background:${color}18;border-color:${color};color:${color}">${ev.a.sym}</div>
-        </div>
-        <div class="tl-half"></div>
+
+      const mainCard=`<div class="tl-card" onclick="selArcGo(${ev.a.id})" style="border-color:${color}22">
+        <div class="tl-arc-nm" style="color:${ev.a.color}">${ev.a.sym} ${ev.a.roman} · ${ev.a.name.toUpperCase()}</div>
+        <div class="tl-person">${hlq(ev.d.name||'—')}</div>
+        <div class="tl-meta">${meta}</div>
+        ${ev.e.text?`<div class="tl-date" style="color:var(--text-title);font-size:11px;margin-top:4px;font-style:italic">"${hlq(ev.e.text.slice(0,60))}${ev.e.text.length>60?'…':''}"</div>`:''}
+        <div class="tl-date">${parseInt(dd)} ${MESI[parseInt(m)-1]}</div>
       </div>`;
+
+      if(node.type==='pair'){
+        // Due card affiancate orizzontalmente
+        const evL=node.evLvl;
+        const lvlCard=`<div class="tl-card" onclick="selArcGo(${evL.a.id})" style="border-color:${evL.a.color}44;margin-top:0;margin-left:6px;flex-shrink:0;background:${evL.a.color}08">
+          <div class="tl-arc-nm" style="color:${evL.a.color}">↑ LIVELLO ${evL.e.newLevel}</div>
+          <div class="tl-meta" style="color:${evL.a.color}88">Salita di livello</div>
+        </div>`;
+        html2+=`<div class="tl-node ${side}">
+          <div class="tl-half">
+            <div style="display:flex;align-items:flex-start">${mainCard}${lvlCard}</div>
+          </div>
+          <div class="tl-dot-wrap">
+            <div class="tl-dot" style="background:${color}18;border-color:${color};color:${color}">${ev.a.sym}</div>
+          </div>
+          <div class="tl-half"></div>
+        </div>`;
+      } else {
+        html2+=`<div class="tl-node ${side}">
+          <div class="tl-half">${mainCard}</div>
+          <div class="tl-dot-wrap">
+            <div class="tl-dot" style="background:${color}18;border-color:${color};color:${color}">${ev.a.sym}</div>
+          </div>
+          <div class="tl-half"></div>
+        </div>`;
+      }
       nodeIdx++;
     });
   });
@@ -2828,7 +2778,7 @@ function rPanoramica(){
         <div>
           <div class="pan-arcname" style="color:${empty?'var(--border)':a.color+'cc'}">${a.name}</div>
           ${d?`<div class="pan-person">${esc(d.name||'—')}</div>`:`<div class="pan-person" style="color:var(--text-title)">Non assegnato</div>`}
-          ${d&&d.badges&&d.badges.length?`<div style="font-size:10px;font-family:var(--fb);color:${badgeColor(d.badges[0])}99;letter-spacing:.5px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.badges[0]}</div>`:''}
+          ${d&&d.tipo_legame?`<div style="font-size:10px;font-family:var(--fb);color:${a.color}88;letter-spacing:.5px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.tipo_legame}</div>`:''}
         </div>
         ${d?`<div class="pan-lvl-row">${bars}</div>`:''}
       </div>`;
@@ -2859,6 +2809,14 @@ function rPanoramica(){
       svgLines+=`<line x1="${CX}" y1="${CY}" x2="${coords[i].x.toFixed(1)}" y2="${coords[i].y.toFixed(1)}" stroke="${a.color}" stroke-width="0.8" opacity="0.2"/>`;
     });
     // Linee connessioni tra nodi (bidirezionali, disegna una volta sola)
+    // Helper: controlla se un arcano passa il filtro corrente
+    function passesFilter(arcId){
+      const dd=getD(arcId);if(!dd)return false;
+      if(!panFilter)return true;
+      if(panFilter==='distanza')return !!dd.distanza;
+      if(panFilter==='anniversario')return (dd.anniversari||[]).some(an=>daysUntil(nextOccurrence(an.month,an.day))<=14&&daysUntil(nextOccurrence(an.month,an.day))>=0);
+      return (dd.stato||'stabile')===panFilter;
+    }
     const drawnConns=new Set();
     ARCANA.forEach((a,i)=>{
       const d=getD(a.id);if(!d)return;
@@ -2868,6 +2826,8 @@ function rPanoramica(){
         drawnConns.add(key);
         const j=otherId;
         if(!getD(j))return;
+        // Entrambi i nodi devono passare il filtro
+        if(!passesFilter(a.id)||!passesFilter(j))return;
         const a2=ARCANA[j];
         // Gradiente colore: metà arcano 1, metà arcano 2
         const gid=`cg-${a.id}-${j}`;
@@ -2978,14 +2938,15 @@ function rCalendario(){
       const key=`${calYear}-${String(an.month).padStart(2,'0')}-${String(an.day).padStart(2,'0')}`;
       if(!dayEvents[key])dayEvents[key]=[];
       const tipo=ANN_TIPI[an.tipo]||ANN_TIPI.altro;
-      dayEvents[key].push({type:'ann',color:'#fd79a8',icon:tipo.icon,label:an.label||tipo.label,who:d.name||'—',arcId:a.id});
+      const annColor=an.tipo==='compleanno'?'#fd79a8':an.tipo==='primo_incontro'?'#00cec9':an.tipo==='anniversario'?'#a29bfe':'#fdcb6e';
+      dayEvents[key].push({type:'ann',color:annColor,icon:tipo.icon,label:an.label||tipo.label,who:d.name||'—',arcId:a.id});
     });
     // log
     (d.log||[]).forEach(e=>{
       if(!e.date)return;
       const [ey,em]=e.date.split('-');
       if(parseInt(ey)!==calYear||parseInt(em)-1!==calMonth)return;
-      const color=e.type==='incontro'?'#4a9eff':e.type==='contatto'?'#a29bfe':e.type==='lvl'?a.color:'#2a2a3a';
+      const color=e.type==='incontro'?'#4a9eff':e.type==='contatto'?'#a29bfe':e.type==='lvl'?a.color:e.type==='nota'?'#e17055':'#888';
       if(!dayEvents[e.date])dayEvents[e.date]=[];
       const icon=e.type==='incontro'?'🤝':e.type==='contatto'?'💬':e.type==='lvl'?'↑':'📝';
       const label=e.type==='lvl'?`Livello ${e.newLevel}`:e.type==='incontro'?`Incontro${e.luogo?' · '+e.luogo:''}`:e.type==='contatto'?`Contatto${e.mezzo?' · '+e.mezzo:''}`:'—';
@@ -3131,15 +3092,20 @@ function rStatistiche(){
   const privilegiati=[...legami].filter(l=>l.log.length>0).sort((a,b)=>b.log.length-a.log.length).slice(0,5);
   const maxP=privilegiati[0]?.log.length||1;
   const daLavorare=legami.filter(l=>{
+    // Escludi legami con primo log meno di 7 giorni fa
+    const allLogDates=l.log.filter(e=>e.date).map(e=>new Date(e.date));
+    const primoLog=allLogDates.length?new Date(Math.min(...allLogDates)):null;
+    const giorniAttivita=primoLog?Math.round((now-primoLog)/86400000):0;
+    if(giorniAttivita<7)return false;
     if(l.d.stato==='trascurato')return true;
     if(l.inc30.length===0&&l.incontri.length>0)return true;
-    if(l.d.level<3&&l.incontri.length<2)return true;
+    if(l.d.level<3&&l.incontri.length<3)return true; // soglia alzata a 3
     return false;
   }).slice(0,5);
 
   // heatmap
   const DAYS=['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
-  const TODS=['Mattina','Pomeriggio','Sera','Notte'];
+  const TODS=['Mattina','Pomeriggio','Sera','Notte','Giornata intera'];
   const cal={};
   DAYS.forEach(d=>{cal[d]={};TODS.forEach(t=>{cal[d][t]=0;});});
   legami.forEach(l=>l.incontri.forEach(e=>{
@@ -3416,8 +3382,38 @@ function editPersonSettings(){
     document.getElementById('as-photo-preview').innerHTML = '📷';
   }
   renderAssignDates();
+  // Connessioni: mostra solo in modalità modifica
+  const connSec=document.getElementById('as-conn-section');
+  const connList=document.getElementById('as-conn-list');
+  if(connSec&&connList){
+    if(_editingPerson){
+      connSec.style.display='block';
+      renderAssignConnList();
+    } else {
+      connSec.style.display='none';
+      connList.innerHTML='';
+    }
+  }
   openModal('m-assign');
   setTimeout(()=>{document.getElementById('as-name').focus();renderBadgeSelector();}, 60);
+}
+
+function renderAssignConnList(){
+  const connList=document.getElementById('as-conn-list');
+  if(!connList)return;
+  const conns=getConnections(sel);
+  const others=ARCANA.filter(a=>a.id!==sel&&getD(a.id));
+  if(!others.length){connList.innerHTML='<div style="font-size:12px;font-family:var(--fb);color:var(--text-dim)">Nessun altro legame assegnato.</div>';return;}
+  connList.innerHTML=others.map(a=>{
+    const d2=getD(a.id);
+    const linked=conns.includes(a.id);
+    return`<div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:${linked?a.color+'10':'var(--bg4)'};border:1px solid ${linked?a.color+'44':'var(--border)'};cursor:pointer;transition:all .2s" onclick="toggleConnection(${sel},${a.id});renderAssignConnList()">
+      <div style="font-size:16px;color:${a.color}">${a.sym}</div>
+      <div style="flex:1"><div style="font-size:10px;font-weight:700;color:${a.color}">${a.roman} · ${a.name}</div>
+      <div style="font-size:12px;font-family:var(--fb);color:var(--text-body)">${esc(d2.name||'—')}</div></div>
+      <div style="font-size:16px;color:${linked?a.color:'var(--border)'}">${linked?'●':'○'}</div>
+    </div>`;
+  }).join('');
 }
 
 function toggleFreqDay(d){
@@ -4376,12 +4372,20 @@ function doSearch(q){
         results.push({arcId:a.id,color:a.color,icon:a.sym,title:hl(e.text.slice(0,80)),sub:`${label} · ${fmtDate(e.date)} · ${esc(d.name||'—')}`,type:'log'});
       }
     });
-    // Note generali
-    re.lastIndex=0;
-    if(d.notes&&re.test(d.notes)){
+    // Note generali e campi narrativi
+    const narrativeFields=[
+      {val:d.notes,sub:'Appunti'},
+      {val:d.prima_impressione,sub:'Prima impressione'},
+      {val:d.momento_definitivo,sub:'Momento definitivo'},
+      {val:d.obiettivo,sub:'Intenzione'},
+    ];
+    narrativeFields.forEach(({val,sub})=>{
       re.lastIndex=0;
-      results.push({arcId:a.id,color:a.color,icon:a.sym,title:hl(d.notes.slice(0,80)),sub:`Appunti · ${esc(d.name||'—')}`,type:'note'});
-    }
+      if(val&&re.test(val)){
+        re.lastIndex=0;
+        results.push({arcId:a.id,color:a.color,icon:a.sym,title:hl(val.slice(0,80)),sub:`${sub} · ${esc(d.name||'—')}`,type:'note'});
+      }
+    });
   });
   cnt.textContent=results.length+' risultat'+(results.length===1?'o':'i');
   list.innerHTML=results.length===0
@@ -4810,7 +4814,18 @@ function exportICS(){
 function rGuida(){
   const el=document.getElementById('view-guida');
   el.innerHTML=`
-  <div style="padding:40px 24px;max-width:700px;text-align:center;margin:0 auto">
+  <div style="padding:16px 24px 40px;display:flex;flex-direction:column;height:calc(100vh - 80px)">
+    <div style="font-size:10px;letter-spacing:5px;color:var(--red);font-family:var(--fb);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+      <span>GUIDA UFFICIALE</span>
+      <a href="guida_all_is_revealed.pdf" download style="font-size:10px;color:var(--muted);font-family:var(--fb);letter-spacing:1px;text-decoration:none;border:1px solid var(--border);padding:4px 10px;transition:all .2s" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--text-main)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">⬇ Scarica</a>
+    </div>
+    <embed src="guida_all_is_revealed.pdf" type="application/pdf" style="flex:1;width:100%;border:1px solid var(--border);min-height:600px">
+    <div style="font-size:10px;font-family:var(--fb);color:var(--text-dim);margin-top:8px;text-align:center">
+      Se il PDF non si carica, <a href="guida_all_is_revealed.pdf" download style="color:var(--red)">scaricalo qui</a>.
+    </div>
+  </div>
+  <!-- VECCHIO markup rimosso: -->
+  <div style="display:none">
     <div style="font-size:10px;letter-spacing:5px;color:var(--red);font-family:var(--fb);margin-bottom:40px">GUIDA UFFICIALE</div>
     <div style="font-size:52px;filter:drop-shadow(0 0 14px color-mix(in srgb,var(--red) 50%,transparent));margin-bottom:20px">✦</div>
     <div style="font-size:22px;font-weight:900;letter-spacing:4px;margin-bottom:8px">ALL IS REVEALED</div>
@@ -4833,6 +4848,7 @@ function rGuida(){
         `).join('')}
       </div>
     </div>
+  </div>
   </div>`;
 }
 
