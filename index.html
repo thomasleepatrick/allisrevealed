@@ -289,8 +289,8 @@ select.inp{cursor:pointer}
 #view-statistiche{padding:22px 24px 40px}
 .stat-section{margin-bottom:26px}
 .stat-section-title{font-size:12px;letter-spacing:5px;color:var(--red);font-family:var(--fb);margin-bottom:13px;padding-bottom:7px;border-bottom:1px solid #111120}
-.stat-row{display:flex;align-items:center;gap:12px;margin-bottom:9px}
-.stat-row-name{font-size:15px;font-family:var(--fb);color:#ccc;width:140px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat-row{display:flex;align-items:center;gap:12px;margin-bottom:9px;max-width:500px}
+.stat-row-name{font-size:15px;font-family:var(--fb);color:#ccc;width:auto;min-width:100px;max-width:200px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stat-bar-wrap{flex:1;background:var(--bg4);height:5px;border-radius:3px;overflow:hidden}
 .stat-bar{height:100%;border-radius:3px;transition:width .6s ease}
 .stat-val{font-size:13px;font-family:var(--fb);color:var(--text-title);width:70px;text-align:right;flex-shrink:0}
@@ -505,7 +505,9 @@ select.inp{cursor:pointer}
 .pan-view-btn:not(.active):hover{border-color:var(--red);color:#fff}
 /* Cerchio */
 .pan-circle-wrap{overflow:auto;padding:20px 0 40px;text-align:center;-webkit-overflow-scrolling:touch}
-.pan-circle-stage{position:relative;width:780px;height:780px;margin:0 auto;display:inline-block}
+.pan-zoom-wrap{display:inline-block;transform-origin:center top;transition:transform .2s ease;cursor:zoom-in}
+.pan-zoom-wrap.zoomed{cursor:zoom-out}
+.pan-circle-stage{position:relative;width:620px;height:620px;margin:0 auto;display:inline-block}
 .pan-circ-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
 .pan-circ-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;background:var(--red);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;font-weight:900;letter-spacing:1px;color:#fff;z-index:5;box-shadow:0 0 20px color-mix(in srgb,var(--red) 40%,transparent);cursor:default}
 .pan-circ-card{position:absolute;width:70px;height:70px;border-radius:50%;border:1px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transform:translate(-50%,-50%);transition:transform .2s,box-shadow .2s;z-index:2;overflow:hidden;text-align:center}
@@ -642,7 +644,7 @@ select.inp{cursor:pointer}
   #view-panoramica{padding:14px 14px 80px}
   .pan-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
   .pan-circle-wrap{padding:10px 0 20px}
-  .pan-circle-stage{width:420px!important;height:420px!important;}
+  .pan-circle-stage{width:360px!important;height:360px!important;}
   .pan-list-row{padding:8px 10px}
   .pan-list-arc{width:70px;font-size:10px}
   .pan-list-bars-mobile{display:none}
@@ -747,36 +749,42 @@ body.is-scrolling .pan-circ-svg{
   position:fixed;inset:0;z-index:600;
   background:rgba(0,0,0,.92);
   display:none;align-items:center;justify-content:center;
-  cursor:zoom-out;
+  cursor:grab;
   backdrop-filter:blur(8px);
   animation:fu .2s ease;
+  overflow:hidden;
+  user-select:none;
 }
-@media(max-width:768px){
-  #card-lightbox{cursor:pointer}
-  #card-lightbox-hint{content:'Tocca per chiudere'}
-}
+#card-lightbox.dragging{cursor:grabbing}
 #card-lightbox.open{display:flex;}
 #card-lightbox-inner{
-  max-width:min(340px, 88vw);
-  max-height:88dvh;
   position:relative;
+  cursor:grab;
+  touch-action:none;
 }
+#card-lightbox-inner.dragging{cursor:grabbing}
 #card-lightbox img,#card-lightbox .lb-svg{
-  width:100%;
+  width:auto;
   height:auto;
-  max-height:88dvh;
+  max-width:min(500px,92vw);
+  max-height:90dvh;
   object-fit:contain;
   border-radius:10px;
   box-shadow:0 0 60px rgba(0,0,0,.8);
   display:block;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-drag:none;
 }
 #card-lightbox .lb-svg{
-  width:min(340px,88vw);
+  width:min(400px,88vw);
+  pointer-events:none;
 }
 #card-lightbox-hint{
-  position:absolute;bottom:-28px;left:0;right:0;
+  position:fixed;bottom:20px;left:0;right:0;
   text-align:center;font-size:10px;font-family:var(--fb);
-  color:rgba(255,255,255,.4);letter-spacing:2px;
+  color:rgba(255,255,255,.35);letter-spacing:2px;
+  pointer-events:none;
 }
 </style>
 </head>
@@ -1073,21 +1081,21 @@ body.is-scrolling .pan-circ-svg{
       <div>
         <label class="lbl">Frequenza abituale</label>
         <div class="freq-row" id="as-freq-row">
-          <div class="freq-day" data-day="0" onclick="toggleFreqDay(0)">Dom</div>
           <div class="freq-day" data-day="1" onclick="toggleFreqDay(1)">Lun</div>
           <div class="freq-day" data-day="2" onclick="toggleFreqDay(2)">Mar</div>
           <div class="freq-day" data-day="3" onclick="toggleFreqDay(3)">Mer</div>
           <div class="freq-day" data-day="4" onclick="toggleFreqDay(4)">Gio</div>
           <div class="freq-day" data-day="5" onclick="toggleFreqDay(5)">Ven</div>
           <div class="freq-day" data-day="6" onclick="toggleFreqDay(6)">Sab</div>
+          <div class="freq-day" data-day="0" onclick="toggleFreqDay(0)">Dom</div>
         </div>
         <div style="font-size:10px;font-family:var(--fb);color:#555;margin-top:6px;letter-spacing:1px">Giorni tipici in cui vi incontrate o sentite</div>
       </div>
 
     </div>
       <!-- Connessioni (solo in modalità modifica) -->
-      <div id="as-conn-section" style="display:none">
-        <label class="lbl">Connessioni <span style="font-size:10px;color:var(--muted);letter-spacing:1px">persone che si conoscono</span></label>
+      <div id="as-conn-section" style="display:none;margin-top:8px">
+        <label class="lbl">Connessioni</label>
         <div id="as-conn-list" style="display:flex;flex-direction:column;gap:3px;max-height:200px;overflow-y:auto"></div>
       </div>
 
@@ -1197,6 +1205,16 @@ body.is-scrolling .pan-circ-svg{
     <div class="modal-title">Modifica voce</div>
     <div class="field-g">
       <div><label class="lbl">Data</label><input class="inp" type="date" id="edit-date"></div>
+      <div id="edit-todfield" style="display:none"><label class="lbl">Momento del giorno</label>
+        <select class="inp" id="edit-tod">
+          <option value="">—</option>
+          <option value="Mattina">☀ Mattina</option>
+          <option value="Pomeriggio">🌤 Pomeriggio</option>
+          <option value="Sera">🌆 Sera</option>
+          <option value="Notte">🌙 Notte</option>
+          <option value="Giornata intera">🌐 Giornata intera</option>
+        </select>
+      </div>
       <div id="edit-luogof"><label class="lbl">Luogo</label><input class="inp" type="text" id="edit-luogo"></div>
       <div id="edit-mezzof"><label class="lbl">Mezzo</label>
         <select class="inp" id="edit-mezzo">
@@ -1252,7 +1270,7 @@ body.is-scrolling .pan-circ-svg{
 <div id="card-lightbox" ondblclick="closeLightbox()" title="Doppio click per chiudere">
   <div id="card-lightbox-inner">
     <div id="card-lightbox-content"></div>
-    <div id="card-lightbox-hint">Doppio click per chiudere · Esc per uscire</div>
+    <div id="card-lightbox-hint" id="lb-hint-text">Trascina per spostarti · Doppio click per chiudere</div>
   </div>
 </div>
 
@@ -1306,8 +1324,8 @@ function updateMobNav(v){
 
 // Cerchio panoramica: ricalcola dimensioni per mobile
 function getMobileCircleSize(){
-  if(!isMobile()) return { size:780, R:330, CX:390, CY:390 };
-  const vw = Math.min(window.innerWidth - 16, 420);
+  if(!isMobile()) return { size:620, R:270, CX:310, CY:310 };
+  const vw = Math.min(window.innerWidth - 16, 360);
   const R = Math.round(vw * 0.42);
   const C = Math.round(vw / 2);
   return { size: vw, R, CX:C, CY:C };
@@ -2221,23 +2239,83 @@ function flipCard(){
   if(hint)hint.textContent=cardFlipped?'↔ ingrandisci':'↻ gira';
 }
 
+let _lbDrag={active:false,startX:0,startY:0,tx:0,ty:0,lastTx:0,lastTy:0};
+
 function openLightbox(vis){
   const a=ARCANA[sel];
   const content=document.getElementById('card-lightbox-content');
   if(!content)return;
   if(vis.type==='img'){
-    content.innerHTML=`<img src="${vis.content}" alt="${a.name}">`;
+    content.innerHTML=`<img src="${vis.content}" alt="${a.name}" draggable="false">`;
   } else {
     content.innerHTML=`<div class="lb-svg">${vis.content}</div>`;
   }
+  // Reset posizione
+  _lbDrag.tx=0;_lbDrag.ty=0;_lbDrag.lastTx=0;_lbDrag.lastTy=0;
+  const inner=document.getElementById('card-lightbox-inner');
+  if(inner)inner.style.transform='translate(0,0)';
   const lb=document.getElementById('card-lightbox');
   lb.style.setProperty('--arc-color', a.color);
   lb.classList.add('open');
-  // Su mobile: tap singolo chiude
+  initLightboxDrag();
+}
+
+function initLightboxDrag(){
+  const inner=document.getElementById('card-lightbox-inner');
+  const lb=document.getElementById('card-lightbox');
+  if(!inner||!lb)return;
+  let clickStartX=0,clickStartY=0,moved=false;
+
+  function onDown(e){
+    e.preventDefault();
+    const pt=e.touches?e.touches[0]:e;
+    _lbDrag.active=true;moved=false;
+    clickStartX=pt.clientX;clickStartY=pt.clientY;
+    _lbDrag.startX=pt.clientX-_lbDrag.tx;
+    _lbDrag.startY=pt.clientY-_lbDrag.ty;
+    inner.classList.add('dragging');
+    lb.classList.add('dragging');
+  }
+  function onMove(e){
+    if(!_lbDrag.active)return;
+    e.preventDefault();
+    const pt=e.touches?e.touches[0]:e;
+    const dx=pt.clientX-clickStartX;
+    const dy=pt.clientY-clickStartY;
+    if(Math.abs(dx)>4||Math.abs(dy)>4)moved=true;
+    _lbDrag.tx=pt.clientX-_lbDrag.startX;
+    _lbDrag.ty=pt.clientY-_lbDrag.startY;
+    inner.style.transform=`translate(${_lbDrag.tx}px,${_lbDrag.ty}px)`;
+  }
+  function onUp(e){
+    if(!_lbDrag.active)return;
+    _lbDrag.active=false;
+    inner.classList.remove('dragging');
+    lb.classList.remove('dragging');
+  }
+  function onDblClick(e){
+    if(!moved)closeLightbox();
+  }
+
+  // Rimuovi listener precedenti
+  const newInner=inner.cloneNode(true);
+  inner.parentNode.replaceChild(newInner,inner);
+
+  newInner.addEventListener('mousedown',onDown,{passive:false});
+  newInner.addEventListener('touchstart',onDown,{passive:false});
+  document.addEventListener('mousemove',onMove,{passive:false});
+  document.addEventListener('touchmove',onMove,{passive:false});
+  document.addEventListener('mouseup',onUp);
+  document.addEventListener('touchend',onUp);
+  lb.ondblclick=(e)=>{if(!moved)closeLightbox();};
+  // Su mobile: doppio tap chiude (se non si è trascinato)
   if(isMobile()){
-    lb.onclick=()=>closeLightbox();
-  } else {
-    lb.onclick=null;
+    let lastTap=0;
+    newInner.addEventListener('touchend',e=>{
+      const now=Date.now();
+      if(now-lastTap<300&&!moved)closeLightbox();
+      lastTap=now;
+    });
   }
 }
 
@@ -2473,7 +2551,7 @@ function rLegame(){
       ${d.frequenza&&d.frequenza.length?`
         <div>
           <div class="narr-lbl" style="color:#fdcb6e88">Frequenza abituale</div>
-          <div class="freq-row">${['Dom','Lun','Mar','Mer','Gio','Ven','Sab'].map((day,i)=>`<div class="freq-day${(d.frequenza||[]).includes(i)?' active':''}" style="pointer-events:none">${day}</div>`).join('')}</div>
+          <div class="freq-row">${['Lun','Mar','Mer','Gio','Ven','Sab','Dom'].map((day,i)=>{const di=i===6?0:i+1;return`<div class="freq-day${(d.frequenza||[]).includes(di)?' active':''}" style="pointer-events:none">${day}</div>`;}).join('')}</div>
         </div>`:''
       }
     </div>`:''}
@@ -2682,20 +2760,18 @@ function rStoria(){
       </div>`;
 
       if(node.type==='pair'){
-        // Due card affiancate orizzontalmente
+        // mainCard sul lato corrente, lvlCard sull'altro lato dell'asse
         const evL=node.evLvl;
-        const lvlCard=`<div class="tl-card" onclick="selArcGo(${evL.a.id})" style="border-color:${evL.a.color}44;margin-top:0;margin-left:6px;flex-shrink:0;background:${evL.a.color}08">
+        const lvlCard=`<div class="tl-card" onclick="selArcGo(${evL.a.id})" style="border-color:${evL.a.color}44;background:${evL.a.color}08;text-align:${side==='right'?'right':'left'}">
           <div class="tl-arc-nm" style="color:${evL.a.color}">↑ LIVELLO ${evL.e.newLevel}</div>
           <div class="tl-meta" style="color:${evL.a.color}88">Salita di livello</div>
         </div>`;
         html2+=`<div class="tl-node ${side}">
-          <div class="tl-half">
-            <div style="display:flex;align-items:flex-start">${mainCard}${lvlCard}</div>
-          </div>
+          <div class="tl-half">${mainCard}</div>
           <div class="tl-dot-wrap">
             <div class="tl-dot" style="background:${color}18;border-color:${color};color:${color}">${ev.a.sym}</div>
           </div>
-          <div class="tl-half"></div>
+          <div class="tl-half">${lvlCard}</div>
         </div>`;
       } else {
         html2+=`<div class="tl-node ${side}">
@@ -2857,7 +2933,7 @@ function rPanoramica(){
       </div>`;
     }).join('');
 
-    contentHTML=`<div class="pan-circle-wrap">
+    contentHTML=`<div class="pan-circle-wrap"><div class="pan-zoom-wrap" id="pan-zoom-wrap" onclick="togglePanZoom(this)" title="Clicca per ingrandire">
       <div class="pan-circle-stage" style="width:${_csize}px;height:${_csize}px">
         <svg class="pan-circ-svg" viewBox="0 0 ${_csize} ${_csize}">${svgLines}
           <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4 6" opacity="0.4"/>
@@ -2867,7 +2943,7 @@ function rPanoramica(){
         </div>
         ${circCards}
       </div>
-    </div>`;
+    </div></div>`;
   }
 
   else if(panView==='lista'){
@@ -2916,6 +2992,11 @@ function rPanoramica(){
 }
 
 function setPanView(v){panView=v;rPanoramica();}
+function togglePanZoom(el){
+  if(!el)return;
+  const zoomed=el.classList.toggle('zoomed');
+  el.style.transform=zoomed?'scale(1.7)':'scale(1)';
+}
 function selArcGo(id){sel=id;setView('arcani');rAll();}
 
 let calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
@@ -2928,7 +3009,8 @@ function rCalendario(){
 
   // Raccogli tutti gli eventi del mese
   const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
-  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const rawDay=new Date(calYear,calMonth,1).getDay();
+  const firstDay=(rawDay+6)%7; // Lunedì = colonna 0
   const dayEvents={}; // 'YYYY-MM-DD' → [{type,color,icon,label,who,arcId}]
 
   ARCANA.forEach(a=>{
@@ -2938,7 +3020,7 @@ function rCalendario(){
       const key=`${calYear}-${String(an.month).padStart(2,'0')}-${String(an.day).padStart(2,'0')}`;
       if(!dayEvents[key])dayEvents[key]=[];
       const tipo=ANN_TIPI[an.tipo]||ANN_TIPI.altro;
-      const annColor=an.tipo==='compleanno'?'#fd79a8':an.tipo==='primo_incontro'?'#00cec9':an.tipo==='anniversario'?'#a29bfe':'#fdcb6e';
+      const annColor=an.tipo==='compleanno'?'#00b894':an.tipo==='primo_incontro'?'#00cec9':an.tipo==='anniversario'?'#fd79a8':'#fdcb6e';
       dayEvents[key].push({type:'ann',color:annColor,icon:tipo.icon,label:an.label||tipo.label,who:d.name||'—',arcId:a.id});
     });
     // log
@@ -2958,7 +3040,7 @@ function rCalendario(){
   const yr=now.getFullYear();
   const yrOpts=Array.from({length:13},(_,i)=>yr-3+i).map(y=>`<option value="${y}" ${y===calYear?'selected':''}>${y}</option>`).join('');
 
-  const DAYS_IT=['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+  const DAYS_IT=['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
   const MONTHS_IT=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 
   // Build grid cells
@@ -3401,17 +3483,24 @@ function editPersonSettings(){
 function renderAssignConnList(){
   const connList=document.getElementById('as-conn-list');
   if(!connList)return;
-  const conns=getConnections(sel);
-  const others=ARCANA.filter(a=>a.id!==sel&&getD(a.id));
-  if(!others.length){connList.innerHTML='<div style="font-size:12px;font-family:var(--fb);color:var(--text-dim)">Nessun altro legame assegnato.</div>';return;}
+  const currentSel=sel; // cattura sel al momento del render
+  const conns=getConnections(currentSel);
+  const others=ARCANA.filter(a=>a.id!==currentSel&&getD(a.id));
+  if(!others.length){
+    connList.innerHTML='<div style="font-size:12px;font-family:var(--fb);color:var(--text-dim);padding:8px 0">Nessun altro legame assegnato ancora.</div>';
+    return;
+  }
   connList.innerHTML=others.map(a=>{
     const d2=getD(a.id);
     const linked=conns.includes(a.id);
-    return`<div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:${linked?a.color+'10':'var(--bg4)'};border:1px solid ${linked?a.color+'44':'var(--border)'};cursor:pointer;transition:all .2s" onclick="toggleConnection(${sel},${a.id});renderAssignConnList()">
-      <div style="font-size:16px;color:${a.color}">${a.sym}</div>
-      <div style="flex:1"><div style="font-size:10px;font-weight:700;color:${a.color}">${a.roman} · ${a.name}</div>
-      <div style="font-size:12px;font-family:var(--fb);color:var(--text-body)">${esc(d2.name||'—')}</div></div>
-      <div style="font-size:16px;color:${linked?a.color:'var(--border)'}">${linked?'●':'○'}</div>
+    return`<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:${linked?a.color+'10':'var(--bg4)'};border:1px solid ${linked?a.color+'55':'var(--border)'};cursor:pointer;border-radius:2px;margin-bottom:3px;transition:all .2s"
+      onclick="toggleConnection(${currentSel},${a.id});renderAssignConnList()">
+      <div style="font-size:18px;color:${a.color}">${a.sym}</div>
+      <div style="flex:1">
+        <div style="font-size:10px;font-weight:700;color:${a.color};letter-spacing:1px">${a.roman} · ${a.name}</div>
+        <div style="font-size:13px;font-family:var(--fb);color:var(--text-body)">${esc(d2?d2.name:'—')}</div>
+      </div>
+      <div style="font-size:18px;color:${linked?a.color:'var(--border)'};transition:color .2s">${linked?'●':'○'}</div>
     </div>`;
   }).join('');
 }
@@ -4297,9 +4386,11 @@ function openEditLog(id){
   document.getElementById('edit-tlbl').textContent=e.type==='nota'?'Nota':'Note';
   const lf=document.getElementById('edit-luogof');
   const mf=document.getElementById('edit-mezzof');
+  const tf=document.getElementById('edit-todfield');
   lf.style.display=e.type==='incontro'?'block':'none';
   mf.style.display=e.type==='contatto'?'block':'none';
-  if(e.type==='incontro')document.getElementById('edit-luogo').value=e.luogo||'';
+  if(tf)tf.style.display=e.type==='incontro'?'block':'none';
+  if(e.type==='incontro'){document.getElementById('edit-luogo').value=e.luogo||'';if(tf)document.getElementById('edit-tod').value=e.tod||'';}
   if(e.type==='contatto')document.getElementById('edit-mezzo').value=e.mezzo||'';
   openModal('m-edit-log');
 }
@@ -4309,7 +4400,7 @@ function saveEditLog(){
   const e=d.log.find(x=>x.id===editingLogId);if(!e)return;
   e.date=document.getElementById('edit-date').value||e.date;
   e.text=document.getElementById('edit-txt').value.trim();
-  if(e.type==='incontro')e.luogo=document.getElementById('edit-luogo').value.trim();
+  if(e.type==='incontro'){e.luogo=document.getElementById('edit-luogo').value.trim();e.tod=document.getElementById('edit-tod').value||e.tod;}
   if(e.type==='contatto')e.mezzo=document.getElementById('edit-mezzo').value;
   setD(sel,d);editingLogId=null;closeModal('m-edit-log');rAll();
 }
