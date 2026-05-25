@@ -976,7 +976,11 @@ body.is-scrolling .pan-circ-svg{
   <div class="prof-card">
     <div style="font-size:9px;letter-spacing:5px;color:var(--red);font-family:var(--fb);margin-bottom:6px;text-align:center">IL TUO VIAGGIO INIZIA ORA</div>
     <div style="font-size:20px;font-weight:900;letter-spacing:3px;margin-bottom:6px;text-align:center">CHI SEI?</div>
-    <div style="font-size:13px;font-family:var(--fb);color:var(--text-body);margin-bottom:24px;text-align:center;line-height:1.6">Questo nome apparirà nella tua mappa dei legami.<br>Puoi cambiarlo in qualsiasi momento dalle Impostazioni.</div>
+    <div style="font-size:13px;font-family:var(--fb);color:var(--text-body);margin-bottom:16px;text-align:center;line-height:1.6">Questo nome apparirà nella tua mappa dei legami.<br>Puoi cambiarlo in qualsiasi momento dalle Impostazioni.</div>
+    <div style="font-size:11px;font-family:var(--fb);color:var(--text-dim);margin-bottom:20px;text-align:center;line-height:1.7;padding:10px 14px;border:1px solid var(--border);border-left:2px solid var(--red)">
+      <strong style="color:var(--muted)">✦ I tuoi dati sono privati e salvati nel browser.</strong><br>
+      Puoi creare un account gratuito (pulsante <em>Accedi</em> in alto) per sincronizzare i dati tra dispositivi diversi — ma non è obbligatorio. L'app funziona anche senza.
+    </div>
     <div class="prof-avatar-wrap" onclick="document.getElementById('prof-photo-inp').click()">
       <div class="prof-avatar" id="prof-avatar-prev"><span id="prof-initial-prev" style="color:var(--red)">?</span></div>
     </div>
@@ -1558,11 +1562,24 @@ _sb.auth.onAuthStateChange(async (event, session)=>{
   }
 });
 
-// Controlla sessione esistente all'avvio
-_sb.auth.getSession().then(async ({data})=>{
-  const user = data?.session?.user||null;
-  if(user) updateAuthUI(user);
-});
+// Controlla sessione esistente all'avvio (incluso redirect da email conferma)
+(async ()=>{
+  // Gestisci redirect da email di conferma (token nell'URL hash)
+  const hash = window.location.hash;
+  if(hash && hash.includes('access_token')){
+    // Supabase legge automaticamente il token dall'hash
+    const {data, error} = await _sb.auth.getSession();
+    if(data?.session?.user){
+      updateAuthUI(data.session.user);
+      // Pulisci l'URL
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  } else {
+    const {data} = await _sb.auth.getSession();
+    const user = data?.session?.user||null;
+    if(user) updateAuthUI(user);
+  }
+})();
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MOBILE — drawer, bottom nav, cerchio responsivo
@@ -4880,6 +4897,12 @@ const OB_STEPS_DESKTOP=[
     text:'Il tuo nome e avatar sono sempre visibili qui. Cliccaci per modificare il profilo. Nelle Impostazioni trovi backup, temi e altro.',
     position:'bottom'
   },
+  {
+    target:()=>document.getElementById('hdr-login-btn'),
+    title:'Account e sincronizzazione',
+    text:'Puoi creare un account gratuito per sincronizzare i dati tra telefono e computer. Non è obbligatorio — l\'app funziona anche senza. Trovi il pulsante in alto a destra.',
+    position:'bottom'
+  },
 ];
 
 const OB_STEPS_MOBILE=[
@@ -4917,6 +4940,12 @@ const OB_STEPS_MOBILE=[
     target:()=>document.getElementById('hdr-profile'),
     title:'Il tuo profilo',
     text:'Il tuo avatar è sempre visibile qui. Toccalo per modificare il profilo. Nelle Impostazioni trovi backup e temi visivi.',
+    position:'bottom'
+  },
+  {
+    target:()=>document.getElementById('hdr-login-btn'),
+    title:'Account e sincronizzazione',
+    text:'Puoi creare un account gratuito per sincronizzare i tuoi dati tra telefono e computer. Non è obbligatorio — l\'app funziona anche senza.',
     position:'bottom'
   },
 ];
