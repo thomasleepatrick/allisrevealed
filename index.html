@@ -1407,11 +1407,13 @@ body.is-scrolling .pan-circ-svg{
 // ── SUPABASE INIT ───────────────────────────────────────────────────────────
 const _SB_URL = 'https://xupryklfisvvpeygdpxo.supabase.co';
 const _SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1cHJ5a2xmaXN2dnBleWdkcHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2OTU5NTQsImV4cCI6MjA5NTI3MTk1NH0.awFmmhiGFUiKw8vKmOIgCRlmmni2afAOjSwToGXJhtc';
-const _sb = supabase.createClient(_SB_URL, _SB_KEY);
+const _sb = supabase.createClient(_SB_URL, _SB_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
 let _sbUser = null;
-let _syncPending = false;
+let _appReady = false; // true dopo init completa
 
-// Stato sync UI
+// ── UI SYNC STATE ────────────────────────────────────────────────────────────
 function setSyncState(state, msg){
   const dot = document.getElementById('sync-dot');
   const lbl = document.getElementById('auth-sync-lbl');
@@ -1420,7 +1422,39 @@ function setSyncState(state, msg){
   lbl.textContent = msg||'';
 }
 
-// ── AUTH FUNCTIONS ──────────────────────────────────────────────────────────
+// ── SCHERMATA LOGIN (blocca app se non loggato) ──────────────────────────────
+function showLoginWall(){
+  // Nascondi tutto e mostra solo il modal auth
+  document.getElementById('layout').style.display='none';
+  const hdr = document.getElementById('hdr');
+  if(hdr) hdr.style.display='none';
+  const ab = document.getElementById('auth-bar');
+  if(ab) ab.classList.remove('show');
+  // Apri modal login senza possibilità di chiuderlo dal backdrop
+  const overlay = document.getElementById('m-auth');
+  if(overlay){
+    overlay.classList.add('open');
+    overlay.onclick = null; // disabilita chiusura backdrop
+  }
+  switchAuthTab('login');
+  showAuthMsg('','');
+  setTimeout(()=>{
+    const em = document.getElementById('auth-email');
+    if(em) em.focus();
+  }, 100);
+}
+
+function hideLoginWall(){
+  document.getElementById('layout').style.display='';
+  const hdr = document.getElementById('hdr');
+  if(hdr) hdr.style.display='';
+  closeModal('m-auth');
+  // Riabilita chiusura backdrop
+  const overlay = document.getElementById('m-auth');
+  if(overlay) overlay.onclick = (e)=>{ if(e.target===overlay) closeModal('m-auth'); };
+}
+
+// ── AUTH FUNCTIONS ───────────────────────────────────────────────────────────
 let _authTab = 'login';
 
 function openAuthModal(){
@@ -1453,21 +1487,21 @@ async function doAuthAction(){
   const pw=(document.getElementById('auth-password').value||'').trim();
   if(!email||!pw){showAuthMsg('err','Inserisci email e password.');return;}
   const btn=document.getElementById('auth-submit-btn');
-  btn.disabled=true;btn.textContent='...';
+  btn.disabled=true; btn.textContent='...';
   try{
     let res;
     if(_authTab==='login'){
-      res=await _sb.auth.signInWithPassword({email,password:pw});
+      res = await _sb.auth.signInWithPassword({email, password:pw});
     } else {
-      res=await _sb.auth.signUp({email,password:pw});
+      res = await _sb.auth.signUp({email, password:pw});
     }
     if(res.error) throw res.error;
-    if(_authTab==='register'&&res.data?.user&&!res.data.session){
-      showAuthMsg('ok','Controlla la tua email per confermare la registrazione.');
-      btn.disabled=false;btn.textContent='Registrati';
+    if(_authTab==='register' && res.data?.user && !res.data.session){
+      showAuthMsg('ok','Controlla la tua email per confermare la registrazione. Poi accedi.');
+      btn.disabled=false; btn.textContent='Registrati';
       return;
     }
-    closeModal('m-auth');
+    // Login OK — onAuthStateChange gestirà il resto
   } catch(e){
     showAuthMsg('err', e.message||'Errore di autenticazione.');
     btn.disabled=false;
@@ -1475,59 +1509,65 @@ async function doAuthAction(){
   }
 }
 
-
-
 async function signOut(){
-  await _sb.auth.signOut();
-  _sbUser=null;
-  updateAuthUI(null);
+  try{ await _sb.auth.signOut(); } catch(e){}
+  // onAuthStateChange → SIGNED_OUT gestirà il resto
 }
 
 async function sendPasswordReset(){
   const email=(document.getElementById('auth-email').value||'').trim();
-  if(!email){showAuthMsg('err','Inserisci la tua email.');return;}
-  const {error}=await _sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.href});
-  if(error)showAuthMsg('err',error.message);
+  if(!email){showAuthMsg('err','Inserisci la tua email prima.');return;}
+  const {error}=await _sb.auth.resetPasswordForEmail(email,{
+    redirectTo: window.location.origin + window.location.pathname
+  });
+  if(error) showAuthMsg('err',error.message);
   else showAuthMsg('ok','Email di reset inviata. Controlla la casella.');
 }
 
 function updateAuthUI(user){
-  _sbUser=user;
-  const bar=document.getElementById('auth-bar');
-  const btn=document.getElementById('hdr-login-btn');
-  const lbl=document.getElementById('auth-email-lbl');
+  _sbUser = user;
+  const bar = document.getElementById('auth-bar');
+  const btn = document.getElementById('hdr-login-btn');
+  const lbl = document.getElementById('auth-email-lbl');
   if(user){
-    if(bar)bar.classList.add('show');
-    if(btn)btn.style.display='none';
-    if(lbl)lbl.textContent=user.email;
-    setSyncState('ok','Sincronizzato');
+    if(bar) bar.classList.add('show');
+    if(btn) btn.style.display='none';
+    if(lbl) lbl.textContent = user.email;
   } else {
-    if(bar)bar.classList.remove('show');
-    if(btn)btn.style.display='';
+    if(bar) bar.classList.remove('show');
+    if(btn) btn.style.display='';
     setSyncState('','');
   }
 }
 
-// ── SYNC SUPABASE ────────────────────────────────────────────────────────────
+// ── SYNC ─────────────────────────────────────────────────────────────────────
 async function loadFromSupabase(){
   if(!_sbUser) return;
   setSyncState('syncing','Caricamento...');
   try{
-    const {data:row,error}=await _sb.from('user_data').select('data').eq('user_id',_sbUser.id).single();
-    if(error&&error.code!=='PGRST116') throw error; // PGRST116 = row not found
-    if(row&&row.data&&Object.keys(row.data).length>0){
-      // Remoto prevale: carica in data globale
+    const {data:row, error} = await _sb
+      .from('user_data')
+      .select('data')
+      .eq('user_id', _sbUser.id)
+      .maybeSingle();
+    if(error){
+      console.error('[Sync] Load error:', error.message);
+      setSyncState('error','Errore caricamento');
+      return;
+    }
+    if(row && row.data && Object.keys(row.data).length > 0){
       data = row.data;
-      try{localStorage.setItem('sl-v5',JSON.stringify(data));}catch(e){}
+      try{ localStorage.setItem('sl-v5', JSON.stringify(data)); } catch(e){}
       rAll();
       setSyncState('ok','Sincronizzato');
     } else {
-      // Nessun dato remoto: carica locale e salva su Supabase
+      // Nessun dato remoto: carica da locale e salva su cloud
+      setSyncState('syncing','Primo sync...');
       await saveToSupabase();
     }
   } catch(e){
-    console.error('[Sync] Load error:',e);
-    setSyncState('error','Errore sync');
+    console.error('[Sync] Load exception:', e);
+    setSyncState('error','Errore di rete');
   }
 }
 
@@ -1535,53 +1575,99 @@ async function saveToSupabase(){
   if(!_sbUser) return;
   setSyncState('syncing','Salvataggio...');
   try{
-    const {error}=await _sb.from('user_data').upsert({
-      user_id:_sbUser.id,
-      data:data,
-      updated_at:new Date().toISOString()
-    },{onConflict:'user_id'});
-    if(error) throw error;
+    const {error} = await _sb.from('user_data').upsert({
+      user_id: _sbUser.id,
+      data: data,
+      updated_at: new Date().toISOString()
+    }, {onConflict:'user_id'});
+    if(error){
+      console.error('[Sync] Save error:', error.message, error.code);
+      setSyncState('error','Errore salvataggio');
+      return;
+    }
     setSyncState('ok','Sincronizzato');
   } catch(e){
-    console.error('[Sync] Save error:',e);
-    setSyncState('error','Errore sync');
+    console.error('[Sync] Save exception:', e);
+    setSyncState('error','Errore di rete');
   }
+}
+
+async function changePassword(){
+  const pw=(document.getElementById('set-new-pw')?.value||'').trim();
+  if(!pw||pw.length<6){showAccountMsg('err','La password deve avere almeno 6 caratteri.');return;}
+  const {error}=await _sb.auth.updateUser({password:pw});
+  if(error) showAccountMsg('err',error.message);
+  else{ showAccountMsg('ok','Password aggiornata.'); document.getElementById('set-new-pw').value=''; }
+}
+
+async function changeEmail(){
+  const email=(document.getElementById('set-new-email')?.value||'').trim();
+  if(!email){showAccountMsg('err','Inserisci una email valida.');return;}
+  const {error}=await _sb.auth.updateUser({email},{emailRedirectTo:window.location.href});
+  if(error) showAccountMsg('err',error.message);
+  else showAccountMsg('ok','Controlla la nuova email per confermare il cambio.');
+}
+
+function showAccountMsg(type, text){
+  const el=document.getElementById('account-msg');
+  if(!el) return;
+  el.style.display='block';
+  el.style.background=type==='ok'?'#00b89420':'#d6303120';
+  el.style.border='1px solid '+(type==='ok'?'#00b89466':'#d6303166');
+  el.style.color=type==='ok'?'#00b894':'#d63031';
+  el.textContent=text;
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>{el.style.display='none';},5000);
 }
 
 async function syncNow(){
-  if(!_sbUser){openAuthModal();return;}
+  if(!_sbUser){ openAuthModal(); return; }
   await saveToSupabase();
 }
 
-// Ascolta cambiamenti di sessione
-_sb.auth.onAuthStateChange(async (event, session)=>{
-  const user = session?.user||null;
-  updateAuthUI(user);
-  if(event==='SIGNED_IN'){
-    await loadFromSupabase();
+// ── AUTH STATE LISTENER ──────────────────────────────────────────────────────
+_sb.auth.onAuthStateChange(async (event, session) => {
+  console.log('[Auth] event:', event, session?.user?.email||'—');
+  const user = session?.user || null;
+
+  if(event === 'SIGNED_OUT'){
+    updateAuthUI(null);
+    data = {};
+    try{ localStorage.removeItem('sl-v5'); } catch(e){}
+    showLoginWall();
+    return;
+  }
+
+  if(event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED'){
+    if(user){
+      updateAuthUI(user);
+      hideLoginWall();
+      // Attendi che il DOM sia pronto prima di caricare
+      if(!_appReady){
+        await new Promise(r => setTimeout(r, 300));
+      }
+      await loadFromSupabase();
+    } else if(event === 'INITIAL_SESSION'){
+      // Nessuna sessione → mostra login
+      showLoginWall();
+    }
+    return;
+  }
+
+  if(event === 'USER_UPDATED' && user){
+    updateAuthUI(user);
+    return;
   }
 });
 
-// Controlla sessione esistente all'avvio (incluso redirect da email conferma)
-(async ()=>{
-  // Gestisci redirect da email di conferma (token nell'URL hash)
-  const hash = window.location.hash;
-  if(hash && hash.includes('access_token')){
-    // Supabase legge automaticamente il token dall'hash
-    const {data, error} = await _sb.auth.getSession();
-    if(data?.session?.user){
-      updateAuthUI(data.session.user);
-      // Pulisci l'URL
-      window.history.replaceState(null, '', window.location.pathname);
-    }
-  } else {
-    const {data} = await _sb.auth.getSession();
-    const user = data?.session?.user||null;
-    if(user) updateAuthUI(user);
-  }
-})();
+// ── INIT: controlla sessione all'avvio ──────────────────────────────────────
+// Nascondi subito il layout fino a quando non sappiamo se c'è una sessione
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('layout').style.display = 'none';
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
+// MOBILE — drawer, bottom nav, cerchio responsivo// ─────────────────────────────────────────────────────────────────────────────
 // MOBILE — drawer, bottom nav, cerchio responsivo
 // ─────────────────────────────────────────────────────────────────────────────
 function isMobile(){ return window.innerWidth <= 768; }
@@ -2275,10 +2361,9 @@ const getD=id=>data[id]||null;
 const setD=(id,d)=>{data[id]=d;save();};
 function save(){
   try{localStorage.setItem('sl-v5',JSON.stringify(data));}catch(e){}
-  // Sync Supabase debounced (evita troppi write)
   if(_sbUser){
     clearTimeout(window._syncTimer);
-    window._syncTimer=setTimeout(()=>saveToSupabase(), 2000);
+    window._syncTimer=setTimeout(()=>saveToSupabase(), 2500);
   }
 }
 function load(){try{data=JSON.parse(localStorage.getItem('sl-v5')||'{}');}catch(e){data={};}}
@@ -3762,7 +3847,7 @@ function selArc(id){
   if(isMobile()) closeDrawer();
 }
 function rTotal(){const n=Object.keys(data).length;document.getElementById('total-n').innerHTML=n+' <span style="font-size:14px;color:#888;font-weight:400">su 21</span>';}
-function rAll(){rLeft();rTop();rDetail();rLegame();rTotal();}
+function rAll(){rLeft();rTop();rDetail();rLegame();rTotal();_appReady=true;}
 
 // temp photo storage for assign modal
 let _assignPhoto = null;
@@ -4364,6 +4449,38 @@ function rImpostazioni(){
   el.innerHTML=`
     <div style="padding:22px 24px;max-width:900px">
       <div style="font-size:10px;letter-spacing:5px;color:var(--red);font-family:var(--fb);margin-bottom:14px">IMPOSTAZIONI</div>
+
+      <!-- SEZIONE ACCOUNT -->
+      ${_sbUser ? `
+      <div style="background:var(--bg3);border:1px solid var(--border);margin-bottom:12px">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+          <div style="font-size:13px;font-weight:700;letter-spacing:2px;margin-bottom:3px">ACCOUNT</div>
+          <div style="font-size:12px;font-family:var(--fb);color:var(--muted)">${_sbUser.email}</div>
+        </div>
+        <div style="padding:14px 20px;display:flex;flex-direction:column;gap:10px">
+          <!-- Cambia password -->
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input class="inp" type="password" id="set-new-pw" placeholder="Nuova password (min. 6 caratteri)" style="flex:1;min-width:180px;font-size:13px;padding:7px 10px">
+            <button class="btn btn-g btn-sm" onclick="changePassword()">Cambia password</button>
+          </div>
+          <!-- Cambia email -->
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input class="inp" type="email" id="set-new-email" placeholder="Nuova email" style="flex:1;min-width:180px;font-size:13px;padding:7px 10px">
+            <button class="btn btn-g btn-sm" onclick="changeEmail()">Cambia email</button>
+          </div>
+          <div id="account-msg" style="font-size:12px;font-family:var(--fb);padding:7px 10px;border-radius:2px;display:none"></div>
+          <div style="padding-top:8px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap">
+            <div style="font-size:11px;font-family:var(--fb);color:var(--text-dim)">
+              Per cancellare l'account contatta l'amministratore.
+            </div>
+            <button class="btn btn-sm" style="background:transparent;border:1px solid #c8102e44;color:#c8102e" onclick="signOut()">Disconnetti</button>
+          </div>
+        </div>
+      </div>` : `
+      <div style="background:var(--bg3);border:1px solid var(--border);margin-bottom:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div style="font-size:12px;font-family:var(--fb);color:var(--text-dim)">Non hai effettuato l'accesso.</div>
+        <button class="btn btn-r btn-sm" onclick="openAuthModal()">✦ Accedi</button>
+      </div>`}
 
       ${(()=>{
         const p=getProfile();
@@ -5959,6 +6076,7 @@ function playTone(){}
 // INIT
 load();
 applyTheme(getActiveTheme());
+_appReady=false; // sarà true dopo il primo rAll post-auth
 function checkTrascurato(){
   const now=new Date();now.setHours(0,0,0,0);
   let changed=false;
