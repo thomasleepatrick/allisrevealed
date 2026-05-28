@@ -91,7 +91,7 @@ body{font-family:var(--fd);color:var(--text-main);display:flex;flex-direction:co
 .hdr-nl{font-size:11px;color:var(--text-title);letter-spacing:2px;font-family:var(--fb)}
 
 /* LAYOUT */
-#layout{display:flex;flex:1;overflow:hidden;min-height:0}
+#layout{display:none;flex:1;overflow:hidden;min-height:0}
 #left{width:188px;min-width:188px;background:var(--bg2);border-right:1px solid #111120;overflow-y:auto;flex-shrink:0}
 #right{flex:1;overflow-y:auto;min-width:0}
 
@@ -896,7 +896,7 @@ body.is-scrolling .pan-circ-svg{
 </div>
 
 <!-- MODAL AUTH -->
-<div class="overlay" id="m-auth">
+<div class="overlay" id="m-auth" style="z-index:500">
   <div class="modal" style="max-width:400px;border-top:3px solid var(--red)">
     <div style="text-align:center;margin-bottom:6px">
       <div style="font-size:36px;color:var(--red);filter:drop-shadow(0 0 8px color-mix(in srgb,var(--red) 50%,transparent))">✦</div>
@@ -1445,9 +1445,9 @@ function showLoginWall(){
 }
 
 function hideLoginWall(){
-  document.getElementById('layout').style.display='';
+  document.getElementById('layout').style.display='flex';
   const hdr = document.getElementById('hdr');
-  if(hdr) hdr.style.display='';
+  if(hdr) hdr.style.display='flex';
   closeModal('m-auth');
   // Riabilita chiusura backdrop
   const overlay = document.getElementById('m-auth');
@@ -1662,9 +1662,7 @@ _sb.auth.onAuthStateChange(async (event, session) => {
 
 // ── INIT: controlla sessione all'avvio ──────────────────────────────────────
 // Nascondi subito il layout fino a quando non sappiamo se c'è una sessione
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('layout').style.display = 'none';
-});
+// layout già nascosto via CSS al caricamento
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MOBILE — drawer, bottom nav, cerchio responsivo// ─────────────────────────────────────────────────────────────────────────────
@@ -1792,8 +1790,10 @@ function saveProfileFirst(){
   _profPhoto = null;
   document.getElementById('profile-screen').classList.remove('open');
   rProfileHeader();
-  // Ora mostra onboarding se non già visto
-  setTimeout(()=>{ showOnboarding(); }, 300);
+  // Onboarding parte dopo il profilo — solo se siamo già loggati
+  if(_sbUser){
+    setTimeout(()=>showOnboarding(), 400);
+  }
 }
 
 function saveProfileEdit(){
@@ -4433,12 +4433,8 @@ function closeBg(e,id){if(e.target===document.getElementById(id))closeModal(id);
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 // API KEY
-function getSavedKey(){
-  try { return localStorage.getItem('sl-apikey')||''; } catch(e){ return ''; }
-}
-function setSavedKey(k){
-  try { if(k) localStorage.setItem('sl-apikey',k); else localStorage.removeItem('sl-apikey'); } catch(e){}
-}
+
+
 
 // IMPOSTAZIONI
 function rImpostazioni(){
@@ -5014,12 +5010,6 @@ const OB_STEPS_DESKTOP=[
     text:'Il tuo nome e avatar sono sempre visibili qui. Cliccaci per modificare il profilo. Nelle Impostazioni trovi backup, temi e altro.',
     position:'bottom'
   },
-  {
-    target:()=>document.getElementById('hdr-login-btn'),
-    title:'Account e sincronizzazione',
-    text:'Puoi creare un account gratuito per sincronizzare i dati tra telefono e computer. Non è obbligatorio — l\'app funziona anche senza. Trovi il pulsante in alto a destra.',
-    position:'bottom'
-  },
 ];
 
 const OB_STEPS_MOBILE=[
@@ -5030,43 +5020,36 @@ const OB_STEPS_MOBILE=[
     position:'bottom'
   },
   {
-    target:()=>document.getElementById('arc-top'),
-    title:'La carta e il legame',
-    text:'Qui trovi il significato dell\'arcano. Scorri verso il basso per la scheda dove assegni una persona e tieni il diario del rapporto.',
+    target:()=>document.querySelector('.tarot-wrap,.tarot-card'),
+    title:'La carta del Tarocco',
+    text:'Toccala per girarla e vedere l\'illustrazione. Un secondo tocco ingrandisce l\'immagine. Sotto trovi il significato del legame.',
     position:'bottom'
   },
   {
-    target:()=>document.querySelector('.p-actions, #legame .leg-hdr'),
+    target:()=>document.querySelector('#legame .leg-hdr'),
     title:'Assegna e registra',
-    text:'Tocca "+ Assegna persona" per collegare un nome all\'arcano. Poi registra incontri, contatti e note.',
-    position:'top'
+    text:'Tocca "+ Assegna persona" per collegare un nome all\'arcano. Poi registra incontri, contatti e note nel diario.',
+    position:'bottom'
   },
   {
     target:()=>document.getElementById('mob-nav'),
     title:'Le sezioni',
-    text:'La barra in basso ti porta in tutte le sezioni — Mappa, Storia, Calendario, Statistiche. Il menu ⋯ contiene Impostazioni e Guida.',
+    text:'La barra in basso ti porta in tutte le sezioni: Mappa, Storia, Calendario. Il menu ⋯ contiene Statistiche, Impostazioni e Guida.',
     position:'top'
   },
   {
     target:()=>document.getElementById('oracle-fab'),
     title:'L\'Oracolo',
-    text:'Il pulsante ✦ Oracolo ti offre una riflessione contestuale in qualsiasi sezione.',
+    text:'Il pulsante ✦ Oracolo ti offre una riflessione contestuale sulla sezione o sul legame che stai visualizzando.',
     position:'top'
   },
   {
     target:()=>document.getElementById('hdr-profile'),
     title:'Il tuo profilo',
-    text:'Il tuo avatar è sempre visibile qui. Toccalo per modificare il profilo. Nelle Impostazioni trovi backup e temi visivi.',
-    position:'bottom'
-  },
-  {
-    target:()=>document.getElementById('hdr-login-btn'),
-    title:'Account e sincronizzazione',
-    text:'Puoi creare un account gratuito per sincronizzare i tuoi dati tra telefono e computer. Non è obbligatorio — l\'app funziona anche senza.',
+    text:'Il tuo avatar è sempre visibile qui. Toccalo per modificare nome e foto. Nelle Impostazioni trovi i temi visivi e le opzioni account.',
     position:'bottom'
   },
 ];
-
 // Step attivi in base al dispositivo
 const OB_STEPS = window.innerWidth <= 768 ? OB_STEPS_MOBILE : OB_STEPS_DESKTOP;
 
@@ -5090,7 +5073,12 @@ function renderObStep(){
   const textEl=document.getElementById('ob-tip-text');
   const nextBtn=document.getElementById('ob-next');
 
-  const s=OB_STEPS[_obCurrent];
+  // Salta step con target null o elemento non trovato
+  let s=OB_STEPS[_obCurrent];
+  while(s && s.target && !s.target() && _obCurrent < OB_STEPS.length-1){
+    _obCurrent++;
+    s=OB_STEPS[_obCurrent];
+  }
   const total=OB_STEPS.length;
 
   // Dots
@@ -6070,8 +6058,8 @@ function playLvlUpAnim(level, color, sym){
 }
 
 // Legacy compat
-function showBurst(){}
-function playTone(){}
+
+
 
 // INIT
 load();
@@ -6092,36 +6080,45 @@ function checkTrascurato(){
   });
   if(changed)save();
 }
-// Migrazione attributo→badges
-Object.keys(data).forEach(id=>{
-  const d=data[id];
-  if(d&&d.attributo&&!d.badges){
-    d.badges=[d.attributo];
-    delete d.attributo;
+// Migrazione attributo→badges (eseguita dopo load Supabase in initApp)
+function migrateData(){
+  Object.keys(data).forEach(id=>{
+    const d=data[id];
+    if(d&&d.attributo&&!d.badges){
+      d.badges=[d.attributo];
+      delete d.attributo;
+    }
+  });
+}
+
+// initApp: chiamato dopo caricamento dati da Supabase
+let _initAppDone = false;
+function initApp(){
+  if(_initAppDone) return;
+  _initAppDone = true;
+  migrateData();
+  checkTrascurato();
+  rAll();
+  rProfileHeader();
+  // Ordine garantito: app pronta → profilo (se mancante) → onboarding
+  const _profileReady = checkProfileOnStartup();
+  setTimeout(()=>{checkBackupReminder();}, 800);
+  setTimeout(()=>{checkAnniversariReminder();}, 1500);
+  if(!_profileReady){
+    // Nessun profilo: la schermata profilo si è aperta
+    // showOnboarding verrà chiamato da saveProfileFirst dopo il salvataggio
+  } else {
+    // Profilo già presente: mostra onboarding se non ancora visto
+    setTimeout(()=>showOnboarding(), 400);
   }
-});
-checkTrascurato();
-rAll();
-rProfileHeader();
-const _profileReady = checkProfileOnStartup();
-setTimeout(()=>{autoSnapshot();checkBackupReminder();},500);
-setTimeout(()=>{
-  if(getAutoDownload()&&Object.keys(data).length>0){
-    exportData();
-  }
-},1200);
-setTimeout(()=>{
-  checkAnniversariReminder();
-},1800);
+}
 // Pre-check immagini esterne per tutti gli arcani
 setTimeout(()=>{
   ARCANA.forEach(a=>{
     if(!ARCANA_SVG[a.id]) checkExternalImg(a.id,()=>{});
   });
 },2500);
-setTimeout(()=>{
-  if(_profileReady) showOnboarding();
-},600);
+// onboarding gestito da initApp()
 // ── SERVICE WORKER per notifiche in-browser ──────────────────────────────────
 if('serviceWorker' in navigator && 'Notification' in window){
   // Registra SW inline (blob) per evitare file esterni
