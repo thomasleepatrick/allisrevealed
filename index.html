@@ -1553,21 +1553,24 @@ async function loadFromSupabase(){
     if(error){
       console.error('[Sync] Load error:', error.message);
       setSyncState('error','Errore caricamento');
+      initApp();
       return;
     }
     if(row && row.data && Object.keys(row.data).length > 0){
       data = row.data;
       try{ localStorage.setItem('sl-v5', JSON.stringify(data)); } catch(e){}
-      rAll();
       setSyncState('ok','Sincronizzato');
     } else {
       // Nessun dato remoto: carica da locale e salva su cloud
       setSyncState('syncing','Primo sync...');
+      try{ data = JSON.parse(localStorage.getItem('sl-v5')||'{}'); } catch(e){ data={}; }
       await saveToSupabase();
     }
+    initApp();
   } catch(e){
     console.error('[Sync] Load exception:', e);
     setSyncState('error','Errore di rete');
+    initApp();
   }
 }
 
@@ -1633,6 +1636,8 @@ _sb.auth.onAuthStateChange(async (event, session) => {
   if(event === 'SIGNED_OUT'){
     updateAuthUI(null);
     data = {};
+    _initAppDone = false;
+    _appReady = false;
     try{ localStorage.removeItem('sl-v5'); } catch(e){}
     showLoginWall();
     return;
