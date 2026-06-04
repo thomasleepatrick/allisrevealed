@@ -1432,6 +1432,9 @@ function showLoginWall(){
   }
   switchAuthTab('login');
   showAuthMsg('','');
+  // Resetta bottone in caso fosse rimasto disabled
+  const _ab = document.getElementById('auth-submit-btn');
+  if(_ab){ _ab.disabled=false; _ab.textContent='Accedi'; }
   setTimeout(()=>{
     const em = document.getElementById('auth-email');
     if(em) em.focus();
@@ -1506,14 +1509,14 @@ async function doAuthAction(){
 }
 
 async function signOut(){
-  try{ await _sb.auth.signOut(); } catch(e){}
-  // Forza reset UI subito, senza aspettare l'evento Supabase
   _sbUser = null;
   updateAuthUI(null);
   data = {};
   _initAppDone = false;
   _appReady = false;
+  _loadingData = false;
   showLoginWall();
+  try{ await _sb.auth.signOut(); } catch(e){}
 }
 
 async function sendPasswordReset(){
@@ -1634,32 +1637,44 @@ async function syncNow(){
 }
 
 // ── AUTH STATE LISTENER ──────────────────────────────────────────────────────
+let _loadingData = false; // guard contro chiamate concorrenti a loadFromSupabase
+
 _sb.auth.onAuthStateChange(async (event, session) => {
   console.log('[Auth] event:', event, session?.user?.email||'—');
   const user = session?.user || null;
 
   if(event === 'SIGNED_OUT'){
+    // Ignora SIGNED_OUT se stiamo già mostrando il login wall
+    // (evita loop signOut→SIGNED_OUT→showLoginWall già aperto)
+    _sbUser = null;
     updateAuthUI(null);
     data = {};
     _initAppDone = false;
     _appReady = false;
+    _loadingData = false;
     showLoginWall();
     return;
   }
 
-  if(event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED'){
+  if(event === 'TOKEN_REFRESHED'){
+    // Solo aggiorna il token, non ricaricare dati
+    if(user) { _sbUser = user; }
+    return;
+  }
+
+  if(event === 'SIGNED_IN' || event === 'INITIAL_SESSION'){
     if(user){
       updateAuthUI(user);
       hideLoginWall();
-      if(event === 'TOKEN_REFRESHED' && _appReady){
-        // Solo aggiorna utente, non ricaricare tutto
-        return;
-      }
-      if(!_appReady){
-        await new Promise(r => setTimeout(r, 200));
-      }
+      // Evita chiamate concorrenti
+      if(_loadingData) return;
+      // Se app già pronta e stesso utente, non ricaricare
+      if(_appReady && _sbUser && _sbUser.id === user.id) return;
+      _loadingData = true;
       await loadFromSupabase();
-    } else if(event === 'INITIAL_SESSION'){
+      _loadingData = false;
+    } else {
+      // INITIAL_SESSION senza utente = nessuna sessione attiva
       showLoginWall();
     }
     return;
@@ -1756,10 +1771,11 @@ function getProfile(){
 function saveProfile(p){
   if(typeof data==='object'){ data['__profile__']=p; }
   try{ localStorage.setItem('sl-profile', JSON.stringify(p)); }catch(e){}
-  // Sync su Supabase — usa saveToSupabase direttamente se _sbUser è pronto
   if(_sbUser){
-    clearTimeout(window._syncTimer);
-    window._syncTimer=setTimeout(()=>saveToSupabase(), 500);
+    saveToSupabase();
+  } else {
+    // _sbUser non ancora pronto: ritenta tra 1s
+    setTimeout(()=>{ if(_sbUser) saveToSupabase(); }, 1000);
   }
 }
 
@@ -1873,6 +1889,12 @@ function rProfileHeader(){
 }
 
 function checkProfileOnStartup(){
+  // Migra profilo da localStorage a Supabase se mancante
+  const localP = (()=>{ try{ return JSON.parse(localStorage.getItem('sl-profile')||'null'); }catch(e){ return null; } })();
+  if(localP && localP.name && !(data && data['__profile__'])){
+    data['__profile__'] = localP;
+    if(_sbUser) saveToSupabase();
+  }
   const p = getProfile();
   if(!p || !p.name){
     _profPhoto = null;
@@ -5009,7 +5031,9 @@ let _obCurrent=0;
 function showOnboarding(){
   const p=getProfile();
   if(!p||!p.name) return;
-  if(getPrefs().obDone)return;
+  // Controlla sia in prefs (Supabase) sia in localStorage (fallback immediato)
+  if(getPrefs().obDone) return;
+  try{ if(localStorage.getItem('sl-ob-done')==='1') return; }catch(e){}
   _obCurrent=0;
   document.getElementById('onboarding').classList.add('active');
   renderObStep();
@@ -5158,6 +5182,7 @@ function obNav(dir){
 
 function skipOnboarding(){
   setPrefs({obDone:true});
+  try{ localStorage.setItem('sl-ob-done','1'); }catch(e){}
   const ov=document.getElementById('onboarding');
   ov.classList.remove('active');
   // Nascondi tutti gli elementi
@@ -5297,14 +5322,11 @@ function confirmResetAll(){
 
 async function doResetAll(btn){
   btn.closest('.overlay').remove();
-  // Cancella riga su Supabase
   if(_sbUser){
     try{ await _sb.from('user_data').delete().eq('user_id',_sbUser.id); }catch(e){}
-    try{ await _sb.auth.signOut(); }catch(e){}
   }
-  // Cancella tutto il localStorage
-  try{localStorage.clear();}catch(e){}
-  // Ricarica — primo avvio
+  try{ await _sb.auth.signOut(); }catch(e){}
+  try{ localStorage.clear(); }catch(e){}
   location.reload();
 }
 
@@ -6012,7 +6034,7 @@ function playLvlUpAnim(level, color, sym){
 
 // INIT
 applyTheme(getActiveTheme());
-_appReady=false; // sarà true dopo il primo rAll post-auth
+_appReady=false;
 function checkTrascurato(){
   const now=new Date();now.setHours(0,0,0,0);
   let changed=false;
