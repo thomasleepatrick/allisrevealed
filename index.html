@@ -1553,24 +1553,20 @@ async function loadFromSupabase(){
     if(error){
       console.error('[Sync] Load error:', error.message);
       setSyncState('error','Errore caricamento');
-      initApp();
       return;
     }
     if(row && row.data && Object.keys(row.data).length > 0){
       data = row.data;
-      try{ localStorage.setItem('sl-v5', JSON.stringify(data)); } catch(e){}
       setSyncState('ok','Sincronizzato');
     } else {
-      // Nessun dato remoto: carica da locale e salva su cloud
+      // Account nuovo: nessun dato remoto
       setSyncState('syncing','Primo sync...');
-      try{ data = JSON.parse(localStorage.getItem('sl-v5')||'{}'); } catch(e){ data={}; }
+      data = {};
       await saveToSupabase();
     }
-    initApp();
   } catch(e){
     console.error('[Sync] Load exception:', e);
     setSyncState('error','Errore di rete');
-    initApp();
   }
 }
 
@@ -1636,9 +1632,7 @@ _sb.auth.onAuthStateChange(async (event, session) => {
   if(event === 'SIGNED_OUT'){
     updateAuthUI(null);
     data = {};
-    _initAppDone = false;
-    _appReady = false;
-    try{ localStorage.removeItem('sl-v5'); } catch(e){}
+    // localStorage non usato per dati
     showLoginWall();
     return;
   }
@@ -2365,13 +2359,12 @@ let sel=0, data={}, logType='incontro', pendingDel=null, detailOpen=false, curre
 const getD=id=>data[id]||null;
 const setD=(id,d)=>{data[id]=d;save();};
 function save(){
-  try{localStorage.setItem('sl-v5',JSON.stringify(data));}catch(e){}
   if(_sbUser){
     clearTimeout(window._syncTimer);
     window._syncTimer=setTimeout(()=>saveToSupabase(), 2500);
   }
 }
-function load(){try{data=JSON.parse(localStorage.getItem('sl-v5')||'{}');}catch(e){data={};}}
+function load(){data={};}// dati da Supabase}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DATE HELPERS
@@ -4442,6 +4435,30 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 
 
 // IMPOSTAZIONI
+function rImpostazioniDati(){
+  const keys=Object.keys(data).filter(k=>!k.startsWith('__'));
+  const legamiCount=keys.length;
+  const vociCount=keys.reduce((s,k)=>s+((data[k]&&data[k].log)?data[k].log.length:0),0);
+  let inner='';
+  if(legamiCount>0){
+    inner='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">'+
+      '<button class="btn btn-r btn-sm" onclick="exportData()">&#x2B07; Esporta backup JSON</button>'+
+      '<button class="btn btn-g btn-sm" onclick="document.getElementById(&quot;import-file&quot;).click()">&#x2B06; Importa backup</button>'+
+      '<input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">'+
+      '<button class="btn btn-sm" style="background:transparent;border:1px solid #c8102e44;color:#c8102e;margin-top:4px" onclick="confirmClearAll()">&#x2715; Cancella dati</button>'+
+      '</div><div id="backup-status-msg" style="font-size:11px;font-family:var(--fb);line-height:1.7;padding:10px 14px;border:1px solid var(--border);background:var(--bg4);color:var(--text-title)"></div>';
+  } else {
+    inner='<div style="font-size:12px;font-family:var(--fb);color:var(--text-dim);padding:8px 0">Nessun dato ancora. Assegna il primo legame per iniziare.</div>';
+  }
+  return '<div style="background:var(--bg3);border:1px solid var(--border)">'+
+    '<div style="padding:16px 20px;border-bottom:1px solid var(--border)">'+
+    '<div style="font-size:13px;font-weight:700;letter-spacing:2px;margin-bottom:3px">DATI APP</div>'+
+    '<div style="font-size:12px;font-family:var(--fb);color:var(--muted);line-height:1.6">I dati sono sincronizzati sul tuo account. Esporta un backup JSON per conservarne una copia locale.</div>'+
+    '</div><div style="padding:16px 20px">'+
+    '<div style="font-size:12px;font-family:var(--fb);color:var(--text-title);margin-bottom:12px">Legami attivi: <span style="color:var(--text-main);font-weight:700">'+legamiCount+'</span> &nbsp;&middot;&nbsp; Voci nel diario: <span style="color:var(--text-main);font-weight:700">'+vociCount+'</span></div>'+
+    inner+'</div></div>';
+}
+
 function rImpostazioni(){
   const el=document.getElementById('view-impostazioni');
   const key=getSavedKey();
@@ -4474,7 +4491,10 @@ function rImpostazioni(){
             <div style="font-size:11px;font-family:var(--fb);color:var(--text-dim)">
               Per cancellare l'account contatta l'amministratore.
             </div>
-            <button class="btn btn-sm" style="background:transparent;border:1px solid #c8102e44;color:#c8102e" onclick="signOut()">Disconnetti</button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-sm" style="background:transparent;border:1px solid #c8102e44;color:#c8102e" onclick="signOut()">Disconnetti</button>
+              <button class="btn btn-sm" style="background:transparent;border:1px solid #c8102e88;color:#c8102e" onclick="confirmResetAccount()">✕ Cancella account e dati</button>
+            </div>
           </div>
         </div>
       </div>` : `
@@ -4503,29 +4523,8 @@ function rImpostazioni(){
         </div>`;
       })()}
 
-      
-      <div style="background:var(--card);border:1px solid var(--border)">
-        <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
-          <div style="font-size:13px;font-weight:700;letter-spacing:2px;margin-bottom:3px">DATI DELL'APP</div>
-          <div style="font-size:12px;font-family:var(--fb);color:#c8a030;line-height:1.6">
-            Tutti i legami, diari, anniversari e foto sono salvati nel localStorage di questo browser.
-          </div>
-        </div>
-        <div style="padding:16px 20px">
-          <div style="font-size:12px;font-family:var(--fb);color:#c8a030;margin-bottom:12px">
-            Legami attivi: <span style="color:#fff;font-weight:700">${Object.keys(data).length}</span> &nbsp;·&nbsp;
-            Voci nel diario: <span style="color:#fff;font-weight:700">${Object.values(data).reduce((s,d)=>s+(d.log||[]).length,0)}</span>
-          </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-            <button class="btn btn-r btn-sm" onclick="exportData()">⬇ Esporta backup</button>
-            <button class="btn btn-g btn-sm" onclick="document.getElementById('import-file').click()">⬆ Importa backup</button>
-            <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
-            <button class="btn btn-sm" style="background:transparent;border:1px solid #c8102e44;color:#c8102e;margin-top:4px" onclick="confirmClearAll()">✕ Cancella dati</button>
-            <button class="btn btn-sm" style="background:transparent;border:1px solid #c8102e88;color:#c8102e;margin-top:4px" onclick="confirmResetAll()">⟳ Reset completo</button>
-          </div>
-          <div id="backup-status-msg" style="font-size:11px;font-family:var(--fb);line-height:1.7;padding:10px 14px;border:1px solid var(--border);background:#0a0a14;color:var(--text-title)"></div>
-        </div>
-      </div>
+
+      ${rImpostazioniDati()}
 
       <div style="background:var(--card);border:1px solid var(--border);margin-top:12px">
         <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
@@ -4630,7 +4629,7 @@ function rImpostazioni(){
             </div>
             <div style="display:flex;gap:8px">
               <button class="btn btn-g btn-sm" onclick="applyTheme('custom');rImpostazioni()">Applica personalizzato</button>
-              <button class="btn btn-g btn-xs" style="color:var(--text-dim)" onclick="localStorage.removeItem('sl-theme-custom');applyTheme('abisso');rImpostazioni()">Reset</button>
+              <button class="btn btn-g btn-xs" style="color:var(--text-dim)" onclick="setPrefs({themeCustom:{},theme:'abisso'});applyTheme('abisso');rImpostazioni()">Reset</button>
             </div>
           </div>
         </div>
@@ -4814,35 +4813,32 @@ const PALETTES={
   },
 };
 
-function getActiveTheme(){
-  try{return localStorage.getItem('sl-theme')||'abisso';}catch(e){return'abisso';}
-}
+// ── PREFS: tema, autodownload, onboarding, last-export ── dentro data['__prefs__']
+function getPrefs(){ return (data&&data['__prefs__'])||{}; }
+function setPrefs(obj){ if(typeof data==='object'){data['__prefs__']={...getPrefs(),...obj};save();} }
+
+function getActiveTheme(){ return getPrefs().theme||'abisso'; }
 
 function applyTheme(id){
   const p=PALETTES[id];
   if(!p)return;
   const root=document.documentElement;
-  // Carica custom vars se tema personalizzato
   let vars=p.vars;
   if(id==='custom'){
-    try{const saved=JSON.parse(localStorage.getItem('sl-theme-custom')||'{}');vars={...PALETTES.abisso.vars,...saved};}catch(e){vars=PALETTES.abisso.vars;}
+    const saved=getPrefs().themeCustom||{};
+    vars={...PALETTES.abisso.vars,...saved};
   }
   Object.entries(vars).forEach(([k,v])=>root.style.setProperty(k,v));
-  // Testo su sfondo chiaro: forza colore testo scuro sugli elementi che usano color:#fff hardcoded
   document.body.setAttribute('data-theme',p.dark?'dark':'light');
-  try{localStorage.setItem('sl-theme',id);}catch(e){}
+  setPrefs({theme:id});
 }
 
-function getCustomThemeVars(){
-  try{return JSON.parse(localStorage.getItem('sl-theme-custom')||'{}');}catch(e){return{};}
-}
+function getCustomThemeVars(){ return getPrefs().themeCustom||{}; }
 
 function saveCustomVar(key,val){
   const curr=getCustomThemeVars();
   curr[key]=val;
-  try{localStorage.setItem('sl-theme-custom',JSON.stringify(curr));}catch(e){}
-  // Applica sempre in live preview — il tema custom si attiva automaticamente
-  try{localStorage.setItem('sl-theme','custom');}catch(e){}
+  setPrefs({themeCustom:curr,theme:'custom'});
   applyTheme('custom');
 }
 
@@ -5063,7 +5059,7 @@ let _obCurrent=0;
 function showOnboarding(){
   const p=getProfile();
   if(!p||!p.name) return;
-  try{if(localStorage.getItem('sl-ob-done')==='1')return;}catch(e){}
+  if(getPrefs().obDone)return;
   _obCurrent=0;
   document.getElementById('onboarding').classList.add('active');
   renderObStep();
@@ -5211,7 +5207,7 @@ function obNav(dir){
 }
 
 function skipOnboarding(){
-  try{localStorage.setItem('sl-ob-done','1');}catch(e){}
+  setPrefs({obDone:true});
   const ov=document.getElementById('onboarding');
   ov.classList.remove('active');
   // Nascondi tutti gli elementi
@@ -5227,8 +5223,7 @@ function skipOnboarding(){
 function checkAnniversariReminder(){
   // Non mostrare se già mostrato oggi
   try{
-    const last=localStorage.getItem('sl-reminder-snooze');
-    if(last===today())return;
+    if(getPrefs().reminderSnooze===today())return;
   }catch(e){}
 
   // Raccogli anniversari entro 7 giorni
@@ -5269,9 +5264,7 @@ function checkAnniversariReminder(){
 
 function closeReminder(){
   const snooze=document.getElementById('reminder-snooze');
-  if(snooze&&snooze.checked){
-    try{localStorage.setItem('sl-reminder-snooze',today());}catch(e){}
-  }
+  if(snooze&&snooze.checked){ setPrefs({reminderSnooze:today()}); }
   closeModal('m-reminder');
 }
 
@@ -5306,10 +5299,30 @@ function doClearAll(btn){
   btn.closest('.overlay').remove();
   data={};
   save();
-  try{localStorage.removeItem('sl-v5-snapshot');localStorage.removeItem('sl-last-export');}catch(e){}
+  // no snapshot locale
   rAll();
   if(currentView==='impostazioni')rImpostazioni();
   setTimeout(updateBackupStatus,100);
+}
+
+function confirmResetAccount(){
+  const modal=document.createElement('div');
+  modal.className='overlay open';
+  modal.innerHTML=`<div class="modal" style="max-width:400px;border-top:3px solid var(--red)">
+    <div class="modal-sub" style="color:var(--red)">CANCELLAZIONE ACCOUNT</div>
+    <div class="modal-title">Sei sicuro?</div>
+    <p style="font-size:13px;font-family:var(--fb);color:var(--text-title);line-height:1.7;margin-bottom:10px">
+      Verranno eliminati <strong>tutti i dati</strong> dal cloud e dal dispositivo:<br>
+      legami, diario, profilo, tema, impostazioni.<br>
+      L'account email rimarrà attivo — potrai rientrare e ricominciare da zero.
+    </p>
+    <div class="modal-footer">
+      <button class="btn btn-g" onclick="this.closest('.overlay').remove()">Annulla</button>
+      <button class="btn btn-g btn-sm" onclick="exportData()" style="border-color:#fdcb6e44;color:#fdcb6e">⬇ Backup prima</button>
+      <button class="btn btn-r" onclick="doResetAll(this)">Cancella tutto</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
 }
 
 function confirmResetAll(){
@@ -5332,16 +5345,16 @@ function confirmResetAll(){
   document.body.appendChild(modal);
 }
 
-function doResetAll(btn){
+async function doResetAll(btn){
   btn.closest('.overlay').remove();
-  // Cancella tutte le chiavi sl-*
-  const keys=[];
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    if(k&&k.startsWith('sl-'))keys.push(k);
+  // Cancella riga su Supabase
+  if(_sbUser){
+    try{ await _sb.from('user_data').delete().eq('user_id',_sbUser.id); }catch(e){}
+    try{ await _sb.auth.signOut(); }catch(e){}
   }
-  keys.forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});
-  // Ricarica la pagina — sarà come il primo avvio
+  // Cancella tutto il localStorage
+  try{localStorage.clear();}catch(e){}
+  // Ricarica — primo avvio
   location.reload();
 }
 
@@ -5428,13 +5441,10 @@ function rGuida(){
   </div>`;
 }
 
-function getAutoDownload(){
-  try{return localStorage.getItem('sl-autodownload')==='1';}catch(e){return false;}
-}
+function getAutoDownload(){ return !!getPrefs().autodownload; }
 
 function toggleAutoDownload(){
-  const v=!getAutoDownload();
-  try{localStorage.setItem('sl-autodownload',v?'1':'0');}catch(e){}
+  setPrefs({autodownload:!getAutoDownload()});
   rImpostazioni();
   setTimeout(updateBackupStatus,50);
 }
@@ -5451,7 +5461,7 @@ function exportData(){
   a.click();
   URL.revokeObjectURL(url);
   // record export date
-  try{ localStorage.setItem('sl-last-export', Date.now().toString()); }catch(e){}
+  setPrefs({lastExport: Date.now()});
   updateBackupStatus();
 }
 
@@ -5464,13 +5474,30 @@ function importData(e){
       // validate: should be an object with numeric-ish keys
       if(typeof imported!=='object'||Array.isArray(imported))
         throw new Error('Formato non valido');
-      const count=Object.keys(imported).length;
-      if(!confirm(`Importare ${count} legami dal backup?\nAttenzione: i dati attuali verranno SOSTITUITI.`))return;
-      data=imported;
-      save();
-      rAll();
-      rImpostazioni();
-      alert(`✓ Importati ${count} legami con successo.`);
+      const _impCount=Object.keys(imported).filter(k=>!k.startsWith('__')).length;
+      const _impM=document.createElement('div');
+      _impM.className='overlay open';
+      _impM.innerHTML='<div class="modal" style="max-width:380px;border-top:3px solid var(--red)">'+
+        '<div class="modal-sub" style="color:var(--red)">IMPORTA BACKUP</div>'+
+        '<div class="modal-title">Sostituire i dati?</div>'+
+        '<p style="font-size:13px;font-family:var(--fb);color:var(--text-title);line-height:1.7">'+
+        'Il backup contiene <strong style="color:#fff">'+_impCount+' legami</strong>.<br>'+
+        'I dati attuali verranno sostituiti e sincronizzati sul tuo account.</p>'+
+        '<div class="modal-footer">'+
+        '<button class="btn btn-g" onclick="this.closest(\'.overlay\').remove()">Annulla</button>'+
+        '<button class="btn btn-r" id="_imp-btn">Importa</button>'+
+        '</div></div>';
+      document.body.appendChild(_impM);
+      document.getElementById('_imp-btn').onclick=()=>{
+        _impM.remove();data=imported;save();rAll();rImpostazioni();
+        const _impOk=document.createElement('div');_impOk.className='overlay open';
+        _impOk.innerHTML='<div class="modal" style="max-width:320px;border-top:3px solid #00b894">'+
+          '<div class="modal-title" style="color:#00b894">&#x2713; Completato</div>'+
+          '<p style="font-size:13px;font-family:var(--fb);color:var(--text-title)">'+_impCount+' legami importati.</p>'+
+          '<div class="modal-footer"><button class="btn btn-r" onclick="this.closest(\'.overlay\').remove()">OK</button></div></div>';
+        document.body.appendChild(_impOk);
+        _impOk.onclick=e=>{if(e.target===_impOk)_impOk.remove();};
+      };
     }catch(err){
       alert('Errore durante l\'importazione: '+err.message);
     }
@@ -5479,9 +5506,7 @@ function importData(e){
   e.target.value='';
 }
 
-function getLastExport(){
-  try{ return parseInt(localStorage.getItem('sl-last-export')||'0'); }catch(e){return 0;}
-}
+function getLastExport(){ return getPrefs().lastExport||0; }
 
 function getDaysSinceExport(){
   const last=getLastExport();
@@ -5515,13 +5540,7 @@ function updateBackupStatus(){
 
 // Auto-snapshot: save a second copy in localStorage on every open
 // so even a cache clear might leave a recoverable copy under a different key
-function autoSnapshot(){
-  try{
-    if(Object.keys(data).length===0)return;
-    localStorage.setItem('sl-v5-snapshot', JSON.stringify(data));
-    localStorage.setItem('sl-v5-snapshot-date', Date.now().toString());
-  }catch(e){}
-}
+function autoSnapshot(){}
 
 function checkBackupReminder(){
   const days = getDaysSinceExport();
@@ -6067,7 +6086,6 @@ function playLvlUpAnim(level, color, sym){
 
 
 // INIT
-load();
 applyTheme(getActiveTheme());
 _appReady=false; // sarà true dopo il primo rAll post-auth
 function checkTrascurato(){
@@ -6086,15 +6104,7 @@ function checkTrascurato(){
   if(changed)save();
 }
 // Migrazione attributo→badges (eseguita dopo load Supabase in initApp)
-function migrateData(){
-  Object.keys(data).forEach(id=>{
-    const d=data[id];
-    if(d&&d.attributo&&!d.badges){
-      d.badges=[d.attributo];
-      delete d.attributo;
-    }
-  });
-}
+function migrateData(){}
 
 // initApp: chiamato dopo caricamento dati da Supabase
 let _initAppDone = false;
@@ -6102,6 +6112,8 @@ function initApp(){
   if(_initAppDone) return;
   _initAppDone = true;
   migrateData();
+  // Riapplica tema salvato nelle prefs (potrebbe essere diverso dal default)
+  applyTheme(getActiveTheme());
   checkTrascurato();
   rAll();
   rProfileHeader();
