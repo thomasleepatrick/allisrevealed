@@ -1040,13 +1040,7 @@ body.is-scrolling .pan-circ-svg{
     </div>
   </div>
 </div>
-<div id="backup-alert" style="display:none;background:#c8102e;padding:5px 20px;font-size:10px;font-family:var(--fb);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0">
-  <span id="backup-alert-msg" style="flex:1"></span>
-  <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
-    <button onclick="exportData();document.getElementById('backup-alert').style.display='none'" style="background:rgba(255,255,255,0.2);border:none;color:#fff;padding:4px 12px;cursor:pointer;font-family:var(--fd);font-size:9px;letter-spacing:1px">ESPORTA ORA</button>
-    <button onclick="document.getElementById('backup-alert').style.display='none'" style="background:transparent;border:1px solid rgba(255,255,255,0.3);color:#fff;width:22px;height:22px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;padding:0;border-radius:2px;flex-shrink:0" title="Chiudi">✕</button>
-  </div>
-</div>
+<div id="backup-alert" style="display:none"></div>
 
 <div id="layout">
   <div id="left"></div>
@@ -1551,8 +1545,13 @@ async function loadFromSupabase(){
       .eq('user_id', _sbUser.id)
       .maybeSingle();
     if(error){
-      console.error('[Sync] Load error:', error.message);
-      setSyncState('error','Errore caricamento');
+      console.error('[Sync] Load error:', error.message, error.code);
+      if(error.code==='42501'||error.message.includes('permission denied')){
+        setSyncState('error','Policy RLS — controlla Supabase');
+      } else {
+        setSyncState('error','Errore caricamento');
+      }
+      initApp();
       return;
     }
     if(row && row.data && Object.keys(row.data).length > 0){
@@ -4461,9 +4460,6 @@ function rImpostazioniDati(){
 
 function rImpostazioni(){
   const el=document.getElementById('view-impostazioni');
-  const key=getSavedKey();
-  const hasKey=!!key;
-  const masked=hasKey?'sk-ant-…'+key.slice(-4):'';
   el.innerHTML=`
     <div style="padding:22px 24px;max-width:900px">
       <div style="font-size:10px;letter-spacing:5px;color:var(--red);font-family:var(--fb);margin-bottom:14px">IMPOSTAZIONI</div>
@@ -4646,6 +4642,7 @@ function rImpostazioni(){
 
 
 function updateOracleKeyStatus(){}
+function getSavedKey(){ return null; }
 
 // ─── SISTEMA TEMI ────────────────────────────────────────────────────────────
 const PALETTES={
@@ -5542,32 +5539,7 @@ function updateBackupStatus(){
 // so even a cache clear might leave a recoverable copy under a different key
 function autoSnapshot(){}
 
-function checkBackupReminder(){
-  const days = getDaysSinceExport();
-  const entries = Object.keys(data).length;
-  const alertBar = document.getElementById('backup-alert');
-  const alertMsg = document.getElementById('backup-alert-msg');
-
-  // Nav tab badge
-  const tabs = document.querySelectorAll('.nav-tab');
-  const settingsTab = tabs[tabs.length-1];
-  if(settingsTab){
-    const existing = settingsTab.querySelector('.backup-badge');
-    if(existing) existing.remove();
-  }
-
-  if(entries === 0){ if(alertBar) alertBar.style.display='none'; return; }
-
-  if(days === null || days >= 30){
-    if(alertBar){ alertBar.style.display='flex'; alertBar.style.background='#c8102e'; }
-    if(alertMsg) alertMsg.textContent = days===null ? '⚠ Nessun backup eseguito — i tuoi dati sono a rischio' : `⚠ Ultimo backup ${days} giorni fa — esporta per mettere i dati al sicuro`;
-  } else if(days >= 7){
-    if(alertBar){ alertBar.style.display='flex'; alertBar.style.background='#8a6a00'; }
-    if(alertMsg) alertMsg.textContent = `Ultimo backup ${days} giorni fa. Ti consigliamo di aggiornarlo.`;
-  } else {
-    if(alertBar) alertBar.style.display='none';
-  }
-}
+function checkBackupReminder(){}
 
 
 
