@@ -1496,6 +1496,8 @@ async function doAuthAction(){
       return;
     }
     // Login OK — onAuthStateChange gestirà il resto
+    btn.disabled=false;
+    btn.textContent=_authTab==='login'?'Accedi':'Registrati';
   } catch(e){
     showAuthMsg('err', e.message||'Errore di autenticazione.');
     btn.disabled=false;
@@ -1505,7 +1507,13 @@ async function doAuthAction(){
 
 async function signOut(){
   try{ await _sb.auth.signOut(); } catch(e){}
-  // onAuthStateChange → SIGNED_OUT gestirà il resto
+  // Forza reset UI subito, senza aspettare l'evento Supabase
+  _sbUser = null;
+  updateAuthUI(null);
+  data = {};
+  _initAppDone = false;
+  _appReady = false;
+  showLoginWall();
 }
 
 async function sendPasswordReset(){
@@ -1559,13 +1567,15 @@ async function loadFromSupabase(){
       setSyncState('ok','Sincronizzato');
     } else {
       // Account nuovo: nessun dato remoto
-      setSyncState('syncing','Primo sync...');
       data = {};
       await saveToSupabase();
+      setSyncState('ok','Pronto');
     }
+    initApp();
   } catch(e){
     console.error('[Sync] Load exception:', e);
     setSyncState('error','Errore di rete');
+    initApp();
   }
 }
 
@@ -1631,7 +1641,8 @@ _sb.auth.onAuthStateChange(async (event, session) => {
   if(event === 'SIGNED_OUT'){
     updateAuthUI(null);
     data = {};
-    // localStorage non usato per dati
+    _initAppDone = false;
+    _appReady = false;
     showLoginWall();
     return;
   }
@@ -1640,13 +1651,15 @@ _sb.auth.onAuthStateChange(async (event, session) => {
     if(user){
       updateAuthUI(user);
       hideLoginWall();
-      // Attendi che il DOM sia pronto prima di caricare
+      if(event === 'TOKEN_REFRESHED' && _appReady){
+        // Solo aggiorna utente, non ricaricare tutto
+        return;
+      }
       if(!_appReady){
-        await new Promise(r => setTimeout(r, 300));
+        await new Promise(r => setTimeout(r, 200));
       }
       await loadFromSupabase();
     } else if(event === 'INITIAL_SESSION'){
-      // Nessuna sessione → mostra login
       showLoginWall();
     }
     return;
@@ -1736,11 +1749,18 @@ document.addEventListener('click', e=>{
 let _profPhoto = null; // temp photo durante editing
 
 function getProfile(){
+  if(data && data['__profile__']) return data['__profile__'];
   try{ return JSON.parse(localStorage.getItem('sl-profile')||'null'); }catch(e){ return null; }
 }
 
 function saveProfile(p){
+  if(typeof data==='object'){ data['__profile__']=p; }
   try{ localStorage.setItem('sl-profile', JSON.stringify(p)); }catch(e){}
+  // Sync su Supabase — usa saveToSupabase direttamente se _sbUser è pronto
+  if(_sbUser){
+    clearTimeout(window._syncTimer);
+    window._syncTimer=setTimeout(()=>saveToSupabase(), 500);
+  }
 }
 
 function profileInitial(name){
@@ -4289,7 +4309,7 @@ function saveAnn(){
   const label=document.getElementById('ann-label-inp').value.trim();
   const note=document.getElementById('ann-note').value.trim();
   const dateVal=document.getElementById('ann-date-inp').value;
-  if(!dateVal){alert('Inserisci una data.');return;}
+  if(!dateVal){document.getElementById('ann-date-inp').style.borderColor='var(--red)';setTimeout(()=>{document.getElementById('ann-date-inp').style.borderColor='';},2000);return;}
   const parts=dateVal.split('-');
   const anno=parseInt(parts[0]);
   const month=parseInt(parts[1]);
@@ -4323,88 +4343,7 @@ function handlePhoto(e){
   };reader.readAsDataURL(file);e.target.value='';
 }
 
-// ORACLE
-async function askOracle(){
-  const key=getSavedKey();
-  const desc=document.getElementById('ora-desc').value.trim();
-  if(!key){alert('Inserisci prima la tua API Key nelle Impostazioni (⚙).');return;}
-  if(!desc){alert('Descrivi prima il rapporto.');return;}
-  const btn=document.getElementById('ora-btn');
-  const resEl=document.getElementById('ora-res');
-  btn.textContent='◌  Consultando…';btn.disabled=true;
-  resEl.style.display='none';
-
-  // Try multiple models in order — fallback if one isn't available on the key
-  const MODELS=['claude-opus-4-5','claude-sonnet-4-5','claude-haiku-4-5'];
-  let lastErr=null;
-
-  for(const model of MODELS){
-    try{
-      const res=await fetch('https://api.anthropic.com/v1/messages',{
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'x-api-key':key,
-          'anthropic-version':'2023-06-01',
-          'anthropic-dangerous-direct-browser-calls':'true'
-        },
-        body:JSON.stringify({
-          model,
-          max_tokens:500,
-          system:`Sei un esperto dei Social Links dei giochi Persona di Atlus. Suggerisci l'arcano più adatto (id 0-21). Rispondi SOLO con JSON valido, niente altro: {"arcanaId":<numero 0-21>,"reason":"<2-3 frasi in italiano>"}`,
-          messages:[{role:'user',content:desc}]
-        })
-      });
-
-      if(!res.ok){
-        const errBody=await res.json().catch(()=>({}));
-        // 404 = model not found → try next
-        if(res.status===404){lastErr=`Modello ${model} non disponibile`;continue;}
-        // 401 = bad key
-        if(res.status===401){throw new Error('API Key non valida. Controllala nelle Impostazioni.');}
-        // 429 = rate limit
-        if(res.status===429){throw new Error('Troppe richieste. Attendi qualche secondo e riprova.');}
-        throw new Error(errBody.error?.message||`Errore API (${res.status})`);
-      }
-
-      const json=await res.json();
-      const raw=(json.content||[]).find(b=>b.type==='text')?.text||'{}';
-      const p=JSON.parse(raw.replace(/```json|```/g,'').trim());
-      showOraRes(p);
-      btn.textContent='✦ Rivela l\'Arcano';btn.disabled=false;
-      return; // success
-
-    }catch(e){
-      if(e.message.includes('fetch')||e.message.includes('Failed')||e.message.includes('NetworkError')||e.message.includes('Load failed')){
-        const isFileProtocol = location.protocol === 'file:';
-        resEl.innerHTML=`
-          <div style="margin-top:14px;padding:14px 16px;background:#0a0a14;border-left:3px solid var(--red)">
-            <div style="font-size:13px;color:var(--red);font-weight:700;margin-bottom:8px">Errore di connessione</div>
-            <div style="font-size:11px;font-family:var(--fb);color:var(--text-title);line-height:1.7">
-              ${isFileProtocol
-                ? 'Stai aprendo il file direttamente dal disco (file://). Caricalo su GitHub Pages o avvia un server locale con <code style="background:#1c1c2e;padding:2px 6px">python3 -m http.server 8080</code>.'
-                : 'Impossibile raggiungere le API di Anthropic. Possibili cause:<br><br>• La API Key non è valida o non è configurata — controlla in <b>Impostazioni ⚙</b><br>• Non hai ancora aggiunto un metodo di pagamento su <b>console.anthropic.com</b> (le API richiedono una carta, anche con saldo minimo)<br>• Problema temporaneo di rete — riprova tra qualche secondo<br><br>Errore tecnico: <code style="background:#1c1c2e;padding:2px 6px">${e.message}</code>'
-              }
-            </div>
-          </div>`;
-        resEl.style.display='block';
-        btn.textContent='✦ Rivela l\'Arcano';btn.disabled=false;
-        return;
-      }
-      lastErr=e.message;
-      break; // non-network error, don't retry
-    }
-  }
-
-  // All models failed or non-network error
-  resEl.innerHTML=`<div style="margin-top:14px;padding:12px 14px;background:#0a0a14;border-left:3px solid var(--red)">
-    <div style="font-size:13px;color:var(--red);font-weight:700;margin-bottom:6px">Errore</div>
-    <div style="font-size:11px;font-family:var(--fb);color:var(--text-title);line-height:1.6">${lastErr||'Errore sconosciuto. Controlla la chiave API nelle Impostazioni.'}</div>
-  </div>`;
-  resEl.style.display='block';
-  btn.textContent='✦ Rivela l\'Arcano';btn.disabled=false;
-}
-
+// ORACLE (API esterna rimossa — usa solo oracolo locale)
 function showOraRes(p){
   const el=document.getElementById('ora-res');
   if(!p||p.arcanaId===undefined){el.innerHTML=`<p style="color:var(--red);font-family:var(--fb);font-size:13px;margin-top:12px">Risposta non valida.</p>`;el.style.display='block';return;}
@@ -4880,6 +4819,20 @@ function saveEditLog(){
 }
 
 let _undoTimer=null;
+function showToast(msg, duration){
+  const t=document.getElementById('undo-toast');
+  const m=document.getElementById('undo-msg');
+  if(!t||!m)return;
+  m.textContent=msg;
+  // Nascondi pulsante undo per toast generici
+  const btn=t.querySelector('button');
+  const _prev=btn?btn.style.display:'';
+  if(btn)btn.style.display='none';
+  t.classList.add('show');
+  clearTimeout(t._gt);
+  t._gt=setTimeout(()=>{t.classList.remove('show');if(btn)btn.style.display=_prev;},duration||3000);
+}
+
 function pushUndo(msg,fn){
   undoStack=[{msg,fn}];
   const toast=document.getElementById('undo-toast');
@@ -5272,7 +5225,7 @@ function goToCalendar(){
 
 function confirmClearAll(){
   const n=Object.keys(data).length;
-  if(n===0){alert('Nessun dato da cancellare.');return;}
+  if(n===0){showToast('Nessun dato da cancellare.');return;}
   const modal=document.createElement('div');
   modal.className='overlay open';
   modal.innerHTML=`<div class="modal" style="max-width:380px;border-top:3px solid var(--red)">
@@ -5387,7 +5340,7 @@ function exportICS(){
     });
   });
   lines.push('END:VCALENDAR');
-  if(count===0){alert('Nessuna data importante da esportare. Aggiungi anniversari ai tuoi legami prima.');return;}
+  if(count===0){showToast('Nessuna data da esportare — aggiungi anniversari ai tuoi legami.');return;}
   const blob=new Blob([lines.join('\r\n')],{type:'text/calendar;charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const link=document.createElement('a');
@@ -5496,7 +5449,7 @@ function importData(e){
         _impOk.onclick=e=>{if(e.target===_impOk)_impOk.remove();};
       };
     }catch(err){
-      alert('Errore durante l\'importazione: '+err.message);
+      showToast('Errore importazione: '+err.message);
     }
   };
   reader.readAsText(file);
