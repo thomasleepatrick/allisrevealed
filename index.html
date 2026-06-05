@@ -1541,7 +1541,7 @@ function updateAuthUI(user){
   } else {
     if(bar) bar.classList.remove('show');
     if(btn) btn.style.display='';
-    setSyncState('','');
+    setSyncState('ok','');
   }
 }
 
@@ -1569,16 +1569,15 @@ async function loadFromSupabase(){
       data = row.data;
       setSyncState('ok','Sincronizzato');
     } else {
-      // Account nuovo: nessun dato remoto
+      // Account nuovo: nessun dato ancora
       data = {};
-      await saveToSupabase();
       setSyncState('ok','Pronto');
     }
-    initApp();
+    if(!_initAppDone) initApp();
   } catch(e){
     console.error('[Sync] Load exception:', e);
     setSyncState('error','Errore di rete');
-    initApp();
+    if(!_initAppDone) initApp();
   }
 }
 
@@ -1586,11 +1585,32 @@ async function saveToSupabase(){
   if(!_sbUser) return;
   setSyncState('syncing','Salvataggio...');
   try{
-    const {error} = await _sb.from('user_data').upsert({
-      user_id: _sbUser.id,
-      data: data,
-      updated_at: new Date().toISOString()
-    }, {onConflict:'user_id'});
+    // Prima controlla se esiste già una riga
+    const {data:existing, error:selErr} = await _sb
+      .from('user_data')
+      .select('user_id')
+      .eq('user_id', _sbUser.id)
+      .maybeSingle();
+    if(selErr && selErr.code !== 'PGRST116'){
+      console.error('[Sync] Save check error:', selErr.message, selErr.code);
+      setSyncState('error','Errore salvataggio');
+      return;
+    }
+    let error;
+    if(existing){
+      // Aggiorna riga esistente
+      ({error} = await _sb.from('user_data').update({
+        data: data,
+        updated_at: new Date().toISOString()
+      }).eq('user_id', _sbUser.id));
+    } else {
+      // Inserisce nuova riga
+      ({error} = await _sb.from('user_data').insert({
+        user_id: _sbUser.id,
+        data: data,
+        updated_at: new Date().toISOString()
+      }));
+    }
     if(error){
       console.error('[Sync] Save error:', error.message, error.code);
       setSyncState('error','Errore salvataggio');
@@ -1633,6 +1653,7 @@ function showAccountMsg(type, text){
 
 async function syncNow(){
   if(!_sbUser){ openAuthModal(); return; }
+  clearTimeout(window._syncTimer);
   await saveToSupabase();
 }
 
@@ -1644,15 +1665,17 @@ _sb.auth.onAuthStateChange(async (event, session) => {
   const user = session?.user || null;
 
   if(event === 'SIGNED_OUT'){
-    // Ignora SIGNED_OUT se stiamo già mostrando il login wall
-    // (evita loop signOut→SIGNED_OUT→showLoginWall già aperto)
     _sbUser = null;
     updateAuthUI(null);
     data = {};
     _initAppDone = false;
     _appReady = false;
     _loadingData = false;
-    showLoginWall();
+    // showLoginWall solo se il modal non è già aperto (signOut() lo chiama già)
+    const authOverlay = document.getElementById('m-auth');
+    if(authOverlay && !authOverlay.classList.contains('open')){
+      showLoginWall();
+    }
     return;
   }
 
@@ -2400,12 +2423,12 @@ let sel=0, data={}, logType='incontro', pendingDel=null, detailOpen=false, curre
 const getD=id=>data[id]||null;
 const setD=(id,d)=>{data[id]=d;save();};
 function save(){
-  if(_sbUser){
+  if(_sbUser && Object.keys(data).length > 0){
     clearTimeout(window._syncTimer);
     window._syncTimer=setTimeout(()=>saveToSupabase(), 2500);
   }
 }
-function load(){data={};}// dati da Supabase}
+function load(){data={};} // dati sempre da Supabase
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DATE HELPERS
