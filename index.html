@@ -1519,6 +1519,7 @@ async function doAuthAction(){
 }
 
 async function signOut(){
+  clearTimeout(window._signOutTimer);
   _sbUser = null;
   updateAuthUI(null);
   data = {};
@@ -1559,13 +1560,19 @@ async function loadFromSupabase(){
   if(!_sbUser) return;
   setSyncState('syncing','Caricamento...');
   try{
-    // Verifica sessione fresca prima di procedere
-    const {data:sessionData} = await _sb.auth.getSession();
-    if(!sessionData?.session){
-      console.warn('[Sync] Nessuna sessione valida, avvio app offline');
-      setSyncState('error','Sessione non valida');
-      if(!_initAppDone) initApp();
-      return;
+    // Forza refresh del token prima di procedere
+    const {data:sessionData, error:sessErr} = await _sb.auth.getSession();
+    if(sessErr || !sessionData?.session){
+      // Prova a fare refresh esplicito
+      const {data:refreshData, error:refreshErr} = await _sb.auth.refreshSession();
+      if(refreshErr || !refreshData?.session){
+        console.warn('[Sync] Sessione non rinnovabile, avvio app offline');
+        setSyncState('error','Sessione scaduta — rieffettua il login');
+        if(!_initAppDone) initApp();
+        return;
+      }
+      // Aggiorna _sbUser con la sessione rinnovata
+      _sbUser = refreshData.session.user;
     }
     const {data:row, error} = await _sb
       .from('user_data')
@@ -1602,12 +1609,16 @@ async function saveToSupabase(){
   if(!_sbUser) return;
   setSyncState('syncing','Salvataggio...');
   try{
-    // Verifica sessione fresca
+    // Forza refresh del token
     const {data:sessionData} = await _sb.auth.getSession();
     if(!sessionData?.session){
-      console.warn('[Sync] Nessuna sessione valida per salvataggio');
-      setSyncState('error','Sessione non valida');
-      return;
+      const {data:refreshData, error:refreshErr} = await _sb.auth.refreshSession();
+      if(refreshErr || !refreshData?.session){
+        console.warn('[Sync] Sessione non valida per salvataggio');
+        setSyncState('error','Sessione scaduta — rieffettua il login');
+        return;
+      }
+      _sbUser = refreshData.session.user;
     }
     // Prima controlla se esiste già una riga
     const {data:existing, error:selErr} = await _sb
@@ -1683,13 +1694,20 @@ _sb.auth.onAuthStateChange(async (event, session) => {
   const user = session?.user || null;
 
   if(event === 'SIGNED_OUT'){
+    // Debounce: se arriva subito un SIGNED_IN (es. refresh token), non mostrare login wall
+    clearTimeout(window._signOutTimer);
+    window._signOutTimer = setTimeout(()=>{
+      // Controlla se nel frattempo è arrivato un nuovo login
+      if(!_sbUser){
+        updateAuthUI(null);
+        data = {};
+        _initAppDone = false;
+        _appReady = false;
+        const authOverlay = document.getElementById('m-auth');
+        if(authOverlay && !authOverlay.classList.contains('open')) showLoginWall();
+      }
+    }, 1500);
     _sbUser = null;
-    updateAuthUI(null);
-    data = {};
-    _initAppDone = false;
-    _appReady = false;
-    const authOverlay = document.getElementById('m-auth');
-    if(authOverlay && !authOverlay.classList.contains('open')) showLoginWall();
     return;
   }
 
