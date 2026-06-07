@@ -2644,7 +2644,6 @@ function rTop(){
   const hasSvg=!!cardVis;
   const flipClass=cardFlipped&&hasSvg?' flipped':'';
   const hasVisual=hasSvg||(_imgCache[a.id]==='img');
-  const flipHint=hasVisual?`<div id="card-flip-hint" style="font-size:9px;font-family:var(--fb);color:${a.color}55;letter-spacing:1px;text-align:center;margin-top:6px;pointer-events:none">${cardFlipped?'↔ ingrandisci':'↻ gira'}</div>`:'';
   document.getElementById('arc-top').innerHTML=`
     ${hasSvg?`
     <div class="tarot-wrap${flipClass}" onclick="flipCard()" title="Clicca per girare la carta">
@@ -2669,7 +2668,6 @@ function rTop(){
       <div class="exp-lbl" style="color:${a.color}">ARCANO ${a.roman} — TIPO DI LEGAME</div>
       <div class="exp-title">${a.name}</div>
       <div class="exp-theme">${a.theme}</div>
-      ${flipHint}
       <div class="exp-text" style="margin-top:8px">${a.exp}</div>
     </div>`;
 }
@@ -3926,7 +3924,7 @@ function selArc(id){
   rAll();
   if(isMobile()) closeDrawer();
 }
-function rTotal(){const n=Object.keys(data).length;document.getElementById('total-n').innerHTML=n+' <span style="font-size:14px;color:#888;font-weight:400">su 21</span>';}
+function rTotal(){const n=Object.keys(data).filter(k=>!k.startsWith('__')).length;document.getElementById('total-n').innerHTML=n+' <span style="font-size:14px;color:#888;font-weight:400">su 21</span>';}
 function rAll(){rLeft();rTop();rDetail();rLegame();rTotal();_appReady=true;}
 
 // temp photo storage for assign modal
