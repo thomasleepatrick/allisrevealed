@@ -1519,7 +1519,6 @@ async function doAuthAction(){
 }
 
 async function signOut(){
-  clearTimeout(window._signOutTimer);
   _sbUser = null;
   updateAuthUI(null);
   data = {};
@@ -1693,35 +1692,38 @@ _sb.auth.onAuthStateChange(async (event, session) => {
   console.log('[Auth] event:', event, session?.user?.email||'—');
   const user = session?.user || null;
 
-  if(event === 'SIGNED_OUT'){
-    // Debounce: se arriva subito un SIGNED_IN (es. refresh token), non mostrare login wall
-    clearTimeout(window._signOutTimer);
-    window._signOutTimer = setTimeout(()=>{
-      // Controlla se nel frattempo è arrivato un nuovo login
-      if(!_sbUser){
-        updateAuthUI(null);
-        data = {};
-        _initAppDone = false;
-        _appReady = false;
-        const authOverlay = document.getElementById('m-auth');
-        if(authOverlay && !authOverlay.classList.contains('open')) showLoginWall();
-      }
-    }, 1500);
-    _sbUser = null;
-    return;
-  }
-
+  // TOKEN_REFRESHED e USER_UPDATED: aggiorna solo il riferimento utente
   if(event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED'){
     if(user) _sbUser = user;
     return;
   }
 
+  // SIGNED_OUT esplicito (solo da signOut() manuale, non da scadenza token)
+  // Supabase emette SIGNED_OUT + SIGNED_IN in sequenza per scadenza token —
+  // gestiamo solo il caso in cui non arriva subito un nuovo utente
+  if(event === 'SIGNED_OUT'){
+    if(!session){
+      // Logout reale: nessuna sessione in arrivo
+      updateAuthUI(null);
+      data = {};
+      _initAppDone = false;
+      _appReady = false;
+      const authOverlay = document.getElementById('m-auth');
+      if(authOverlay && !authOverlay.classList.contains('open')) showLoginWall();
+    }
+    return;
+  }
+
   if(event === 'SIGNED_IN' || event === 'INITIAL_SESSION'){
-    if(!user){ showLoginWall(); return; }
-    // Aggiorna sempre utente e UI
-    updateAuthUI(user);
+    if(!user){
+      // Nessuna sessione attiva
+      if(!_initAppDone) showLoginWall();
+      return;
+    }
+    // Cancella eventuale login wall aperto
     hideLoginWall();
-    // Carica dati solo se non ancora fatto per questo utente
+    updateAuthUI(user);
+    // Carica dati solo se non ancora fatto per questo utente in questa sessione
     if(_initAppDone && _sbUser && _sbUser.id === user.id) return;
     await loadFromSupabase();
     return;
