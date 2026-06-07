@@ -1514,7 +1514,6 @@ async function signOut(){
   data = {};
   _initAppDone = false;
   _appReady = false;
-  _loadingData = false;
   showLoginWall();
   try{ await _sb.auth.signOut(); } catch(e){}
 }
@@ -1658,8 +1657,6 @@ async function syncNow(){
 }
 
 // ── AUTH STATE LISTENER ──────────────────────────────────────────────────────
-let _loadingData = false; // guard contro chiamate concorrenti a loadFromSupabase
-
 _sb.auth.onAuthStateChange(async (event, session) => {
   console.log('[Auth] event:', event, session?.user?.email||'—');
   const user = session?.user || null;
@@ -1670,41 +1667,24 @@ _sb.auth.onAuthStateChange(async (event, session) => {
     data = {};
     _initAppDone = false;
     _appReady = false;
-    _loadingData = false;
-    // showLoginWall solo se il modal non è già aperto (signOut() lo chiama già)
     const authOverlay = document.getElementById('m-auth');
-    if(authOverlay && !authOverlay.classList.contains('open')){
-      showLoginWall();
-    }
+    if(authOverlay && !authOverlay.classList.contains('open')) showLoginWall();
     return;
   }
 
-  if(event === 'TOKEN_REFRESHED'){
-    // Solo aggiorna il token, non ricaricare dati
-    if(user) { _sbUser = user; }
+  if(event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED'){
+    if(user) _sbUser = user;
     return;
   }
 
   if(event === 'SIGNED_IN' || event === 'INITIAL_SESSION'){
-    if(user){
-      updateAuthUI(user);
-      hideLoginWall();
-      // Evita chiamate concorrenti
-      if(_loadingData) return;
-      // Se app già pronta e stesso utente, non ricaricare
-      if(_appReady && _sbUser && _sbUser.id === user.id) return;
-      _loadingData = true;
-      await loadFromSupabase();
-      _loadingData = false;
-    } else {
-      // INITIAL_SESSION senza utente = nessuna sessione attiva
-      showLoginWall();
-    }
-    return;
-  }
-
-  if(event === 'USER_UPDATED' && user){
+    if(!user){ showLoginWall(); return; }
+    // Aggiorna sempre utente e UI
     updateAuthUI(user);
+    hideLoginWall();
+    // Carica dati solo se non ancora fatto per questo utente
+    if(_initAppDone && _sbUser && _sbUser.id === user.id) return;
+    await loadFromSupabase();
     return;
   }
 });
