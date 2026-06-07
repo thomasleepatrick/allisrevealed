@@ -1552,8 +1552,9 @@ async function loadFromSupabase(){
     // Verifica sessione fresca prima di procedere
     const {data:sessionData} = await _sb.auth.getSession();
     if(!sessionData?.session){
-      console.warn('[Sync] Nessuna sessione valida, attendo...');
+      console.warn('[Sync] Nessuna sessione valida, avvio app offline');
       setSyncState('error','Sessione non valida');
+      if(!_initAppDone) initApp();
       return;
     }
     const {data:row, error} = await _sb
