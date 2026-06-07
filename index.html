@@ -1549,6 +1549,13 @@ async function loadFromSupabase(){
   if(!_sbUser) return;
   setSyncState('syncing','Caricamento...');
   try{
+    // Verifica sessione fresca prima di procedere
+    const {data:sessionData} = await _sb.auth.getSession();
+    if(!sessionData?.session){
+      console.warn('[Sync] Nessuna sessione valida, attendo...');
+      setSyncState('error','Sessione non valida');
+      return;
+    }
     const {data:row, error} = await _sb
       .from('user_data')
       .select('data')
@@ -1584,6 +1591,13 @@ async function saveToSupabase(){
   if(!_sbUser) return;
   setSyncState('syncing','Salvataggio...');
   try{
+    // Verifica sessione fresca
+    const {data:sessionData} = await _sb.auth.getSession();
+    if(!sessionData?.session){
+      console.warn('[Sync] Nessuna sessione valida per salvataggio');
+      setSyncState('error','Sessione non valida');
+      return;
+    }
     // Prima controlla se esiste già una riga
     const {data:existing, error:selErr} = await _sb
       .from('user_data')
