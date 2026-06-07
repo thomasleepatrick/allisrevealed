@@ -909,6 +909,10 @@ body.is-scrolling .pan-circ-svg{
     </div>
     <div id="auth-msg" class="auth-msg"></div>
     <div class="field-g">
+      <div id="auth-name-wrap" style="display:none">
+        <label class="lbl">Il tuo nome</label>
+        <input class="inp" type="text" id="auth-name" placeholder="Come ti chiami?" maxlength="30" autocomplete="name">
+      </div>
       <div>
         <label class="lbl">Email</label>
         <input class="inp" type="email" id="auth-email" placeholder="la-tua@email.com" autocomplete="email">
@@ -1469,6 +1473,8 @@ function switchAuthTab(tab){
   document.getElementById('tab-register').classList.toggle('active',tab==='register');
   document.getElementById('auth-submit-btn').textContent=tab==='login'?'Accedi':'Registrati';
   document.getElementById('auth-reset-row').style.display=tab==='login'?'block':'none';
+  const nameWrap=document.getElementById('auth-name-wrap');
+  if(nameWrap) nameWrap.style.display=tab==='register'?'block':'none';
   showAuthMsg('','');
 }
 
@@ -1490,7 +1496,11 @@ async function doAuthAction(){
     if(_authTab==='login'){
       res = await _sb.auth.signInWithPassword({email, password:pw});
     } else {
-      res = await _sb.auth.signUp({email, password:pw});
+      const regName=(document.getElementById('auth-name')?.value||'').trim();
+      res = await _sb.auth.signUp({
+        email, password:pw,
+        options:{ data:{ display_name: regName||email.split('@')[0] } }
+      });
     }
     if(res.error) throw res.error;
     if(_authTab==='register' && res.data?.user && !res.data.session){
@@ -1610,20 +1620,16 @@ async function saveToSupabase(){
       setSyncState('error','Errore salvataggio');
       return;
     }
+    const payload = { data: data, updated_at: new Date().toISOString() };
     let error;
     if(existing){
-      // Aggiorna riga esistente
-      ({error} = await _sb.from('user_data').update({
-        data: data,
-        updated_at: new Date().toISOString()
-      }).eq('user_id', _sbUser.id));
+      ({error} = await _sb.from('user_data').update(payload).eq('user_id', _sbUser.id));
     } else {
-      // Inserisce nuova riga
-      ({error} = await _sb.from('user_data').insert({
-        user_id: _sbUser.id,
-        data: data,
-        updated_at: new Date().toISOString()
-      }));
+      ({error} = await _sb.from('user_data').insert({user_id: _sbUser.id, ...payload}));
+      // Se duplicate key (riga già esiste), ritenta con UPDATE
+      if(error && error.code === '23505'){
+        ({error} = await _sb.from('user_data').update(payload).eq('user_id', _sbUser.id));
+      }
     }
     if(error){
       console.error('[Sync] Save error:', error.message, error.code);
@@ -1790,10 +1796,20 @@ function saveProfile(p){
   if(typeof data==='object'){ data['__profile__']=p; }
   try{ localStorage.setItem('sl-profile', JSON.stringify(p)); }catch(e){}
   if(_sbUser){
+    // Salva nome in Supabase user_metadata per persistenza cross-device
+    if(p && p.name){
+      _sb.auth.updateUser({ data: { display_name: p.name } }).catch(()=>{});
+    }
     saveToSupabase();
   } else {
-    // _sbUser non ancora pronto: ritenta tra 1s
-    setTimeout(()=>{ if(_sbUser) saveToSupabase(); }, 1000);
+    setTimeout(()=>{
+      if(_sbUser){
+        if(p && p.name){
+          _sb.auth.updateUser({ data: { display_name: p.name } }).catch(()=>{});
+        }
+        saveToSupabase();
+      }
+    }, 1000);
   }
 }
 
@@ -1907,11 +1923,18 @@ function rProfileHeader(){
 }
 
 function checkProfileOnStartup(){
-  // Migra profilo da localStorage a Supabase se mancante
+  // 1. Migra profilo da localStorage se mancante in data
   const localP = (()=>{ try{ return JSON.parse(localStorage.getItem('sl-profile')||'null'); }catch(e){ return null; } })();
   if(localP && localP.name && !(data && data['__profile__'])){
     data['__profile__'] = localP;
     if(_sbUser) saveToSupabase();
+  }
+  // 2. Recupera nome da Supabase user_metadata se ancora mancante
+  if(!(data && data['__profile__']) && _sbUser){
+    const metaName = _sbUser.user_metadata && _sbUser.user_metadata.display_name;
+    if(metaName){
+      data['__profile__'] = { name: metaName, since: new Date().toISOString().slice(0,10) };
+    }
   }
   const p = getProfile();
   if(!p || !p.name){
